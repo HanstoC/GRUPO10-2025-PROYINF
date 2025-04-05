@@ -9,8 +9,8 @@ Este es el repositorio del grupo 1, cuyos integrantes son:
 * **tutor** : Matias Barrera
 
 ## WIKI
-Puede acceder a la Wiki mediante el siguiente [enlace] (https://github.com/HanstoC/GRUPO01-2025-PROYINF/wiki)
+Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/HanstoC/GRUPO01-2025-PROYINF/wiki)
 
-* [video presentacion cliente] (https://aula.usm.cl/pluginfile.php/6994529/mod_resource/content/1/video1943571039.mp4)
+* [video presentacion cliente](https://aula.usm.cl/pluginfile.php/6994529/mod_resource/content/1/video1943571039.mp4)
 
 
