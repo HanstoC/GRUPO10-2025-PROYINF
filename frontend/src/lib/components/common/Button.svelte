@@ -13,7 +13,12 @@
 	{...props}
 	{..._goto
 		? {
-				href: _goto
+				href: _goto,
+				onclick: (event) => {
+					event.preventDefault();
+					goto(_goto);
+					return false;
+				}
 			}
 		: {}}
 >

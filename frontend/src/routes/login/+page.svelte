@@ -57,6 +57,7 @@
 		flex-direction: row;
 		width: 100%;
 		height: 100%;
+		background: #fff;
 
 		> * {
 			width: 100%;

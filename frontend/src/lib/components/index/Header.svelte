@@ -5,6 +5,7 @@
 	import Vr from '../common/Vr.svelte';
 
 	const AVAILABLE_SECTIONS = {
+		INICIO: ['Inicio', LINKS.HOME],
 		EDITOR_ENSAYOS: ['Editor de Ensayos', LINKS.EDITOR_ENSAYOS],
 		PERFIL: ['Mi Perfil', LINKS.PERFIL],
 		PRACTICAR: ['Practicar', LINKS.PRACTICA],
@@ -21,19 +22,15 @@
 	</div>
 	<actions>
 		{#if Usuario.value}
-			{@const SECTIONS =
-				Usuario.value?.rol === RolUsuario.Profesor
-					? [
-							//
-							AVAILABLE_SECTIONS.EDITOR_ENSAYOS,
-							AVAILABLE_SECTIONS.PERFIL
-						]
-					: [
-							AVAILABLE_SECTIONS.ENSAYOS,
-							AVAILABLE_SECTIONS.PRACTICAR,
-							AVAILABLE_SECTIONS.FORO_INEXISTENTE,
-							AVAILABLE_SECTIONS.PERFIL
-						]}
+			{@const SECTIONS = [
+				//
+				AVAILABLE_SECTIONS.INICIO,
+				...(Usuario.value?.rol === RolUsuario.Profesor
+					? [AVAILABLE_SECTIONS.EDITOR_ENSAYOS]
+					: [AVAILABLE_SECTIONS.ENSAYOS, AVAILABLE_SECTIONS.PRACTICAR]),
+				AVAILABLE_SECTIONS.FORO_INEXISTENTE,
+				AVAILABLE_SECTIONS.PERFIL
+			]}
 			{#each SECTIONS as [section, sectionLink], i (i)}
 				<a href={sectionLink}>{section}</a>
 				{#if i < SECTIONS.length - 1}
