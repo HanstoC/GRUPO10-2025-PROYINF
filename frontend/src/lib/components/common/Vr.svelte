@@ -5,6 +5,6 @@
 		height: 100%;
 		width: 1px;
 		display: block;
-		border: 1px solid black;
+		background: #0004;
 	}
 </style>

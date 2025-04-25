@@ -13,7 +13,4 @@
 	});
 </script>
 
-{#if Usuario.value}
-	<Header />
-{/if}
 {@render children()}

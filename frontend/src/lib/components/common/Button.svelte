@@ -26,6 +26,7 @@
 		background: #000;
 		color: #fff;
 		border-radius: var(--radius-lg);
+		text-align: center;
 
 		&:hover {
 			cursor: pointer;

@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { RolUsuario, Usuario } from '$lib/auth.svelte';
 	import Button from '$lib/components/common/Button.svelte';
+	import Header from '$lib/components/index/Header.svelte';
 	import { LINKS } from '$lib/global/links';
 </script>
 
-<main>
-	<div class="flex flex-col items-center justify-center gap-1">
-		<h1>Bienvenido, {Usuario.value?.nombre || 'usuario'}!</h1>
+<div id="main-index">
+	<Header />
+	<div class="flex h-full w-full flex-col items-center justify-center gap-1">
+		<div class="p-4">
+			<h1>Bienvenido, {Usuario.value?.nombre || 'usuario'}!</h1>
+		</div>
 		{#if Usuario.value?.rol === RolUsuario.Alumno}
 			<Button goto={LINKS.ENSAYOS}>Realizar ensayos</Button>
 			<Button goto={LINKS.PERFIL}>Revisar mi perfil</Button>
@@ -15,16 +19,15 @@
 			<Button goto={LINKS.PERFIL}>Revisar mi perfil</Button>
 		{/if}
 	</div>
-</main>
+</div>
 
 <style>
-	main {
+	#main-index {
+		position: relative;
+		display: flex;
+		flex-direction: column;
 		width: 100%;
 		height: 100%;
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		align-items: center;
 		background: #888;
 	}
 </style>

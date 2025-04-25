@@ -13,7 +13,7 @@
 	};
 </script>
 
-<header>
+<div id="header">
 	<div class="absolute left-4">
 		Barra de navegación específicamente diseñada para {RolUsuario[
 			Usuario.value?.rol ?? RolUsuario.Alumno
@@ -23,7 +23,11 @@
 		{#if Usuario.value}
 			{@const SECTIONS =
 				Usuario.value?.rol === RolUsuario.Profesor
-					? [AVAILABLE_SECTIONS.EDITOR_ENSAYOS, AVAILABLE_SECTIONS.PERFIL]
+					? [
+							//
+							AVAILABLE_SECTIONS.EDITOR_ENSAYOS,
+							AVAILABLE_SECTIONS.PERFIL
+						]
 					: [
 							AVAILABLE_SECTIONS.ENSAYOS,
 							AVAILABLE_SECTIONS.PRACTICAR,
@@ -46,10 +50,10 @@
 	>
 		Cerrar Sesión
 	</Button>
-</header>
+</div>
 
 <style>
-	header {
+	#header {
 		width: 100%;
 		padding: 0.5rem 1rem;
 		display: flex;
@@ -57,6 +61,7 @@
 		justify-content: space-between;
 		align-items: center;
 		gap: 0.2rem;
+		background: #fff;
 	}
 
 	actions {

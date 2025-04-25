@@ -1,4 +1,6 @@
+@import './css/fonts.css';
 @import 'tailwindcss';
+
 @plugin '@tailwindcss/typography';
 
 body {
@@ -6,4 +8,9 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
+}
+
+h1 {
+    font-size: xxx-large;
+    line-height: 1;
 }
