@@ -9,7 +9,6 @@
 		EDITOR_ENSAYOS: ['Editor de Ensayos', LINKS.EDITOR_ENSAYOS],
 		PERFIL: ['Mi Perfil', LINKS.PERFIL],
 		PRACTICAR: ['Practicar', LINKS.PRACTICA],
-		FORO_INEXISTENTE: ['Foro Inexistente', ''],
 		ENSAYOS: [Usuario.value?.rol === RolUsuario.Alumno ? 'Evalúate' : 'Ver Ensayos', LINKS.ENSAYOS]
 	};
 </script>
@@ -28,7 +27,6 @@
 				...(Usuario.value?.rol === RolUsuario.Profesor
 					? [AVAILABLE_SECTIONS.EDITOR_ENSAYOS]
 					: [AVAILABLE_SECTIONS.ENSAYOS, AVAILABLE_SECTIONS.PRACTICAR]),
-				AVAILABLE_SECTIONS.FORO_INEXISTENTE,
 				AVAILABLE_SECTIONS.PERFIL
 			]}
 			{#each SECTIONS as [section, sectionLink], i (i)}

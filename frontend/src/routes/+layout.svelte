@@ -7,12 +7,13 @@
 
 	let { children } = $props();
 
-	$effect(() => {
+	$effect.pre(() => {
 		if (!Usuario.value) return void goto('login');
 		goto('/');
 	});
 </script>
 
+<link rel="preload" href="/login-bg.jpg" as="image" />
 <div id="main-index">
 	{#if Usuario.value}
 		<Header />

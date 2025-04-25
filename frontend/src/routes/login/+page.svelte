@@ -6,9 +6,20 @@
 
 	let rut = $state('');
 	let pwd = $state('');
+	let deltaX = $state(0);
 
 	$effect(() => {
 		if (Usuario.value) return void goto('/');
+	});
+
+	$effect(() => {
+		const onMouseMove = (event: MouseEvent) =>
+			(deltaX = (0.5 - event.clientX / window.innerWidth) * 10);
+
+		document.addEventListener('mousemove', onMouseMove);
+		return () => {
+			document.removeEventListener('mousemove', onMouseMove);
+		};
 	});
 </script>
 
@@ -17,7 +28,12 @@
 		<h1 class="absolute w-1/2 text-center font-bold uppercase opacity-80">
 			Siempre hay luz para tu futuro
 		</h1>
-		<img class="h-full w-auto object-cover object-center" src="/login-bg.jpg" alt="" />
+		<img
+			class="h-full w-auto object-cover"
+			style:object-position={`${50 + deltaX}% 0`}
+			src="/login-bg.jpg"
+			alt=""
+		/>
 	</div>
 	<div class="flex flex-1 flex-col items-center justify-center gap-2">
 		<div class="w-1/4 text-center opacity-50">Bienvenid@. Por favor, inicia sesión.</div>
