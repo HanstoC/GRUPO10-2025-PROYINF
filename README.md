@@ -26,6 +26,7 @@ Antes de comenzar, asegúrate de tener instalado lo siguiente:
 
 - [Node.js](https://nodejs.org/)(última version)
 - [npm](https://www.npmjs.com/) 
+- [Docker](https://docs.docker.com/get-started/get-docker/)
 
 Puedes verificar si los tienes instalados con:
 ```
@@ -35,28 +36,25 @@ npm -v
 
 ## Instalación
 
-Clona el repositorio y entra a la carpeta del proyecto:
+Clona el repositorio:
 ```
 git clone https://github.com/HanstoC/GRUPO01-2025-PROYINF.git
-cd GRUPO01-2025-PROYINF
 ```
-Luego ingresar en la carpeta de frontend
+Luego visualizaras dos carpetas, frontend y backend, para poder levantar todo necesitaras tener abierto docker y ejecutar el siguiente comando
+```
+docker compose up --build
 
 ```
-cd frontend
-```
 
-## Instalación de dependencias:
-```
-npm install
-```
-## Ejecución en modo desarrollo
+## Comandos utiles:
 
-Para iniciar el servidor de desarrollo y ver la aplicación en el navegador:
-```
-npm run dev
-```
-Luego abre tu navegador en http://localhost:5173 o el puerto que indique la terminal.
+- docker compose up Si quieren levantar el proyecto en segundo plano pueden usar:
+- docker compose up -d Para ver el estado de los servicios que están corriendo:
+- docker compose ps Para ver los logs en tiempo real de todos los servicios:
+- docker compose logs -f O de un servicio específico:
+- docker compose logs -f nombre_servicio Para reiniciar un servicio específico:
+- docker compose restart nombre_servicio Para detener todos los contenedores sin eliminar volúmenes:
+- docker compose down
 
 ## Dentro de la página
 Para poder diferenciar entre modo alumno y modo profesor:
