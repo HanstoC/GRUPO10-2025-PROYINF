@@ -1,0 +1,9 @@
+[
+    {
+        "correo":"pepitodirectivo@gmail.com",
+        "nombres" : "Pepito",
+        "rut": "12345678-9",
+        "cargo": "Profesor jefazo",
+        "estamento": "encargado de matemáticas"
+    }
+]

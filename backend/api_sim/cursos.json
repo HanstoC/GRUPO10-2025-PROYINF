@@ -1,0 +1,39 @@
+[
+    {
+        "rbd": "123456",
+        "nombre": "Colegio Ejemplo",
+        "sigla": "CEJ",
+        "genero": "Mixto",
+        "director": "Juan Pérez",
+        "direccion": "Av. Ejemplo 1234",
+        "comuna": "Santiago",
+        "region": "Metropolitana",
+        "vigente": true,
+        "cursos": [
+            {
+                "agno": 2025,
+                "codigo_curso": "123456",
+                "nivel": "3ro Medio",
+                "letra": "A",
+                "cantidad_alumnos": 30,
+                "tipo_ensenanza": "cientifico-humanista",
+                "tipo_nivel": "media",
+                "colegio": "123456",
+                "profesor_jefe": [
+                    {
+                        "rut": "12345678-9",
+                        "nombres": "Ana María",
+                        "paterno": "González",
+                        "materno": "López"
+                    },
+                    {
+                        "rut": "98765432-1",
+                        "nombre": "Luis Fernando",
+                        "paterno": "Pérez",
+                        "materno": "Martínez"
+                    }
+                ]
+            }
+        ]
+    }
+]

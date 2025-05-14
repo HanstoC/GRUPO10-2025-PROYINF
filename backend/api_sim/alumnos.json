@@ -1,0 +1,52 @@
+[
+    {
+        "agno": 2023,
+        "codigo_curso": "123456",
+        "nivel": "1ro Medio",
+        "letra": "A",
+        "cantidad_alumnos": 30,
+        "tipo_ensenanza": "cientifico-humanista",
+        "tipo_nivel": "media",
+        "colegio": "123456",
+        "profesor_jefe": [
+            {
+                "rut": "12345678-9",
+                "nombres": "Ana María",
+                "paterno": "González",
+                "materno": "López"
+            },
+            {
+                "rut": "98765432-1",
+                "nombre": "Luis Fernando",
+                "paterno": "Pérez",
+                "materno": "Martínez"
+            }
+        ],
+        "alumnos": [
+            {
+                "id": 1,
+                "rut": "12345678-9",
+                "nombre": "Juan",
+                "paterno": "Pérez",
+                "materno": "González",
+                "genero": "Masculino",
+                "fecha_nacimiento": "2005-03-15",
+                "matricula": 123456,
+                "nro_lista": 1,
+                "direccion": "Av. Ejemplo 1234",
+                "fecha_inicio_ciclo": "2023-03-01",
+                "fecha_fin_ciclo": "2023-12-31",
+                "situacion_alumno": "Regular",
+                "asistencia": 95.8,
+                "nota_final": 6.5,
+                "email": "pepito@gmail.com",
+                "curso": "1ro Medio A",
+                "colegio": "123456",
+                "estado": "vigente",
+                "agno": 2023,
+                "apoderado": "pepito mama"
+            }
+        ]
+
+    }
+]

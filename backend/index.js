@@ -1,8 +1,12 @@
 const express = require('express');
+const cors = require('cors');
 const pool = require('./db'); // Importar la conexión
+const alumnos = require('./api_sim/alumnos.json'); 
+const docentes= require('./api_sim/docentes.json')
 const app = express();
 const port = 8000;
 
+app.use(cors());
 // Ruta de prueba que guarda un mensaje en la base de datos
 app.get('/save', async (req, res) => {
   try {
@@ -26,6 +30,26 @@ app.get('/messages', async (req, res) => {
   }
 });
 
+app.get('/alumnos', async (req, res) => {
+  try {
+    // console.log(data);
+    res.json(alumnos);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error');
+  }
+});
+
+app.get('/docentes', async (req, res) => {
+  try {
+    // console.log(data);
+    res.json(docentes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error');
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('¡Bienvenido! Usa /save para guardar un mensaje y /messages para verlos.');
 });
@@ -33,3 +57,4 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`App corriendo en http://localhost:${port}`);
 });
+
