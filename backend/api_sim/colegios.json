@@ -1,0 +1,36 @@
+[
+    {
+        "rbd": "123456",
+        "nombre": "Colegio Ejemplo",
+        "siga": "CEJ",
+        "genero": "Mixto",
+        "director": "Juan Pérez",
+        "direccion": "Av. Ejemplo 1234",
+        "comuna": "Santiago",
+        "region": "Metropolitana",
+        "vigente": true
+    },
+    {
+        "rbd": "654321",
+        "nombre": "Colegio Ejemplo 2",
+        "siga": "CEJ2",
+        "genero": "Femenino",
+        "director": "María López",
+        "direccion": "Av. Ejemplo 5678",
+        "comuna": "Valparaíso",
+        "region": "Valparaíso",
+        "vigente": false
+    },
+    {
+        "rbd": "789012",
+        "nombre": "Colegio Ejemplo 3",
+        "siga": "CEJ3",
+        "genero": "Masculino",
+        "director": "Pedro González",
+        "direccion": "Av. Ejemplo 9101",
+        "comuna": "Concepción",
+        "region": "Biobío",
+        "vigente": true
+    }
+
+]
