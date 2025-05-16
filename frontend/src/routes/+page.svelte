@@ -5,15 +5,17 @@
 	import { LINKS } from '$lib/global/links';
 </script>
 
-<div class="flex h-full w-full flex-col items-center justify-center gap-1">
-	<div class="p-4">
-		<h1>Bienvenido, {Usuario.value?.nombre || 'usuario'}!</h1>
+{#if Usuario.value}
+	<div class="flex h-full w-full flex-col items-center justify-center gap-1">
+		<div class="p-4">
+			<h1>Bienvenido, {Usuario.value.nombre}!</h1>
+		</div>
+		{#if Usuario.value?.rol === RolUsuario.Alumno}
+			<Button goto={LINKS.ENSAYOS}>Realizar ensayos</Button>
+			<Button goto={LINKS.PERFIL}>Revisar mi perfil</Button>
+		{:else if Usuario.value?.rol === RolUsuario.Profesor}
+			<Button goto={LINKS.EDITOR_ENSAYOS}>Crear/editar ensayos</Button>
+			<Button goto={LINKS.PERFIL}>Revisar mi perfil</Button>
+		{/if}
 	</div>
-	{#if Usuario.value?.rol === RolUsuario.Alumno}
-		<Button goto={LINKS.ENSAYOS}>Realizar ensayos</Button>
-		<Button goto={LINKS.PERFIL}>Revisar mi perfil</Button>
-	{:else if Usuario.value?.rol === RolUsuario.Profesor}
-		<Button goto={LINKS.EDITOR_ENSAYOS}>Crear/editar ensayos</Button>
-		<Button goto={LINKS.PERFIL}>Revisar mi perfil</Button>
-	{/if}
-</div>
+{/if}

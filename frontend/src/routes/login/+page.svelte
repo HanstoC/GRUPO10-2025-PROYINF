@@ -3,6 +3,7 @@
 	import { RolUsuario, Usuario } from '$lib/auth.svelte';
 	import Button from '$lib/components/common/Button.svelte';
 	import Input from '$lib/components/common/Input.svelte';
+	import RotatingDesc from '$lib/components/login/RotatingDesc.svelte';
 
 	let rut = $state('');
 	let pwd = $state('');
@@ -14,7 +15,7 @@
 
 	$effect(() => {
 		const onMouseMove = (event: MouseEvent) =>
-			(deltaX = (0.5 - event.clientX / window.innerWidth) * 10);
+			(deltaX = (0.5 - event.clientX / window.innerWidth) * 5);
 
 		document.addEventListener('mousemove', onMouseMove);
 		return () => {
@@ -24,12 +25,18 @@
 </script>
 
 <main>
-	<div class="flex-1/3 relative flex flex-col items-center justify-center gap-2">
-		<h1 class="absolute w-1/2 text-center font-bold uppercase opacity-80">
-			Siempre hay luz para tu futuro
-		</h1>
+	<div
+		id="login-alt"
+		class="flex-1/3 pointer-events-none relative flex select-none flex-col items-center justify-center gap-2"
+	>
+		<div class="absolute flex w-1/2 flex-col gap-10 text-center">
+			<h1 class="scale-150 font-extrabold uppercase text-white opacity-80 mix-blend-difference">
+				Siempre hay luz para tu futuro
+			</h1>
+			<RotatingDesc />
+		</div>
 		<img
-			class="h-full w-auto object-cover"
+			class="login-bg h-full w-auto object-cover"
 			style:object-position={`${50 + deltaX}% 0`}
 			src="/login-bg.jpg"
 			alt=""
@@ -39,29 +46,36 @@
 		<div class="w-1/4 text-center opacity-50">Bienvenid@. Por favor, inicia sesión.</div>
 		<form class="flex w-1/2 flex-col gap-1">
 			<div class="flex w-full flex-col gap-1 p-4">
-				<Input type="text" title="Rut" placeholder="Rut" bind:value={rut} />
+				<Input format="rut" type="text" title="Rut" placeholder="Rut" bind:value={rut} />
 				<Input type="password" title="Contraseña" placeholder="Contraseña" bind:value={pwd} />
 			</div>
-			<Button
-				onclick={() => {
-					Usuario.value = {
-						pwd,
-						...(rut === 'profesor'
-							? {
-									imagen: '',
-									rol: RolUsuario.Profesor,
-									nombre: 'Pepe Química'
-								}
-							: {
-									imagen: '',
-									rol: RolUsuario.Alumno,
-									nombre: 'Pepito Alumno'
-								})
-					};
-				}}
-			>
-				Iniciar sesión
-			</Button>
+			<div class="flex w-full flex-col justify-center gap-2">
+				<Button
+					class="w-full"
+					onclick={() => {
+						Usuario.value = {
+							pwd,
+							...(rut === 'profesor'
+								? {
+										imagen: '',
+										rol: RolUsuario.Profesor,
+										nombre: 'Pepe Química'
+									}
+								: {
+										imagen: '',
+										rol: RolUsuario.Alumno,
+										nombre: 'Pepito Alumno'
+									})
+						};
+					}}
+				>
+					Iniciar sesión
+				</Button>
+				<div class="flex w-full flex-col items-center justify-center gap-1">
+					<div class="opacity-50">Si no tienes cuenta</div>
+					<Button variant="alt" class="w-full">Crear cuenta</Button>
+				</div>
+			</div>
 		</form>
 		<p class="absolute bottom-2 opacity-50">Copyright 2025©</p>
 	</div>
@@ -74,6 +88,12 @@
 		width: 100%;
 		height: 100%;
 		background: #fff;
+
+		#login-alt {
+			h1 {
+				font-size: calc(var(--text-4xl) * 2);
+			}
+		}
 
 		> * {
 			width: 100%;
