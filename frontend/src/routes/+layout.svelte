@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import '../app.css';
 	import { Usuario } from '$lib/auth.svelte';
 	import { goto } from '$app/navigation';
 	import Header from '$lib/components/index/Header.svelte';
+	import Loader from '$lib/components/index/Loader.svelte';
+
+	import '../app.css';
+	import 'iconify-icon';
 
 	let { children } = $props();
 
@@ -15,6 +17,7 @@
 
 <link rel="preload" href="/login-bg.jpg" as="image" />
 <div id="main-index">
+	<Loader />
 	{#if Usuario.value}
 		<Header />
 	{/if}

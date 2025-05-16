@@ -8,8 +8,9 @@
 		INICIO: ['Inicio', LINKS.HOME],
 		EDITOR_ENSAYOS: ['Editor de Ensayos', LINKS.EDITOR_ENSAYOS],
 		PERFIL: ['Mi Perfil', LINKS.PERFIL],
-		PRACTICAR: ['Practicar', LINKS.PRACTICA],
-		ENSAYOS: [Usuario.value?.rol === RolUsuario.Alumno ? 'Evalúate' : 'Ver Ensayos', LINKS.ENSAYOS]
+		ENSAYOS: [Usuario.value?.rol === RolUsuario.Alumno ? 'Evalúate' : 'Ver Ensayos', LINKS.ENSAYOS],
+		ARCHIVOS: ['Archivos', LINKS.ARCHIVOS],
+		TEMARIOS: ['Temarios', LINKS.TEMARIOS]
 	};
 </script>
 
@@ -24,9 +25,11 @@
 			{@const SECTIONS = [
 				//
 				AVAILABLE_SECTIONS.INICIO,
+				AVAILABLE_SECTIONS.TEMARIOS,
 				...(Usuario.value?.rol === RolUsuario.Profesor
 					? [AVAILABLE_SECTIONS.EDITOR_ENSAYOS]
-					: [AVAILABLE_SECTIONS.ENSAYOS, AVAILABLE_SECTIONS.PRACTICAR]),
+					: [AVAILABLE_SECTIONS.ENSAYOS]),
+				AVAILABLE_SECTIONS.ARCHIVOS,
 				AVAILABLE_SECTIONS.PERFIL
 			]}
 			{#each SECTIONS as [section, sectionLink], i (i)}

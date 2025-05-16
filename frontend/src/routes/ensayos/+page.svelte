@@ -1,1 +1,5 @@
-Aquí están los ensayos
+<script>
+	import Ensayo from '$lib/components/ensayos/Ensayo.svelte';
+</script>
+
+<Ensayo />

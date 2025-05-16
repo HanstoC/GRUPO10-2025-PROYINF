@@ -4,5 +4,6 @@ export const LINKS = {
 	PERFIL: '/perfil',
 	HOME: '/',
 	LOGIN: '/login',
-	PRACTICA: '/practicar'
+	ARCHIVOS: '/archivos',
+	TEMARIOS: '/temarios'
 };

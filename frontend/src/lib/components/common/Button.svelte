@@ -5,12 +5,15 @@
 	const {
 		children,
 		goto: _goto = '',
+		variant = 'classic',
+		class: _class,
 		...props
-	}: HTMLAnchorAttributes & { goto?: string } = $props();
+	}: HTMLAnchorAttributes & { goto?: string; variant?: 'classic' | 'alt' } = $props();
 </script>
 
 <a
 	{...props}
+	class={`${_class} ${variant}`}
 	{..._goto
 		? {
 				href: _goto,
@@ -35,11 +38,22 @@
 
 		&:hover {
 			cursor: pointer;
-			background: #222;
 		}
 
-		&:active {
-			background: #444;
+		&.alt {
+			background: #0000;
+			border: 1px solid black;
+			color: #000;
+		}
+
+		&.classic {
+			&:hover {
+				background: #222;
+			}
+
+			&:active {
+				background: #444;
+			}
 		}
 	}
 </style>
