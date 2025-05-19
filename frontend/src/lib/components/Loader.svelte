@@ -2,7 +2,7 @@
 	import { Usuario } from '$lib/auth.svelte';
 	import { tick } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { Utils } from '../../../utils/Utils';
+	import { Utils } from '../../utils/Utils';
 
 	let visible = $state(false);
 
@@ -20,6 +20,6 @@
 {#if visible}
 	<div
 		out:fade={{ duration: 200 }}
-		class="absolute left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-white"
+		class="bg-background absolute top-0 left-0 z-[100] flex h-full w-full items-center justify-center"
 	></div>
 {/if}

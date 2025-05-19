@@ -1,21 +1,35 @@
 <script lang="ts">
 	import { RolUsuario, Usuario } from '$lib/auth.svelte';
-	import Button from '$lib/components/common/Button.svelte';
-	import Header from '$lib/components/index/Header.svelte';
-	import { LINKS } from '$lib/global/links';
+	import PageMargin from '$lib/components/common/PageMargin.svelte';
+	import Summary from '$lib/components/ensayos/Summary.svelte';
+	import StudentsResults from '$lib/components/profesor/StudentsResults.svelte';
+	import TeacherSummary from '$lib/components/profesor/TeacherSummary.svelte';
 </script>
 
-{#if Usuario.value}
-	<div class="flex h-full w-full flex-col items-center justify-center gap-1">
-		<div class="p-4">
-			<h1>Bienvenido, {Usuario.value.nombre}!</h1>
-		</div>
-		{#if Usuario.value?.rol === RolUsuario.Alumno}
-			<Button goto={LINKS.ENSAYOS}>Realizar ensayos</Button>
-			<Button goto={LINKS.PERFIL}>Revisar mi perfil</Button>
-		{:else if Usuario.value?.rol === RolUsuario.Profesor}
-			<Button goto={LINKS.EDITOR_ENSAYOS}>Crear/editar ensayos</Button>
-			<Button goto={LINKS.PERFIL}>Revisar mi perfil</Button>
-		{/if}
+{#snippet alumno()}
+	<Summary />
+{/snippet}
+
+{#snippet profesor()}
+	<div class="flex w-full flex-row gap-4">
+		<StudentsResults />
+		<TeacherSummary />
 	</div>
+{/snippet}
+
+{#snippet visualizador()}{/snippet}
+
+{#if Usuario.value}
+	<PageMargin>
+		<div class="mt-10 flex h-full w-full flex-col items-center justify-center gap-4">
+			<div>
+				<h2>Bienvenido, {Usuario.value.nombre}!</h2>
+			</div>
+			{@render {
+				[RolUsuario.Alumno]: alumno,
+				[RolUsuario.Profesor]: profesor,
+				[RolUsuario.Visualizador]: visualizador
+			}[Usuario.value!.rol]()}
+		</div>
+	</PageMargin>
 {/if}

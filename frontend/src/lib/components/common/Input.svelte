@@ -3,82 +3,35 @@
 
 	let {
 		value = $bindable(),
-		title,
 		format = 'none',
+		class: className,
 		...props
 	}: HTMLInputAttributes & {
 		format?: 'none' | 'rut';
 	} = $props();
 
-	interface ProcessFuncInput {
-		value: string;
-		display: string;
-	}
-
-	const process = (node: HTMLInputElement, processFunc: (input: ProcessFuncInput) => void) => {
-		let input: ProcessFuncInput = {
-			value: node.value,
-			display: node.value
-		};
-
-		const updateValue = () => {
-			input.value = node.value;
-			processFunc(input);
-			node.value = input.display;
-		};
-
-		node.addEventListener('input', updateValue);
-		node.addEventListener('paste', updateValue);
-		updateValue();
-
-		return {
-			destroy() {
-				node.removeEventListener('input', updateValue);
-				node.removeEventListener('paste', updateValue);
-			}
-		};
-	};
+	let processFunc: () => any = {
+		none: () => {
+			value = value;
+		},
+		rut: () =>
+			(value = (value as string)
+				.replace(/[^0-9kK]/g, '')
+				.slice(0, 9)
+				.replace(/^(\d{1,3})(\d{3})(\d{3})([\dkK])$/, '$1.$2.$3-$4')
+				.toUpperCase())
+	}[format];
 </script>
 
-<div class="input-container w-full">
-	{#if title}
-		<h4>{title}</h4>
-	{/if}
-	<input
-		use:process={{
-			none: (v: ProcessFuncInput) => void 0,
-			rut: (v: ProcessFuncInput) => {
-				v.value = (v.value.replace(/[^\d]/g, '') ?? '').slice(0, 9);
-				v.display =
-					v.value
-						.match(/(\d{1,2})?(\d{1,3})?(\d{1,3})?(\d)?/)
-						?.slice(1)
-						.filter((s) => s)
-						.map(
-							(s, i, arr) =>
-								(i > 0 ? (arr.length === 4 && i === arr.length - 1 ? '-' : '.') : '') + s
-						)
-						.join('') ?? '';
-			}
-		}[format]}
-		class="w-full"
-		bind:value
-		{...props}
-	/>
-</div>
-
-<style>
-	.input-container {
-		transition: all 50ms ease-out;
-
-		&:focus-within {
-			scale: 1.05;
-		}
-
-		input {
-			border: 1px solid black;
-			padding: var(--radius-md) var(--radius-xl);
-			border-radius: var(--radius-lg);
-		}
-	}
-</style>
+<input
+	class={`border-input placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+	placeholder={(props.placeholder ?? props.type === 'password')
+		? '••••••••••••••••'
+		: format === 'rut'
+			? '12.345.678-9'
+			: undefined}
+	bind:value
+	oninput={processFunc}
+	onpaste={processFunc}
+	{...props}
+/>

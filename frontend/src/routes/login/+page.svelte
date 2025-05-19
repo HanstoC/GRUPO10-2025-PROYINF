@@ -1,13 +1,17 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { RolUsuario, Usuario } from '$lib/auth.svelte';
+	import Database from '$lib/classes/Database';
 	import Button from '$lib/components/common/Button.svelte';
+	import Form from '$lib/components/common/Form';
 	import Input from '$lib/components/common/Input.svelte';
 	import RotatingDesc from '$lib/components/login/RotatingDesc.svelte';
 
 	let rut = $state('');
-	let pwd = $state('');
+	let contraseña = $state('');
 	let deltaX = $state(0);
+	let error = $state('');
+	let loading = $state(false);
 
 	$effect(() => {
 		if (Usuario.value) return void goto('/');
@@ -24,7 +28,7 @@
 	});
 </script>
 
-<main>
+<div class="flex h-full w-full flex-row">
 	<div
 		id="login-alt"
 		class="flex-1/3 pointer-events-none relative flex select-none flex-col items-center justify-center gap-2"
@@ -38,69 +42,47 @@
 		<img
 			class="login-bg h-full w-auto object-cover"
 			style:object-position={`${50 + deltaX}% 0`}
-			src="/login-bg.jpg"
+			src="/login-bg.png"
 			alt=""
 		/>
 	</div>
 	<div class="flex flex-1 flex-col items-center justify-center gap-2">
 		<div class="w-1/4 text-center opacity-50">Bienvenid@. Por favor, inicia sesión.</div>
-		<form class="flex w-1/2 flex-col gap-1">
+		<Form.Root
+			oninput={() => (error = '')}
+			onsubmit={async () => {
+				loading = true;
+				try {
+					await Database.login(rut, contraseña);
+				} catch (err) {
+					error = `${err}`;
+				} finally {
+					loading = false;
+				}
+			}}
+			class="flex w-1/2 flex-col gap-1"
+		>
 			<div class="flex w-full flex-col gap-1 p-4">
-				<Input format="rut" type="text" title="Rut" placeholder="Rut" bind:value={rut} />
-				<Input type="password" title="Contraseña" placeholder="Contraseña" bind:value={pwd} />
+				<Form.Item required>
+					<Form.Label>Rut</Form.Label>
+					<Input format="rut" type="text" bind:value={rut} />
+				</Form.Item>
+				<Form.Item required>
+					<Form.Label>Contraseña</Form.Label>
+					<Input type="password" bind:value={contraseña} />
+				</Form.Item>
 			</div>
-			<div class="flex w-full flex-col justify-center gap-2">
-				<Button
-					class="w-full"
-					onclick={() => {
-						Usuario.value = {
-							pwd,
-							...(rut === 'profesor'
-								? {
-										imagen: '',
-										rol: RolUsuario.Profesor,
-										nombre: 'Pepe Química'
-									}
-								: {
-										imagen: '',
-										rol: RolUsuario.Alumno,
-										nombre: 'Pepito Alumno'
-									})
-						};
-					}}
-				>
-					Iniciar sesión
-				</Button>
-				<div class="flex w-full flex-col items-center justify-center gap-1">
-					<div class="opacity-50">Si no tienes cuenta</div>
-					<Button variant="alt" class="w-full">Crear cuenta</Button>
+			<Form.Error {error} />
+			<Form.Footer>
+				<Form.Submit {loading}>Iniciar sesión</Form.Submit>
+				<div class="flex w-full flex-row items-center justify-center gap-2">
+					<div class="flex-1/2 w-full text-center text-sm opacity-50">
+						Y si aún no tienes cuenta
+					</div>
+					<Button variant="secondary" class="w-full flex-1">Crear cuenta</Button>
 				</div>
-			</div>
-		</form>
+			</Form.Footer>
+		</Form.Root>
 		<p class="absolute bottom-2 opacity-50">Copyright 2025©</p>
 	</div>
-</main>
-
-<style>
-	main {
-		display: flex;
-		flex-direction: row;
-		width: 100%;
-		height: 100%;
-		background: #fff;
-
-		#login-alt {
-			h1 {
-				font-size: calc(var(--text-4xl) * 2);
-			}
-		}
-
-		> * {
-			width: 100%;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-		}
-	}
-</style>
+</div>

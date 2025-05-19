@@ -9,34 +9,18 @@
 		class: _class,
 		...props
 	}: HTMLAttributes<HTMLDivElement> & {
-		size?: 'md' | 'lg';
+		size?: 'sm' | 'md' | 'lg';
 		variant?: 'default' | 'outlined';
 		startIcon?: string;
 	} = $props();
 </script>
 
-<div {...props} class={`card ${_class} ${size} ${variant}`}>
+<div
+	{...props}
+	class={`bg-card text-card-foreground rounded-xl p-4 [&.lg]:p-8 [&.outlined]:border-1 [&.outlined]:border-[#fff8] [&.sm]:p-2 ${_class} ${size} ${variant}`}
+>
 	{#if startIcon}
 		<iconify-icon height="100%" width="auto" class="left-0 h-full" icon={startIcon}></iconify-icon>
 	{/if}
 	{@render children?.()}
 </div>
-
-<style>
-	.card {
-		border-radius: var(--radius-xl);
-		padding: var(--radius-xl);
-		background: #000;
-		margin: var(--radius-sm);
-		color: #fff;
-
-		&.outlined {
-			background: unset;
-			border: 1px solid #fff8;
-		}
-
-		&.lg {
-			padding: var(--radius-3xl);
-		}
-	}
-</style>

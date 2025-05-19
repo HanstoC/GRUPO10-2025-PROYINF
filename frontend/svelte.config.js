@@ -1,11 +1,6 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-
-
-const config = {
-	preprocess: vitePreprocess(),
-	kit: { adapter: adapter() }
-};
+import tailwindcss from '@tailwindcss/vite';
 
 // export default {
 //   plugins: [sveltekit()],
@@ -15,10 +10,11 @@ const config = {
 //   }
 // };
 export default {
+  plugins: [tailwindcss()],
+  preprocess: vitePreprocess(),
   kit: {
     adapter: adapter({
       fallback: 'index.html'  // o el nombre correcto
     })
-  
-}
+  }
 };

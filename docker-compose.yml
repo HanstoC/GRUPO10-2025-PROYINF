@@ -24,9 +24,8 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
-
   postgres_db:
-    image: postgres:15-alpine
+    build: ./db
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
@@ -35,6 +34,5 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-
 volumes:
   postgres_data:

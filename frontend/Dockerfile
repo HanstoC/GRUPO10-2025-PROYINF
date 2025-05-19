@@ -1,15 +1,14 @@
-# Stage 1: Build the Svelte app
-FROM node:latest AS builder
+FROM node:latest AS base
 WORKDIR /app
 
 COPY package*.json ./
 RUN npm install
 COPY . .
 
+FROM base AS builder
 RUN npm run build
 
-# Stage 2: Serve the app with Nginx
-FROM nginx:alpine
+FROM nginx:alpine AS prod
 COPY --from=builder /app/build /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

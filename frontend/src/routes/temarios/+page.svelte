@@ -43,7 +43,7 @@
 	<div id="temario-page" style={`--color: ${bgColor};`}>
 		<div id="current-temario">
 			<div
-				class="absolute -bottom-2 z-10 flex h-full select-none flex-col items-center justify-end"
+				class="absolute -bottom-2 z-10 flex h-full flex-col items-center justify-end select-none"
 			>
 				<h1>
 					{latestData[0]}
@@ -69,7 +69,7 @@
 		<div id="current-temario-info" style={`--color: ${bgColor};`}>
 			<div
 				id="current-temario-mask"
-				class="pointer-events-none fixed left-1/2 top-0 z-10 h-full w-full -translate-x-1/2"
+				class="pointer-events-none fixed top-0 left-1/2 z-10 h-full w-full -translate-x-1/2"
 			></div>
 			<div class="relative min-h-[100vh] w-2/3 flex-none">
 				{#key selectedTemario}
@@ -79,29 +79,34 @@
 						class="absolute flex h-full w-full flex-col items-center justify-start gap-10"
 					>
 						<div class="flex flex-col gap-2 text-justify">
-							<div class="flex w-auto flex-row">
+							<div class="flex w-auto flex-row gap-10">
 								<Card
+									size="sm"
 									class="flex flex-1 items-center gap-2"
 									startIcon="iconoir:chat-bubble-question-solid"
 								>
 									<b>{preguntas} preguntas</b> selección múltiple
 								</Card>
-								<Card class="flex flex-1 items-center gap-2" startIcon="iconoir:clock-solid">
+								<Card
+									size="sm"
+									class="flex flex-1 items-center gap-2"
+									startIcon="iconoir:clock-solid"
+								>
 									<b>{duracion.toFixed(1)} hrs</b> duración.
 								</Card>
 							</div>
 							<p>{descripcion}</p>
 						</div>
-						<div class="max-w-3/4 w-3/4">
+						<div class="flex w-3/4 max-w-3/4 flex-col gap-2">
 							{#each contenidos as contenido}
 								{@const { area, temas } = contenido}
-								<Card size="lg" class="bg-[#0008]!">
+								<Card size="lg" class="bg-background/30! text-foreground!">
 									<h2 class="w-full font-extrabold uppercase">{area}</h2>
 									<div class="flex flex-col gap-4">
 										{#each temas as { titulo, subtemas }}
 											<Tema tema={titulo}>
 												{#each subtemas as subtema}
-													<li class="opacity-75">{subtema}</li>
+													<li>{subtema}</li>
 												{/each}
 											</Tema>
 										{/each}
@@ -115,14 +120,6 @@
 			</div>
 		</div>
 	</div>
-	<!-- <div class="relative flex w-full flex-col items-center justify-center">
-		{#each entries as [año, prueba]}
-			<Card class="temario-box">
-				<h1>{año}</h1>
-				<h2>{prueba}</h2>
-			</Card>
-		{/each}
-	</div> -->
 {/if}
 
 <style>
@@ -206,16 +203,5 @@
 			overflow-y: auto;
 			background-color: var(--color);
 		}
-	}
-
-	:global(.temario-box) {
-		display: flex;
-		flex-direction: column;
-		width: 50%;
-		height: 1px;
-		justify-content: center;
-		align-items: center;
-		text-align: center;
-		border: 1px solid black;
 	}
 </style>

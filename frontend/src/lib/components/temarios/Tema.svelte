@@ -5,10 +5,10 @@
 </script>
 
 <div class="w-full">
-	<h3 class="uppercase">
+	<h3 class="font-medium uppercase">
 		{tema.replace(/(?:\:|\.)$/g, '')}
 	</h3>
-	<div class="ml-10">
+	<div class="ml-4">
 		{@render children?.()}
 	</div>
 </div>

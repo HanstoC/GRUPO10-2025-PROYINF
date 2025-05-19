@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const pool = require('./db'); // Importar la conexión
-const alumnos = require('./api_sim/alumnos.json'); 
-const docentes= require('./api_sim/docentes.json')
+const alumnos = require('./api_sim/alumnos.json');
+const docentes = require('./api_sim/docentes.json')
 const app = express();
 const port = 8000;
 
@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 (async () => {
-await pool.query('SET search_path TO "Public"');
+  await pool.query('SET search_path TO "Public"');
 })();
 
 
@@ -56,7 +56,6 @@ app.get('/docentes', async (req, res) => {
     res.status(500).send('Error');
   }
 });
-
 
 app.post('/preguntas', async (req, res) => {
   const client = await pool.connect();
@@ -112,7 +111,7 @@ app.get('/topicos/:idAsignatura', async (req, res) => {
   await pool.query('SET search_path TO "Public"');
 
   if (isNaN(idAsignatura)) {
-  return res.status(400).json({ error: 'ID de asignatura inválido' });
+    return res.status(400).json({ error: 'ID de asignatura inválido' });
   }
   try {
     const result = await pool.query(
@@ -125,7 +124,6 @@ app.get('/topicos/:idAsignatura', async (req, res) => {
     res.status(500).send('Error al obtener los tópicos');
   }
 });
-
 
 app.get('/asignatura/nombre/:nombre', async (req, res) => {
   const { nombre } = req.params;
@@ -145,8 +143,32 @@ app.get('/asignatura/nombre/:nombre', async (req, res) => {
     res.status(500).send('Error en el servidor');
   }
 });
+
 app.get('/', (req, res) => {
-  res.send('¡Bienvenido! si ves este mensaje es que back se levanto de buenas.');
+  res.send('Backend corriendo');
+});
+
+app.post('/login', async (req, res) => {
+  const { rut, contraseña } = req.body;
+
+  if (!rut || !contraseña)
+    return res.status(400).json({ error: 'Rut y contraseña son requeridos' });
+
+  try {
+    const result = await pool.query(
+      'SELECT * FROM USUARIO WHERE rut = $1 AND contraseña = $2',
+      [rut, contraseña]
+    );
+
+    if (result.rows.length > 0) {
+      res.status(200).json({ message: 'Inicio de sesión exitoso', user: result.rows[0] });
+    } else {
+      res.status(401).json({ error: 'Credenciales inválidas' });
+    }
+  } catch (err) {
+    console.error('Error al iniciar sesión:', err);
+    res.status(500).send('Error al intentar iniciar sesión');
+  }
 });
 
 app.listen(port, () => {

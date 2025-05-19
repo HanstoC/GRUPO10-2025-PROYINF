@@ -1,14 +1,15 @@
 export interface Usuario {
-	nombre: string;
-	pwd: string;
-	imagen: string;
+	nombre?: string;
+	imagen?: string;
 	rol: RolUsuario;
+	correo: string;
+	rut: string;
 }
 
 export enum RolUsuario {
-	Alumno,
-	Profesor,
-	Visualizador
+	Alumno = 'alumno',
+	Profesor = 'profesor',
+	Visualizador = 'visualizador'
 }
 
 export const Usuario: { value: Usuario | null } = $state({

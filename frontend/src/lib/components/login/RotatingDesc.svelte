@@ -38,12 +38,12 @@
 </script>
 
 {#if mounted}
-	<div class="relative h-8 w-full">
+	<div class="text-md text-shadow-md relative h-8 w-full">
 		{#key currentText}
 			<h3
 				in:fly={{ delay: 500, x: 20 }}
 				out:fly={{ x: -20 }}
-				class="absolute left-0 w-full italic text-white"
+				class="absolute left-0 w-full italic text-black"
 			>
 				{TEXTS[currentText]}
 			</h3>
