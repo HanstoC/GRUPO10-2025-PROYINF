@@ -38,7 +38,7 @@
 </script>
 
 {#if mounted}
-	<div class="text-md text-shadow-md relative h-8 w-full">
+	<div class="text-md relative h-8 w-full">
 		{#key currentText}
 			<h3
 				in:fly={{ delay: 500, x: 20 }}

@@ -4,6 +4,7 @@
 	import Summary from '$lib/components/ensayos/Summary.svelte';
 	import StudentsResults from '$lib/components/profesor/StudentsResults.svelte';
 	import TeacherSummary from '$lib/components/profesor/TeacherSummary.svelte';
+	import SearchAlumno from '$lib/components/utils/SearchAlumno.svelte';
 </script>
 
 {#snippet alumno()}
@@ -17,7 +18,9 @@
 	</div>
 {/snippet}
 
-{#snippet visualizador()}{/snippet}
+{#snippet visualizador()}
+	<SearchAlumno />
+{/snippet}
 
 {#if Usuario.value}
 	<PageMargin>
