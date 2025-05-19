@@ -46,6 +46,35 @@ docker compose up --build
 
 ```
 
+si ya existen elementos es necesario volver a iniciarla, para poder bajar los volumenes se debe utilizar:
+```
+docker compose down --volumes
+
+```
+## Dentro de la página
+
+Dento del proyecto, en la carpeta db se encuentra la información de los usuarios creados a modo de prueba de igual manera las credenciales para cada uno son:
+
+- Profesor:
+  ```
+  rut: 11223344-5
+  contraseña: profesor123
+
+  ```
+- Alumno:
+  ```
+  rut: 55667788-9
+  contraseña: alumnocomun
+
+  ```
+
+- Visualizador de reportes:
+  ```
+  rut: 22334455-6
+  contraseña: visualizadorcomun
+
+  ```
+
 ## Comandos utiles:
 
 - docker compose up Si quieren levantar el proyecto en segundo plano pueden usar:
@@ -56,7 +85,4 @@ docker compose up --build
 - docker compose restart nombre_servicio Para detener todos los contenedores sin eliminar volúmenes:
 - docker compose down
 
-## Dentro de la página
-Para poder diferenciar entre modo alumno y modo profesor:
-- modo alumno :  ingresar con login vacío.
-- modo profesor : en rut ingresar con palabra "profesor".
+
