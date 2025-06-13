@@ -37,6 +37,7 @@
 		size = 'default',
 		loading = false,
 		class: _class,
+		disabled = false,
 		...props
 	}: HTMLAnchorAttributes & {
 		goto?: string;
@@ -45,29 +46,13 @@
 		loading?: boolean;
 		startIcon?: any;
 		class?: string;
-	}
-
-	export let href: string | undefined = undefined;
-	export let variant: keyof typeof BUTTONS_VARIANTS.variants.variant = 'default';
-	export let size: keyof typeof BUTTONS_VARIANTS.variants.size = 'default';
-	export let loading = false;
-	export let startIcon: any = undefined;
-	let className = '';
-	export { className as class };
-
-	function handleClick(event: MouseEvent) {
-		if (href) {
-			event.preventDefault();
-			goto(href);
-		}
-	}
-
-	$: buttonClass = `${buttonVariants({ variant, size })} ${loading ? 'pointer-events-none opacity-75' : ''} ${className} ${variant}`;
+		disabled?: boolean;
+	} = $props();
 </script>
 
 <a
 	{...props}
-	class={`button select-none ${buttonVariants({ variant, size })} ${_disabled ? 'pointer-events-none opacity-75' : ''} ${_class} ${variant}`}
+	class={`button select-none ${buttonVariants({ variant, size })} ${disabled ? 'pointer-events-none opacity-75' : ''} ${_class} ${variant}`}
 	{..._goto
 		? {
 				href: _goto,

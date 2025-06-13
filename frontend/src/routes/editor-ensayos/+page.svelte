@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { API } from '$lib/global/api';
 	import { Usuario } from '$lib/auth.svelte';
-	import Button from '$lib/components/common/Button.svelte';
 	import Card from '$lib/components/common/Card.svelte';
 	import PageMargin from '$lib/components/common/PageMargin.svelte';
+	import Form from '$lib/components/common/Form';
+	import Input from '$lib/components/common/Input.svelte';
 
 	let ensayos = $state([]);
 	let cargando = $state(true);

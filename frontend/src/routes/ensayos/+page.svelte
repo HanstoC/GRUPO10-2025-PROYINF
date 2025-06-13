@@ -11,6 +11,8 @@
 	import { LINKS } from '$lib/global/links';
 	import { page } from '$app/state';
 	import { onMount } from 'svelte';
+	import { RolUsuario, Usuario } from '$lib/auth.svelte';
+	import Button from '$lib/components/common/Button.svelte';
 
 	interface URLParams {
 		q: string;
@@ -54,6 +56,11 @@
 </script>
 
 <PageMargin>
+	{#if Usuario.value?.rol === RolUsuario.Profesor}
+		<Card class="w-full">
+			<Button goto={LINKS.EDITOR_ENSAYOS}>Crear ensayo</Button>
+		</Card>
+	{/if}
 	<Card class="w-full">
 		<div class="flex flex-col gap-2">
 			<Form.Root class="w-fit">
@@ -64,7 +71,7 @@
 			<SearchBar
 				bind:value={query}
 				placeholder="Buscar en título, descripción, autores..."
-				onpress={search}
+				onclick={search}
 			/>
 		</div>
 	</Card>

@@ -6,14 +6,14 @@
 
 	let {
 		value = $bindable(),
-		onpress,
+		onsearch,
 		...props
-	}: HTMLAttributes<HTMLInputElement> & { value?: string; onpress?: () => any } = $props();
+	}: HTMLAttributes<HTMLInputElement> & { value?: string; onsearch?: () => any } = $props();
 </script>
 
 <div class="flex w-full flex-row">
 	<Input bind:value {...props} class="w-full rounded-r-none" />
-	<Button onclick={onpress} class="w-fit rounded-l-none" variant="outlined"
+	<Button onclick={onsearch} class="w-fit rounded-l-none" variant="outlined"
 		><IconoirSearch class="mr-2" /> Buscar</Button
 	>
 </div>

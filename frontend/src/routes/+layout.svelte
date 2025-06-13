@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Usuario } from '$lib/auth.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Loader from '$lib/components/Loader.svelte';
 	import Database from '$lib/classes/Database';
@@ -9,7 +8,6 @@
 	import 'iconify-icon';
 
 	import { page } from '$app/state';
-	import Database from '$lib/classes/Database';
 	import { LINKS } from '$lib/global/links';
 
 	let { children } = $props();

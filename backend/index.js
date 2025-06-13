@@ -2,10 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const { Pool } = require('pg');
 
-const pool = require('./db');
 const alumnos = require('./api_sim/alumnos.json');
-const docentes = require('./api_sim/docentes.json')
+const docentes = require('./api_sim/docentes.json');
 
 const app = express();
 const port = 8000;
@@ -56,7 +56,7 @@ app.get('/asignaturas', necesitaAuth, async (req, res) => {
   }
 });
 
-app.post('/asignaturas', async (req, res) => {
+app.post('/asignaturas', necesitaAuth, async (req, res) => {
   const client = await pool.connect();
   try {
     const { nombre } = req.body;
@@ -234,23 +234,11 @@ app.post('/login', async (req, res) => {
       res.status(401).json({ error: 'Credenciales inválidas' });
     }
   } catch (err) {
-    await cliente.query('ROLLBACK');
     console.error('Error al actualizar ensayo:', err);
     res.status(500).send('Error al actualizar el ensayo');
-  } finally {
-    cliente.release();
   }
 });
 
-app.get('/logout', (req, res) => {
-  req.session.destroy(err => {
-    if (err)
-      return res.status(500).json({ error: 'Error al cerrar sesión' });
-    res.clearCookie('connect.sid');
-    res.status(200).json({ message: 'Sesión cerrada correctamente' });
-  });
-});
-
 app.get("/check-session", necesitaAuth, (req, res) => {
   res.status(200).json({
     authenticated: true,
@@ -264,13 +252,6 @@ app.get('/logout', (req, res) => {
       return res.status(500).json({ error: 'Error al cerrar sesión' });
     res.clearCookie('connect.sid');
     res.status(200).json({ message: 'Sesión cerrada correctamente' });
-  });
-});
-
-app.get("/check-session", necesitaAuth, (req, res) => {
-  res.status(200).json({
-    authenticated: true,
-    user: req.session.user
   });
 });
 
