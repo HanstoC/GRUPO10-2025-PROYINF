@@ -1,10 +1,8 @@
-<vr></vr>
+<script lang="ts">
+	import type { HTMLAttributes } from 'svelte/elements';
 
-<style>
-	:global(vr) {
-		height: 100%;
-		width: 1px;
-		display: block;
-		background: #0004;
-	}
-</style>
+	let { class: _class, ...props }: HTMLAttributes<HTMLDivElement> = $props();
+</script>
+
+<!-- svelte-ignore element_invalid_self_closing_tag -->
+<div class={`bg-border h-full w-px ${_class}`} {...props} />

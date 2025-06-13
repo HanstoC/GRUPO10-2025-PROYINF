@@ -1,38 +1,41 @@
 <script lang="ts">
-	import { RolUsuario, Usuario } from '$lib/auth.svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+	import { NombreUsuario, RolUsuario, Usuario } from '$lib/auth.svelte';
+	import Database from '$lib/classes/Database';
 	import PageMargin from '$lib/components/common/PageMargin.svelte';
-	import Summary from '$lib/components/ensayos/Summary.svelte';
 	import StudentsResults from '$lib/components/profesor/StudentsResults.svelte';
 	import TeacherSummary from '$lib/components/profesor/TeacherSummary.svelte';
 	import SearchAlumno from '$lib/components/utils/SearchAlumno.svelte';
+	import { LINKS } from '$lib/global/links';
+
+	$effect(() => {
+		if (page.url.hash.match(/logout/gi)) Database.logout().then(() => goto(LINKS.LOGIN));
+	});
 </script>
 
-{#snippet alumno()}
-	<Summary />
-{/snippet}
-
-{#snippet profesor()}
-	<div class="flex w-full flex-row gap-4">
-		<StudentsResults />
-		<TeacherSummary />
-	</div>
-{/snippet}
-
-{#snippet visualizador()}
-	<SearchAlumno />
-{/snippet}
-
 {#if Usuario.value}
-	<PageMargin>
-		<div class="mt-10 flex h-full w-full flex-col items-center justify-center gap-4">
-			<div>
-				<h2>Bienvenido, {Usuario.value.nombre}!</h2>
-			</div>
-			{@render {
-				[RolUsuario.Alumno]: alumno,
-				[RolUsuario.Profesor]: profesor,
-				[RolUsuario.Visualizador]: visualizador
-			}[Usuario.value!.rol]()}
+	{#snippet alumno()}{/snippet}
+
+	{#snippet profesor()}
+		<div class="flex w-full flex-row gap-4">
+			<StudentsResults />
+			<TeacherSummary />
 		</div>
+	{/snippet}
+
+	{#snippet visualizador()}
+		<SearchAlumno />
+	{/snippet}
+
+	<PageMargin>
+		<div>
+			<h2>Bienvenido, {NombreUsuario}!</h2>
+		</div>
+		{@render {
+			[RolUsuario.Alumno]: alumno,
+			[RolUsuario.Profesor]: profesor,
+			[RolUsuario.Visualizador]: visualizador
+		}[Usuario.value!.rol]()}
 	</PageMargin>
 {/if}

@@ -1,67 +1,47 @@
 <script lang="ts">
 	import Card from '$lib/components/common/Card.svelte';
 	import Tema from '$lib/components/temarios/Tema.svelte';
+	import { LINKS } from '$lib/global/links';
+	import EnumHelper from '$lib/helpers/EnumHelper';
 	import _ from 'lodash';
 	import { fly } from 'svelte/transition';
 
-	const COLORS: ((input: string) => string | null)[] = [
-		(i) => (i.match(/\blectora\b/gi) ? '#b31530' : null),
-		(i) => (i.match(/\bM2\b/g) ? '#362782' : null),
-		(i) => (i.match(/\bmatem.tica\b/gi) ? '#1464b5' : null),
-		(i) => (i.match(/\bhistoria\b/gi) ? '#cf5615' : null),
-		(i) => (i.match(/\bciencias?\b/gi) ? '#7b1da3' : null),
-		(i) => '#222'
-	];
-	let TEMARIOS_JSON: any | null = $state(null);
-
-	let [latestData, ...dataEntries] = $derived(Object.entries(TEMARIOS_JSON ?? {}).reverse());
-	let temarios = $derived(
-		//@ts-ignore
-		Object.entries(latestData[1]) //
-			.filter(([what, _]) => what.match(/\bregular\b/gi))
-	);
-
-	let selectedTemario = $state(0);
-	let bgColor = $derived.by(() => {
-		for (const fn of COLORS) {
-			let color = fn(temarios[selectedTemario][0]);
-			if (color) return color;
-		}
-
-		return '';
-	});
-
+	let selectedTemario = $state(+(localStorage.getItem('selected-temario') ?? 0));
 	$effect(() => {
-		(async () => {
-			TEMARIOS_JSON = await fetch('/data/temario.json').then((r) => r.json());
-		})();
+		localStorage.setItem('selected-temario', `${selectedTemario}`);
 	});
 </script>
 
-{#if TEMARIOS_JSON}
+{#await fetch(LINKS.FILE_TEMARIOS).then((r) => r.json()) then json}
+	{@const [latestData, ...dataEntries] = Object.entries(json ?? {}).reverse()}
+	{@const temarios = Object.entries(latestData[1]) //
+		.filter(([what, _]) => what.match(/\bregular\b/gi))}
+	{@const bgColor = EnumHelper.colorsAsignatura(temarios[selectedTemario][0])}
 	{@const { titulo, contenidos, descripcion, duracion, preguntas }: any = temarios[selectedTemario][1]}
-	<div id="temario-page" style={`--color: ${bgColor};`}>
+	<div id="temario-page" class="**:transition-all! **:duration-500!" style={`--color: ${bgColor};`}>
 		<div id="current-temario">
-			<div
-				class="absolute -bottom-2 z-10 flex h-full flex-col items-center justify-end select-none"
-			>
-				<h1>
-					{latestData[0]}
-				</h1>
-			</div>
-			<div class="z-10 flex w-full flex-row items-center justify-start px-10">
+			<div class="z-10 flex h-full w-full flex-row items-center justify-start px-10">
 				{#each temarios as [what, _], i}
 					{@const isSelected = selectedTemario === i}
 					<button
 						onclick={(_) => (selectedTemario = i)}
-						class={`relative flex h-full flex-1 flex-col items-center justify-center text-center ${isSelected ? 'selected' : 'cursor-pointer'}`}
+						class={`relative flex h-full flex-1 flex-col items-center justify-center text-center font-extralight ${isSelected ? 'font-extrabold! text-white' : 'group cursor-pointer text-white/70 hover:text-white'} duration-100!`}
 					>
-						<h2 class="uppercase">
+						<p class="text-3xl uppercase">
 							{what
 								.replace(/Temario de la PAES \w+(?: \w+)? de/gi, '')
 								.replace(/\.$/gi, '')
 								.trim()}
-						</h2>
+						</p>
+						{#if isSelected}
+							<div
+								transition:fly={{ y: 20 }}
+								class="pointer-events-none absolute bottom-0 h-4 w-full bg-white"
+							></div>
+						{/if}
+						<div
+							class="absolute bottom-0 left-0 h-full w-full bg-white/20 opacity-0 group-hover:opacity-100"
+						></div>
 					</button>
 				{/each}
 			</div>
@@ -69,7 +49,7 @@
 		<div id="current-temario-info" style={`--color: ${bgColor};`}>
 			<div
 				id="current-temario-mask"
-				class="pointer-events-none fixed top-0 left-1/2 z-10 h-full w-full -translate-x-1/2"
+				class="pointer-events-none fixed left-1/2 top-0 z-10 h-full w-full -translate-x-1/2"
 			></div>
 			<div class="relative min-h-[100vh] w-2/3 flex-none">
 				{#key selectedTemario}
@@ -97,10 +77,10 @@
 							</div>
 							<p>{descripcion}</p>
 						</div>
-						<div class="flex w-3/4 max-w-3/4 flex-col gap-2">
+						<div class="max-w-3/4 flex w-3/4 flex-col gap-2 pb-40">
 							{#each contenidos as contenido}
 								{@const { area, temas } = contenido}
-								<Card size="lg" class="bg-background/30! text-foreground!">
+								<Card size="lg" class="bg-background/30! text-foreground! border-none">
 									<h2 class="w-full font-extrabold uppercase">{area}</h2>
 									<div class="flex flex-col gap-4">
 										{#each temas as { titulo, subtemas }}
@@ -113,14 +93,13 @@
 									</div>
 								</Card>
 							{/each}
-							<div class="h-40"></div>
 						</div>
 					</div>
 				{/key}
 			</div>
 		</div>
 	</div>
-{/if}
+{/await}
 
 <style>
 	#temario-page {
@@ -133,10 +112,6 @@
 		max-height: 100%;
 		overflow-y: hidden;
 
-		* {
-			transition: all 0.5s ease-out;
-		}
-
 		#current-temario {
 			position: relative;
 			width: 100%;
@@ -147,33 +122,6 @@
 			justify-content: space-evenly;
 			align-items: center;
 			overflow: hidden;
-
-			button {
-				* {
-					transition-duration: 0.1s;
-					transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
-				}
-
-				&:not(.selected):hover {
-					scale: 1.1;
-				}
-
-				&.selected h2 {
-					scale: 1.2;
-					font-weight: bolder;
-					text-shadow:
-						0 0 10px black,
-						0 0 1rem black;
-				}
-
-				h2 {
-					scale: 0.9;
-				}
-
-				&:not(.selected) {
-					opacity: 0.75;
-				}
-			}
 
 			h1 {
 				transition-property: color;

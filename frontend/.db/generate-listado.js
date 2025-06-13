@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 import { load } from 'cheerio';
 import { readFile, writeFile } from 'fs/promises';
 import { GoogleGenAI, Type } from '@google/genai';
-import { inspect } from 'util';
 
 Array.range = (start, end) =>
 	!end
@@ -22,7 +21,7 @@ async function tryExecute(tries, what, delay) {
 }
 
 const ai = new GoogleGenAI({
-	apiKey: 'AIzaSyCfuePIu5AQ3HbpQgUwaYC3ay2Ryi5J3Aw'
+	apiKey: process.env.GEN_API_KEY
 });
 let results;
 

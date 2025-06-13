@@ -43,6 +43,7 @@
 	"dependencies": {
 		"@google/genai": "^0.10.0",
 		"@tailwindcss/postcss": "^4.1.7",
+		"bits-ui": "^1.5.3",
 		"cheerio": "^1.0.0",
 		"iconify-icon": "^2.3.0",
 		"lodash": "^4.17.21",

@@ -26,7 +26,7 @@
 
 	$effect(() => {
 		const interval = setInterval(() => {
-			currentText = (currentText + 1) % TEXTS.length;
+			if (document.hasFocus()) currentText = (currentText + 1) % TEXTS.length;
 		}, 3000);
 
 		return () => {
@@ -38,15 +38,15 @@
 </script>
 
 {#if mounted}
-	<div class="text-md relative h-8 w-full">
+	<div class="relative h-8 w-full">
 		{#key currentText}
-			<h3
+			<p
 				in:fly={{ delay: 500, x: 20 }}
 				out:fly={{ x: -20 }}
-				class="absolute left-0 w-full italic text-black"
+				class="absolute left-0 w-full font-medium text-white italic sm:text-lg xl:text-xl"
 			>
 				{TEXTS[currentText]}
-			</h3>
+			</p>
 		{/key}
 	</div>
 {/if}

@@ -1,14 +1,37 @@
 const express = require('express');
 const cors = require('cors');
-const pool = require('./db'); // Importar la conexión
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+
+const pool = require('./db');
 const alumnos = require('./api_sim/alumnos.json');
 const docentes = require('./api_sim/docentes.json')
+
 const app = express();
 const port = 8000;
 
+function necesitaAuth(req, res, next) {
+  if (req.session && req.session.user)
+    return next();
+  else
+    return res.status(401).json({ error: 'No autorizado' });
+}
 
-app.use(cors());
-
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+app.use(cookieParser());
+app.use(session({
+  secret: process.env.SESSION_SECRET || "secreto-sesión-no-tan-secreto",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: false,
+    httpOnly: true,
+    maxAge: 86400000, // 1 día en milisegundos
+  }
+}));
 app.use(express.json());
 
 (async () => {
@@ -16,7 +39,7 @@ app.use(express.json());
 })();
 
 
-app.get('/asignaturas', async (req, res) => {
+app.get('/asignaturas', necesitaAuth, async (req, res) => {
   try {
     const asignaturas = await pool.query('SELECT * FROM "ASIGNATURA"');
     res.json(asignaturas.rows);
@@ -26,7 +49,7 @@ app.get('/asignaturas', async (req, res) => {
   }
 });
 
-app.get('/ensayos', async (req, res) => {
+app.get('/ensayos', necesitaAuth, async (req, res) => {
   try {
     await pool.query('SET search_path TO "Public"');
     const asignaturas = await pool.query('SELECT * FROM "ENSAYO"');
@@ -37,7 +60,7 @@ app.get('/ensayos', async (req, res) => {
   }
 });
 
-app.get('/alumnos', async (req, res) => {
+app.get('/alumnos', necesitaAuth, async (req, res) => {
   try {
     // console.log(data);
     res.json(alumnos);
@@ -47,7 +70,7 @@ app.get('/alumnos', async (req, res) => {
   }
 });
 
-app.get('/docentes', async (req, res) => {
+app.get('/docentes', necesitaAuth, async (req, res) => {
   try {
     // console.log(data);
     res.json(docentes);
@@ -57,7 +80,7 @@ app.get('/docentes', async (req, res) => {
   }
 });
 
-app.post('/preguntas', async (req, res) => {
+app.post('/preguntas', necesitaAuth, async (req, res) => {
   const client = await pool.connect();
   await pool.query('SET search_path TO "Public"');
 
@@ -105,7 +128,7 @@ app.post('/preguntas', async (req, res) => {
   }
 });
 
-app.get('/topicos/:idAsignatura', async (req, res) => {
+app.get('/topicos/:idAsignatura', necesitaAuth, async (req, res) => {
   const idAsignatura = parseInt(req.params.idAsignatura, 10);
   console.log(idAsignatura)
   await pool.query('SET search_path TO "Public"');
@@ -125,7 +148,7 @@ app.get('/topicos/:idAsignatura', async (req, res) => {
   }
 });
 
-app.get('/asignatura/nombre/:nombre', async (req, res) => {
+app.get('/asignatura/nombre/:nombre', necesitaAuth, async (req, res) => {
   const { nombre } = req.params;
   try {
     const result = await pool.query(
@@ -161,6 +184,13 @@ app.post('/login', async (req, res) => {
     );
 
     if (result.rows.length > 0) {
+      const { id, rut, tipo } = result.rows[0]
+      req.session.user = {
+        id,
+        rut,
+        tipo
+      };
+
       res.status(200).json({ message: 'Inicio de sesión exitoso', user: result.rows[0] });
     } else {
       res.status(401).json({ error: 'Credenciales inválidas' });
@@ -169,6 +199,22 @@ app.post('/login', async (req, res) => {
     console.error('Error al iniciar sesión:', err);
     res.status(500).send('Error al intentar iniciar sesión');
   }
+});
+
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err)
+      return res.status(500).json({ error: 'Error al cerrar sesión' });
+    res.clearCookie('connect.sid');
+    res.status(200).json({ message: 'Sesión cerrada correctamente' });
+  });
+});
+
+app.get("/check-session", necesitaAuth, (req, res) => {
+  res.status(200).json({
+    authenticated: true,
+    user: req.session.user
+  });
 });
 
 app.listen(port, () => {

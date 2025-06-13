@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { tv } from 'tailwind-variants';
 	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import LoadingIndicator from './utils/LoadingIndicator.svelte';
 
 	const BUTTONS_VARIANTS = {
 		base: 'cursor-pointer focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50',
@@ -13,7 +14,7 @@
 					'border-input bg-background hover:bg-accent hover:text-accent-foreground border shadow-sm',
 				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm',
 				ghost: 'hover:bg-accent hover:text-accent-foreground',
-				link: 'text-primary underline-offset-4 hover:underline'
+				link: 'text-foreground/70 hover:text-accent-foreground hover:underline'
 			},
 			size: {
 				default: 'h-9 px-4 py-2',
@@ -29,7 +30,6 @@
 	} as const;
 
 	const buttonVariants = tv(BUTTONS_VARIANTS);
-
 	const {
 		children,
 		goto: _goto = '',
@@ -50,7 +50,7 @@
 
 <a
 	{...props}
-	class={`button ${buttonVariants({ variant, size })} ${_disabled ? 'pointer-events-none opacity-75' : ''} ${_class} ${variant}`}
+	class={`button select-none ${buttonVariants({ variant, size })} ${_disabled ? 'pointer-events-none opacity-75' : ''} ${_class} ${variant}`}
 	{..._goto
 		? {
 				href: _goto,
@@ -63,7 +63,7 @@
 		: {}}
 >
 	{#if loading}
-		Cargando...
+		<LoadingIndicator />
 	{:else}
 		{@render children?.()}
 	{/if}

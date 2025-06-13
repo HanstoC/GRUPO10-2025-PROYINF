@@ -1,8 +1,8 @@
+import { browser } from "$app/environment";
+import { STORAGE } from "./global/storage";
+
 export interface Usuario {
-	nombre?: string;
-	imagen?: string;
 	rol: RolUsuario;
-	correo: string;
 	rut: string;
 }
 
@@ -12,6 +12,7 @@ export enum RolUsuario {
 	Visualizador = 'visualizador'
 }
 
+export const NombreUsuario = browser ? (localStorage?.getItem(STORAGE.NOMBRE_USUARIO) ?? 'Invitado') : ''
 export const Usuario: { value: Usuario | null } = $state({
 	value: null
 });

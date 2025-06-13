@@ -1,57 +1,75 @@
 <script lang="ts">
-	import { page } from '$app/state';
-	import { RolUsuario, Usuario } from '$lib/auth.svelte';
+	import { goto } from '$app/navigation';
+	import { NombreUsuario, RolUsuario, Usuario } from '$lib/auth.svelte';
 	import { LINKS } from '$lib/global/links';
 	import EnumHelper from '$lib/helpers/EnumHelper';
 	import IconoirLogOut from '$lib/icons/IconoirLogOut.svelte';
+	import IconoirMenu from '$lib/icons/IconoirMenu.svelte';
+	import IconoirProfileCircle from '$lib/icons/IconoirProfileCircle.svelte';
 	import Button from './common/Button.svelte';
+	import DropdownMenu from './common/Dropdown Menu';
+	import Vr from './common/Vr.svelte';
 
 	const AVAILABLE_SECTIONS = {
 		INICIO: ['Inicio', LINKS.HOME],
-		EDITOR_ENSAYOS: ['Editor de Ensayos', LINKS.EDITOR_ENSAYOS],
-		PERFIL: ['Mi Perfil', LINKS.PERFIL],
-		ENSAYOS: [Usuario.value?.rol === RolUsuario.Alumno ? 'Evalúate' : 'Ver Ensayos', LINKS.ENSAYOS],
-		ARCHIVOS: ['Archivos', LINKS.ARCHIVOS],
+		EVALUATE: ['Evalúate', LINKS.EVALUATE],
 		TEMARIOS: ['Temarios', LINKS.TEMARIOS]
 	};
 </script>
 
 <div
-	class="bg-background text-foreground sticky top-0 z-50 flex h-14 w-full flex-row items-center justify-between border-b-[1px] p-2"
+	class="bg-card text-card-foreground bg-linear-to-r/shorter sticky top-0 z-50 flex h-14 w-full flex-row items-center justify-between border-b-[1px] p-2"
 >
 	<div class="absolute left-4">
 		Barra de navegación específicamente diseñada para {EnumHelper.rolUsuarioName(
 			Usuario.value?.rol
 		)}
 	</div>
-	<div class="absolute left-1/2 flex -translate-x-1/2 flex-row gap-8">
+	<div class="absolute left-1/2 flex h-full -translate-x-1/2 flex-row items-center justify-center">
 		{#if Usuario.value}
 			{@const SECTIONS = [
 				//
 				AVAILABLE_SECTIONS.INICIO,
-				AVAILABLE_SECTIONS.TEMARIOS,
-				...(Usuario.value?.rol === RolUsuario.Profesor
-					? [AVAILABLE_SECTIONS.EDITOR_ENSAYOS]
-					: [AVAILABLE_SECTIONS.ENSAYOS]),
-				AVAILABLE_SECTIONS.ARCHIVOS,
-				AVAILABLE_SECTIONS.PERFIL
+				...(Usuario.value?.rol !== RolUsuario.Visualizador
+					? [
+							...(Usuario.value?.rol === RolUsuario.Alumno
+								? [AVAILABLE_SECTIONS.TEMARIOS, AVAILABLE_SECTIONS.EVALUATE]
+								: [])
+						]
+					: [])
 			]}
 			{#each SECTIONS as [section, sectionLink], i (i)}
-				{@const selected = page.url.pathname === sectionLink}
-				<a class={`font-medium ${selected ? 'border-b-4 font-extrabold' : ''}`} href={sectionLink}
-					>{section}</a
-				>
+				<a href={sectionLink}>
+					<Button variant="link">
+						{section}
+					</Button>
+				</a>
+				{#if i < SECTIONS.length - 1}
+					<Vr />
+				{/if}
 			{/each}
 		{/if}
 	</div>
-	<Button
-		class="absolute right-4"
-		size="icon"
-		variant="outlined"
-		onclick={() => {
-			Usuario.value = null;
-		}}
-	>
-		<IconoirLogOut class="h-full w-full p-2" />
-	</Button>
+
+	<div class="absolute right-4 z-10 flex flex-row items-center justify-center gap-2">
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger>
+				<Button variant="outlined">
+					<IconoirMenu class="svg-icon" />
+					{NombreUsuario}
+				</Button>
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content>
+				<DropdownMenu.Group>
+					<DropdownMenu.Item onclick={() => goto(LINKS.PERFIL)}>
+						<IconoirProfileCircle class="svg-icon" /> Perfil</DropdownMenu.Item
+					>
+					<DropdownMenu.Separator />
+					<DropdownMenu.Item variant="destructive" onclick={() => goto(LINKS.LOGOUT)}
+						><IconoirLogOut class="svg-icon" /> Cerrar Sesión</DropdownMenu.Item
+					>
+				</DropdownMenu.Group>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+	</div>
 </div>
