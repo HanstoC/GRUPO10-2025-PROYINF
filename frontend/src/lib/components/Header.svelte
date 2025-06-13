@@ -15,6 +15,38 @@
 		EVALUATE: ['Evalúate', LINKS.EVALUATE],
 		TEMARIOS: ['Temarios', LINKS.TEMARIOS]
 	};
+
+	let mobileMenuOpen = $state(false);
+
+	// Close sidebar when clicking outside
+	function handleOutsideClick(event: MouseEvent) {
+		const sidebar = document.getElementById('mobile-sidebar');
+		const hamburger = document.getElementById('hamburger-button');
+
+		if (
+			sidebar &&
+			hamburger &&
+			!sidebar.contains(event.target as Node) &&
+			!hamburger.contains(event.target as Node)
+		) {
+			mobileMenuOpen = false;
+		}
+	}
+
+	$effect(() => {
+		if (mobileMenuOpen) {
+			document.addEventListener('click', handleOutsideClick);
+			document.body.style.overflow = 'hidden'; // Prevent background scrolling
+		} else {
+			document.removeEventListener('click', handleOutsideClick);
+			document.body.style.overflow = 'auto';
+		}
+
+		return () => {
+			document.removeEventListener('click', handleOutsideClick);
+			document.body.style.overflow = 'auto';
+		};
+	});
 </script>
 
 <div
@@ -71,5 +103,67 @@
 				</DropdownMenu.Group>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
+	</div>
+</div>
+
+<!-- Mobile Sidebar Overlay -->
+{#if mobileMenuOpen}
+	<div class="fixed inset-0 z-40 bg-black/50 md:hidden" style="top: 56px;"></div>
+{/if}
+
+<!-- Mobile Sidebar -->
+<div
+	id="mobile-sidebar"
+	class={`bg-muted/30 border-border fixed left-0 top-14 z-50 h-[calc(100vh-56px)] w-64 transform border-r backdrop-blur-sm transition-transform duration-300 ease-in-out md:hidden ${
+		mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+	}`}
+>
+	<div class="flex h-full flex-col">
+		<!-- Navigation Links -->
+		<nav class="flex-1 space-y-2 px-4 py-6">
+			{#if Usuario.value}
+				{@const SECTIONS = [
+					//
+					AVAILABLE_SECTIONS.INICIO,
+					AVAILABLE_SECTIONS.TEMARIOS,
+					...(Usuario.value?.rol === RolUsuario.Profesor
+						? [AVAILABLE_SECTIONS.EDITOR_ENSAYOS]
+						: [AVAILABLE_SECTIONS.ENSAYOS]),
+					AVAILABLE_SECTIONS.ARCHIVOS,
+					AVAILABLE_SECTIONS.PERFIL
+				]}
+				{#each SECTIONS as [section, sectionLink], i (i)}
+					{@const selected = page.url.pathname === sectionLink}
+					<a
+						class={`block rounded-lg px-4 py-3 font-medium transition-colors ${
+							selected
+								? 'bg-primary text-primary-foreground font-extrabold'
+								: 'hover:bg-accent/50 hover:text-accent-foreground'
+						}`}
+						href={sectionLink}
+						onclick={() => (mobileMenuOpen = false)}
+					>
+						{section}
+					</a>
+				{/each}
+			{/if}
+		</nav>
+
+		<!-- User Info Section -->
+		{#if Usuario.value}
+			<div class="border-border/30 bg-background/50 border-t p-4">
+				<div class="flex items-center space-x-3">
+					<div class="bg-primary flex h-8 w-8 items-center justify-center rounded-full">
+						<span class="text-primary-foreground text-sm font-semibold">
+							{Usuario.value.nombre?.charAt(0).toUpperCase()}
+						</span>
+					</div>
+					<div class="min-w-0 flex-1">
+						<p class="truncate text-sm font-medium">{Usuario.value.nombre}</p>
+						<p class="text-muted-foreground truncate text-xs">{Usuario.value.correo}</p>
+					</div>
+				</div>
+			</div>
+		{/if}
 	</div>
 </div>

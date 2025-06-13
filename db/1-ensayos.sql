@@ -17,7 +17,7 @@ CREATE TABLE
         "id_asignatura" INTEGER REFERENCES "ASIGNATURA" (id) NOT NULL,
         "dificultad" varchar(100) NOT NULL,
         "id_profesor" INTEGER NOT NULL,
-        "fecha_creacion" DATE
+        "fecha_creacion" DATE DEFAULT CURRENT_DATE
     );
 
 CREATE TABLE
@@ -35,7 +35,7 @@ CREATE TABLE
 CREATE TABLE
     "ENSAYO_PREGUNTA" (
         "id" serial PRIMARY KEY,
-        "id_ensayo" INTEGER REFERENCES "ENSAYO" (id) UNIQUE NOT NULL,
+        "id_ensayo" INTEGER REFERENCES "ENSAYO" (id) NOT NULL,
         "id_pregunta" INTEGER NOT NULL
     );
 
@@ -45,17 +45,17 @@ CREATE TABLE
         "id_asignatura" INTEGER REFERENCES "ASIGNATURA" (id) NOT NULL,
         "id_profesor" INTEGER NOT NULL,
         "id_tematica" INTEGER REFERENCES "TEMATICA" (id) NOT NULL,
-        "enunciado" TEXT,
-        "imagen" TEXT,
-        "efectividad" float
+        "enunciado" TEXT NOT NULL,
+        "imagen_base64" TEXT,
+        "efectividad" float DEFAULT 0
     );
 
 CREATE TABLE
     "ALTERNATIVA" (
         "id" serial PRIMARY KEY,
         "id_pregunta" INTEGER REFERENCES "PREGUNTA" (id) NOT NULL,
-        "contenido" TEXT,
-        "es_correcta" boolean
+        "texto" TEXT NOT NULL,
+        "es_correcta" boolean NOT NULL
     );
 
 CREATE TABLE

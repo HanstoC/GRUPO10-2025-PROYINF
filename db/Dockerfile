@@ -1,5 +1,7 @@
-FROM postgres:15-alpine AS base
+FROM postgres:15-alpine
 
-ADD 1-ensayos.sql /docker-entrypoint-initdb.d
-ADD 2-usuarios.sql /docker-entrypoint-initdb.d
-ADD 3-populado.sql /docker-entrypoint-initdb.d
+# Copy initialization scripts
+COPY *.sql /docker-entrypoint-initdb.d/
+
+# Ensure scripts are executable
+RUN chmod +x /docker-entrypoint-initdb.d/*.sql

@@ -25,9 +25,9 @@
         "alumnos": [
             {
                 "id": 1,
-                "rut": "12345678-9",
+                "rut": "55667788-9",
                 "nombre": "Juan",
-                "paterno": "Pérez",
+                "paterno": "Pepito",
                 "materno": "González",
                 "genero": "Masculino",
                 "fecha_nacimiento": "2005-03-15",

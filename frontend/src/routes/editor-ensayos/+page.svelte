@@ -1,36 +1,57 @@
 <script lang="ts">
+	import { API } from '$lib/global/api';
+	import { Usuario } from '$lib/auth.svelte';
 	import Button from '$lib/components/common/Button.svelte';
 	import Card from '$lib/components/common/Card.svelte';
-	import FileInput from '$lib/components/common/FileInput.svelte';
-	import Input from '$lib/components/common/Input.svelte';
 	import PageMargin from '$lib/components/common/PageMargin.svelte';
-	import Form from '$lib/components/common/Form';
-	import { API } from '$lib/global/api';
 
-	const pregunta: {
-		[key: string]: string;
-	} = $state({
-		pregunta: '',
-		respuesta1: '',
-		respuesta2: '',
-		respuesta3: '',
-		respuesta4: '',
-		topico: ''
+	let ensayos = $state([]);
+	let cargando = $state(true);
+	let error = $state('');
+	let eliminando = $state(false);
+
+	$effect(() => {
+		cargarEnsayos();
 	});
-	let imagenes: FileList | null = $state(null);
 
-	async function guardarPregunta() {
-		const payload = pregunta;
-		const res = await fetch(API.GUARDAR_PREGUNTA, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(payload)
+	async function cargarEnsayos() {
+		try {
+			const respuesta = await fetch(API.ENSAYOS_PROFESOR(Usuario.value?.id));
+			if (!respuesta.ok) throw new Error('Error al cargar ensayos');
+			ensayos = await respuesta.json();
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Error desconocido';
+		} finally {
+			cargando = false;
+		}
+	}
+
+	async function manejarEliminacion(id: number) {
+		if (!confirm('¿Está seguro que desea eliminar este ensayo?')) return;
+
+		eliminando = true;
+		try {
+			const respuesta = await fetch(API.ELIMINAR_ENSAYO(id.toString()), {
+				method: 'DELETE'
+			});
+
+			if (!respuesta.ok) throw new Error('Error al eliminar el ensayo');
+
+			// Recargar lista de ensayos
+			await cargarEnsayos();
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Error desconocido';
+		} finally {
+			eliminando = false;
+		}
+	}
+
+	function formatearFecha(fechaStr: string) {
+		return new Date(fechaStr).toLocaleDateString('es-CL', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric'
 		});
-
-		if (res.ok) console.log('Pregunta guardada');
-		else console.error('Error al guardar la pregunta');
 	}
 </script>
 

@@ -51,15 +51,15 @@
 				id="current-temario-mask"
 				class="pointer-events-none fixed left-1/2 top-0 z-10 h-full w-full -translate-x-1/2"
 			></div>
-			<div class="relative min-h-[100vh] w-2/3 flex-none">
+			<div class="relative min-h-[100vh] w-full flex-none lg:w-2/3">
 				{#key selectedTemario}
 					<div
 						in:fly={{ x: 40, duration: 300, delay: 100 }}
 						out:fly={{ x: -40, duration: 300 }}
-						class="absolute flex h-full w-full flex-col items-center justify-start gap-10"
+						class="absolute flex h-full w-full flex-col items-center justify-start gap-4 p-4 md:gap-10"
 					>
 						<div class="flex flex-col gap-2 text-justify">
-							<div class="flex w-auto flex-row gap-10">
+							<div class="flex w-auto flex-col gap-4 sm:flex-row md:gap-10">
 								<Card
 									size="sm"
 									class="flex flex-1 items-center gap-2"
@@ -75,7 +75,7 @@
 									<b>{duracion.toFixed(1)} hrs</b> duración.
 								</Card>
 							</div>
-							<p>{descripcion}</p>
+							<p class="text-sm md:text-base">{descripcion}</p>
 						</div>
 						<div class="max-w-3/4 flex w-3/4 flex-col gap-2 pb-40">
 							{#each contenidos as contenido}
@@ -86,7 +86,7 @@
 										{#each temas as { titulo, subtemas }}
 											<Tema tema={titulo}>
 												{#each subtemas as subtema}
-													<li>{subtema}</li>
+													<li class="text-sm md:text-base">{subtema}</li>
 												{/each}
 											</Tema>
 										{/each}
@@ -115,7 +115,7 @@
 		#current-temario {
 			position: relative;
 			width: 100%;
-			flex: 0.33;
+			flex: 0.4;
 			display: flex;
 			background: black;
 			color: white;
@@ -126,9 +126,12 @@
 			h1 {
 				transition-property: color;
 				font-weight: bolder;
-				font-size: 40vh;
-				margin-bottom: -5vh;
+				margin-bottom: -2vh;
 				color: var(--color);
+
+				@media (min-width: 768px) {
+					margin-bottom: -5vh;
+				}
 			}
 		}
 

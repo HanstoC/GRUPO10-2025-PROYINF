@@ -34,24 +34,58 @@ app.use(session({
 }));
 app.use(express.json());
 
-(async () => {
-  await pool.query('SET search_path TO "Public"');
-})();
+const pool = new Pool({
+  user: process.env.DB_USER || 'user',
+  host: process.env.DB_HOST || 'postgres_db',
+  database: process.env.DB_NAME || 'mydb',
+  password: process.env.DB_PASSWORD || 'password',
+  port: process.env.DB_PORT || 5432,
+});
 
+(async () => {
+  await pool.query('SET search_path TO "public"');
+})();
 
 app.get('/asignaturas', necesitaAuth, async (req, res) => {
   try {
-    const asignaturas = await pool.query('SELECT * FROM "ASIGNATURA"');
-    res.json(asignaturas.rows);
+    const result = await pool.query('SELECT * FROM "ASIGNATURA" ORDER BY nombre');
+    res.json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Error');
+    console.error('Error al obtener asignaturas:', err);
+    res.status(500).send('Error al obtener las asignaturas');
+  }
+});
+
+app.post('/asignaturas', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { nombre } = req.body;
+
+    const existingSubject = await client.query(
+      'SELECT * FROM "ASIGNATURA" WHERE LOWER(nombre) = LOWER($1)',
+      [nombre]
+    );
+
+    if (existingSubject.rows.length > 0) {
+      return res.json(existingSubject.rows[0]);
+    }
+
+    const result = await client.query(
+      'INSERT INTO "ASIGNATURA" (nombre) VALUES ($1) RETURNING *',
+      [nombre]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error al crear asignatura:', err);
+    res.status(500).send('Error al crear la asignatura');
+  } finally {
+    client.release();
   }
 });
 
 app.get('/ensayos', necesitaAuth, async (req, res) => {
   try {
-    await pool.query('SET search_path TO "Public"');
     const asignaturas = await pool.query('SELECT * FROM "ENSAYO"');
     res.json(asignaturas.rows);
   } catch (err) {
@@ -82,7 +116,6 @@ app.get('/docentes', necesitaAuth, async (req, res) => {
 
 app.post('/preguntas', necesitaAuth, async (req, res) => {
   const client = await pool.connect();
-  await pool.query('SET search_path TO "Public"');
 
   try {
     const {
@@ -91,20 +124,30 @@ app.post('/preguntas', necesitaAuth, async (req, res) => {
       topico,
       pregunta,
       imagen,
-      respuestas
+      respuestas,
+      id_tematica
     } = req.body;
 
     await client.query('BEGIN');
 
+    let tematicaId = id_tematica;
+    if (!id_tematica && topico) {
+      const tematicaResult = await client.query(
+        'INSERT INTO "TEMATICA" (id_asignatura, nombre) VALUES ($1, $2) RETURNING id',
+        [id_asignatura, topico]
+      );
+      tematicaId = tematicaResult.rows[0].id;
+    }
+
     const insertPregunta = `
-      INSERT INTO pregunta (id_asignatura, id_profesor, tematica, enunciado, imagen_base64)
+      INSERT INTO "PREGUNTA" (id_asignatura, id_profesor, id_tematica, enunciado, imagen_base64)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING id
     `;
     const { rows } = await client.query(insertPregunta, [
       id_asignatura,
       id_profesor,
-      topico,
+      tematicaId,
       pregunta,
       imagen
     ]);
@@ -112,7 +155,7 @@ app.post('/preguntas', necesitaAuth, async (req, res) => {
 
     for (const r of respuestas) {
       await client.query(
-        'INSERT INTO alternativa (id_pregunta, texto, es_correcta) VALUES ($1, $2, $3)',
+        'INSERT INTO "ALTERNATIVA" (id_pregunta, texto, es_correcta) VALUES ($1, $2, $3)',
         [id_pregunta, r.texto, r.es_correcta]
       );
     }
@@ -131,7 +174,6 @@ app.post('/preguntas', necesitaAuth, async (req, res) => {
 app.get('/topicos/:idAsignatura', necesitaAuth, async (req, res) => {
   const idAsignatura = parseInt(req.params.idAsignatura, 10);
   console.log(idAsignatura)
-  await pool.query('SET search_path TO "Public"');
 
   if (isNaN(idAsignatura)) {
     return res.status(400).json({ error: 'ID de asignatura inválido' });
@@ -172,14 +214,10 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const { rut, contraseña } = req.body;
-
-  if (!rut || !contraseña)
-    return res.status(400).json({ error: 'Rut y contraseña son requeridos' });
-
   try {
+    const { rut, contraseña } = req.body;
     const result = await pool.query(
-      'SELECT * FROM USUARIO WHERE rut = $1 AND contraseña = $2',
+      'SELECT * FROM "usuario" WHERE rut = $1 AND contraseña = $2',
       [rut, contraseña]
     );
 
@@ -196,8 +234,11 @@ app.post('/login', async (req, res) => {
       res.status(401).json({ error: 'Credenciales inválidas' });
     }
   } catch (err) {
-    console.error('Error al iniciar sesión:', err);
-    res.status(500).send('Error al intentar iniciar sesión');
+    await cliente.query('ROLLBACK');
+    console.error('Error al actualizar ensayo:', err);
+    res.status(500).send('Error al actualizar el ensayo');
+  } finally {
+    cliente.release();
   }
 });
 
@@ -217,7 +258,23 @@ app.get("/check-session", necesitaAuth, (req, res) => {
   });
 });
 
+app.get('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err)
+      return res.status(500).json({ error: 'Error al cerrar sesión' });
+    res.clearCookie('connect.sid');
+    res.status(200).json({ message: 'Sesión cerrada correctamente' });
+  });
+});
+
+app.get("/check-session", necesitaAuth, (req, res) => {
+  res.status(200).json({
+    authenticated: true,
+    user: req.session.user
+  });
+});
+
 app.listen(port, () => {
-  console.log(`App corriendo en http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
 

@@ -43,9 +43,26 @@
 		variant?: keyof typeof BUTTONS_VARIANTS.variants.variant;
 		size?: keyof typeof BUTTONS_VARIANTS.variants.size;
 		loading?: boolean;
-	} = $props();
+		startIcon?: any;
+		class?: string;
+	}
 
-	let _disabled = $derived(loading);
+	export let href: string | undefined = undefined;
+	export let variant: keyof typeof BUTTONS_VARIANTS.variants.variant = 'default';
+	export let size: keyof typeof BUTTONS_VARIANTS.variants.size = 'default';
+	export let loading = false;
+	export let startIcon: any = undefined;
+	let className = '';
+	export { className as class };
+
+	function handleClick(event: MouseEvent) {
+		if (href) {
+			event.preventDefault();
+			goto(href);
+		}
+	}
+
+	$: buttonClass = `${buttonVariants({ variant, size })} ${loading ? 'pointer-events-none opacity-75' : ''} ${className} ${variant}`;
 </script>
 
 <a

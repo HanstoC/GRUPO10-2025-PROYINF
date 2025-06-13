@@ -2,6 +2,8 @@
 	import { Usuario } from '$lib/auth.svelte';
 	import Header from '$lib/components/Header.svelte';
 	import Loader from '$lib/components/Loader.svelte';
+	import Database from '$lib/classes/Database';
+	import { onMount } from 'svelte';
 
 	import '../app.css';
 	import 'iconify-icon';

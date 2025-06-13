@@ -14,7 +14,14 @@ export default {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter({
-      fallback: 'index.html'  // o el nombre correcto
-    })
+      pages: 'build',
+      assets: 'build',
+      fallback: 'index.html',
+      precompress: false,
+      strict: true
+    }),
+    paths: {
+      base: ''
+    }
   }
 };

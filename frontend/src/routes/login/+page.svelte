@@ -29,25 +29,25 @@
 	});
 </script>
 
-<div class="flex h-full w-full flex-row">
+<div class="flex h-full w-full flex-col md:flex-row">
 	<div
 		id="login-alt"
-		class="pointer-events-none relative flex flex-1/3 flex-col items-center justify-center gap-2 select-none"
+		class="flex-1/3 pointer-events-none relative flex select-none flex-col items-center justify-center gap-2"
 	>
 		<div class="absolute flex w-1/2 flex-col gap-6 text-center">
-			<h1 class="scale-150 font-extrabold text-white uppercase opacity-80 mix-blend-difference">
+			<h1 class="scale-150 font-extrabold uppercase text-white opacity-80 mix-blend-difference">
 				Siempre hay luz para tu futuro
 			</h1>
 			<RotatingDesc />
 		</div>
 		<img
-			class="login-bg h-full w-auto object-cover"
+			class="login-bg h-full w-full object-cover md:w-auto"
 			style:object-position={`${50 + deltaX}% 0`}
 			src="/login-bg.png"
 			alt=""
 		/>
 	</div>
-	<div class="flex flex-3 flex-col items-center justify-center gap-2 lg:flex-2 xl:flex-1">
+	<div class="flex-3 lg:flex-2 flex flex-col items-center justify-center gap-2 xl:flex-1">
 		{#if loading}
 			<LoadingIndicator text="Espera un poco..." />
 		{/if}
