@@ -43,20 +43,20 @@
 	<div id="temario-page" style={`--color: ${bgColor};`}>
 		<div id="current-temario">
 			<div
-				class="absolute -bottom-2 z-10 flex h-full flex-col items-center justify-end select-none"
+				class="absolute -bottom-2 z-10 flex h-full flex-col items-center justify-end select-none px-4"
 			>
-				<h1>
+				<h1 class="text-center text-4xl sm:text-6xl md:text-8xl lg:text-[40vh]">
 					{latestData[0]}
 				</h1>
 			</div>
-			<div class="z-10 flex w-full flex-row items-center justify-start px-10">
+			<div class="z-10 flex w-full flex-row items-center justify-start px-2 sm:px-4 md:px-10 overflow-x-auto">
 				{#each temarios as [what, _], i}
 					{@const isSelected = selectedTemario === i}
 					<button
 						onclick={(_) => (selectedTemario = i)}
-						class={`relative flex h-full flex-1 flex-col items-center justify-center text-center ${isSelected ? 'selected' : 'cursor-pointer'}`}
+						class={`relative flex h-full flex-1 min-w-0 flex-col items-center justify-center text-center px-1 sm:px-2 ${isSelected ? 'selected' : 'cursor-pointer'}`}
 					>
-						<h2 class="uppercase">
+						<h2 class="uppercase text-xs sm:text-sm md:text-base lg:text-xl break-words">
 							{what
 								.replace(/Temario de la PAES \w+(?: \w+)? de/gi, '')
 								.replace(/\.$/gi, '')
@@ -71,15 +71,15 @@
 				id="current-temario-mask"
 				class="pointer-events-none fixed top-0 left-1/2 z-10 h-full w-full -translate-x-1/2"
 			></div>
-			<div class="relative min-h-[100vh] w-2/3 flex-none">
+			<div class="relative min-h-[100vh] w-full lg:w-2/3 flex-none">
 				{#key selectedTemario}
 					<div
 						in:fly={{ x: 40, duration: 300, delay: 100 }}
 						out:fly={{ x: -40, duration: 300 }}
-						class="absolute flex h-full w-full flex-col items-center justify-start gap-10"
+						class="absolute flex h-full w-full flex-col items-center justify-start gap-4 md:gap-10 p-4"
 					>
 						<div class="flex flex-col gap-2 text-justify">
-							<div class="flex w-auto flex-row gap-10">
+							<div class="flex w-auto flex-col sm:flex-row gap-4 md:gap-10">
 								<Card
 									size="sm"
 									class="flex flex-1 items-center gap-2"
@@ -95,25 +95,25 @@
 									<b>{duracion.toFixed(1)} hrs</b> duración.
 								</Card>
 							</div>
-							<p>{descripcion}</p>
+							<p class="text-sm md:text-base">{descripcion}</p>
 						</div>
-						<div class="flex w-3/4 max-w-3/4 flex-col gap-2">
+						<div class="flex w-full lg:w-3/4 lg:max-w-3/4 flex-col gap-2">
 							{#each contenidos as contenido}
 								{@const { area, temas } = contenido}
 								<Card size="lg" class="bg-background/30! text-foreground!">
-									<h2 class="w-full font-extrabold uppercase">{area}</h2>
+									<h2 class="w-full font-extrabold uppercase text-sm md:text-xl lg:text-2xl">{area}</h2>
 									<div class="flex flex-col gap-4">
 										{#each temas as { titulo, subtemas }}
 											<Tema tema={titulo}>
 												{#each subtemas as subtema}
-													<li>{subtema}</li>
+													<li class="text-sm md:text-base">{subtema}</li>
 												{/each}
 											</Tema>
 										{/each}
 									</div>
 								</Card>
 							{/each}
-							<div class="h-40"></div>
+							<div class="h-20 md:h-40"></div>
 						</div>
 					</div>
 				{/key}
@@ -140,13 +140,17 @@
 		#current-temario {
 			position: relative;
 			width: 100%;
-			flex: 0.33;
+			flex: 0.4;
 			display: flex;
 			background: black;
 			color: white;
 			justify-content: space-evenly;
 			align-items: center;
 			overflow: hidden;
+
+			@media (max-width: 768px) {
+				flex: 0.3;
+			}
 
 			button {
 				* {
@@ -155,19 +159,33 @@
 				}
 
 				&:not(.selected):hover {
-					scale: 1.1;
+					scale: 1.05;
+				}
+
+				@media (min-width: 768px) {
+					&:not(.selected):hover {
+						scale: 1.1;
+					}
 				}
 
 				&.selected h2 {
-					scale: 1.2;
+					scale: 1.1;
 					font-weight: bolder;
 					text-shadow:
 						0 0 10px black,
 						0 0 1rem black;
+
+					@media (min-width: 768px) {
+						scale: 1.2;
+					}
 				}
 
 				h2 {
-					scale: 0.9;
+					scale: 0.95;
+
+					@media (min-width: 768px) {
+						scale: 0.9;
+					}
 				}
 
 				&:not(.selected) {
@@ -178,9 +196,12 @@
 			h1 {
 				transition-property: color;
 				font-weight: bolder;
-				font-size: 40vh;
-				margin-bottom: -5vh;
+				margin-bottom: -2vh;
 				color: var(--color);
+
+				@media (min-width: 768px) {
+					margin-bottom: -5vh;
+				}
 			}
 		}
 

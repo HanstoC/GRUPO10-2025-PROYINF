@@ -1,3 +1,8 @@
+INSERT INTO "ASIGNATURA" (nombre) VALUES ('Matemáticas');
+INSERT INTO "ASIGNATURA" (nombre) VALUES ('Lenguaje');
+INSERT INTO "ASIGNATURA" (nombre) VALUES ('Historia');
+INSERT INTO "ASIGNATURA" (nombre) VALUES ('Ciencias');
+
 INSERT INTO
     USUARIO (rut, contraseña, correo, tipo)
 VALUES

@@ -17,7 +17,10 @@
 
 <div
 	{...props}
-	class={`bg-card text-card-foreground rounded-xl p-4 [&.lg]:p-8 [&.outlined]:border-1 [&.outlined]:border-[#fff8] [&.sm]:p-2 ${_class} ${size} ${variant}`}
+	class={`bg-card text-card-foreground rounded-xl 
+		${size === 'sm' ? 'p-2 sm:p-3' : size === 'lg' ? 'p-4 sm:p-6 md:p-8' : 'p-3 sm:p-4'} 
+		${variant === 'outlined' ? 'border border-border/20' : ''} 
+		${_class}`}
 >
 	{#if startIcon}
 		<iconify-icon height="100%" width="auto" class="left-0 h-full" icon={startIcon}></iconify-icon>

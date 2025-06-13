@@ -1,23 +1,114 @@
 <script lang="ts">
-	import { RolUsuario, Usuario } from '$lib/auth.svelte';
-	import Avatar from '$lib/components/common/Avatar.svelte';
-	import Card from '$lib/components/common/Card.svelte';
-	import PageMargin from '$lib/components/common/PageMargin.svelte';
-	import EnumHelper from '$lib/helpers/EnumHelper';
+	import { Usuario } from "$lib/auth.svelte";
+	import { onMount } from "svelte";
+	import { goto } from "$app/navigation";
 
-	let { rut, rol, nombre, correo, imagen } = Usuario.value ?? {};
+	onMount(() => {
+		// Redirect to login if no user data
+		if (!Usuario.value) {
+			goto('/login');
+		}
+	});
+
+	// Format RUT with dots and dash
+	function formatRut(rut: string) {
+		if (!rut) return '';
+		// Remove existing format
+		rut = rut.replace(/\./g, '').replace(/-/g, '');
+		// Add dash before last digit
+		rut = rut.slice(0, -1) + '-' + rut.slice(-1);
+		// Add dots for thousands
+		rut = rut.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+		return rut;
+	}
+
+	// Map role to display text
+	function getRolDisplay(rol: string) {
+		const roles = {
+			'alumno': 'Estudiante',
+			'profesor': 'Profesor',
+			'visualizador': 'Visualizador'
+		};
+		return roles[rol] || rol;
+	}
 </script>
 
-<PageMargin>
-	<Card size="lg" class="flex flex-col items-center justify-center gap-1">
-		<div class="flex flex-row items-center justify-center gap-4">
-			<Avatar class="h-10">
-				{imagen}
-			</Avatar>
-			<h1>{nombre}</h1>
+<div class="container mx-auto px-4">
+	<div class="max-w-2xl mx-auto py-8">
+		<div class="shadow rounded-lg overflow-hidden">
+			<div class="px-6 py-8">
+				<!-- Header -->
+				<div class="text-center mb-8">
+					<div class="h-32 w-32 rounded-full bg-card mx-auto mb-4 flex items-center justify-center">
+						{#if Usuario.value?.imagen}
+							<img 
+								src={Usuario.value.imagen} 
+								alt="Foto de perfil" 
+								class="h-32 w-32 rounded-full object-cover"
+							/>
+						{:else}
+							<span class="text-5xl text-gray-400">
+								{Usuario.value?.nombre?.[0]?.toUpperCase() || '?'}
+							</span>
+						{/if}
+					</div>
+					<h1 class="text-xl font-bold text-gray-100">
+						{Usuario.value?.nombre || 'Usuario'}
+					</h1>
+					<p class="text-sm text-gray-400 mt-1">
+						{getRolDisplay(Usuario.value?.rol || '')}
+					</p>
+				</div>
+
+				<!-- Info Grid -->
+				<div class="grid gap-6 mb-8">
+					<div class="grid gap-4">
+						<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+							<span class="text-sm font-medium text-gray-400">RUT</span>
+							<span class="text-base text-gray-200">{formatRut(Usuario.value?.rut || '')}</span>
+						</div>
+						<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+							<span class="text-sm font-medium text-gray-400">Correo</span>
+							<span class="text-base text-gray-200">{Usuario.value?.correo || ''}</span>
+						</div>
+
+						{#if Usuario.value?.rol === 'alumno'}
+							<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+								<span class="text-sm font-medium text-gray-400">Curso</span>
+								<span class="text-base text-gray-200">{Usuario.value?.curso || ''}</span>
+							</div>
+							<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+								<span class="text-sm font-medium text-gray-400">Asistencia</span>
+								<span class="text-base text-gray-200">{Usuario.value?.asistencia ? `${Usuario.value.asistencia}%` : '-'}</span>
+							</div>
+							<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+								<span class="text-sm font-medium text-gray-400">Apoderado</span>
+								<span class="text-base text-gray-200">{Usuario.value?.apoderado || '-'}</span>
+							</div>
+							<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+								<span class="text-sm font-medium text-gray-400">Dirección</span>
+								<span class="text-base text-gray-200">{Usuario.value?.direccion || '-'}</span>
+							</div>
+							<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+								<span class="text-sm font-medium text-gray-400">Fecha de Nacimiento</span>
+								<span class="text-base text-gray-200">{Usuario.value?.fecha_nacimiento || '-'}</span>
+							</div>
+							<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+								<span class="text-sm font-medium text-gray-400">Género</span>
+								<span class="text-base text-gray-200">{Usuario.value?.genero || '-'}</span>
+							</div>
+							<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+								<span class="text-sm font-medium text-gray-400">Situación</span>
+								<span class="text-base text-gray-200">{Usuario.value?.situacion_alumno || '-'}</span>
+							</div>
+							<div class="flex flex-col md:flex-row md:justify-between p-4 bg-card rounded-lg">
+								<span class="text-sm font-medium text-gray-400">Tipo de Enseñanza</span>
+								<span class="text-base text-gray-200">{Usuario.value?.tipo_ensenanza || '-'}</span>
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
 		</div>
-		<p>{EnumHelper.rolUsuarioName(rol)}</p>
-		<p>{correo}</p>
-		<p>{rut}</p>
-	</Card>
-</PageMargin>
+	</div>
+</div>

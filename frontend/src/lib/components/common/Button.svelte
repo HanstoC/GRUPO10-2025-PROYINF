@@ -30,41 +30,53 @@
 
 	const buttonVariants = tv(BUTTONS_VARIANTS);
 
-	const {
-		children,
-		goto: _goto = '',
-		variant = 'default',
-		size = 'default',
-		loading = false,
-		class: _class,
-		...props
-	}: HTMLAnchorAttributes & {
-		goto?: string;
+	interface $$Props extends HTMLButtonAttributes {
+		href?: string;
 		variant?: keyof typeof BUTTONS_VARIANTS.variants.variant;
 		size?: keyof typeof BUTTONS_VARIANTS.variants.size;
 		loading?: boolean;
-	} = $props();
+		startIcon?: any;
+		class?: string;
+	}
 
-	let _disabled = $derived(loading);
+	export let href: string | undefined = undefined;
+	export let variant: keyof typeof BUTTONS_VARIANTS.variants.variant = 'default';
+	export let size: keyof typeof BUTTONS_VARIANTS.variants.size = 'default';
+	export let loading = false;
+	export let startIcon: any = undefined;
+	let className = '';
+	export { className as class };
+
+	function handleClick(event: MouseEvent) {
+		if (href) {
+			event.preventDefault();
+			goto(href);
+		}
+	}
+
+	$: buttonClass = `${buttonVariants({ variant, size })} ${loading ? 'pointer-events-none opacity-75' : ''} ${className} ${variant}`;
 </script>
 
-<a
-	{...props}
-	class={`button ${buttonVariants({ variant, size })} ${_disabled ? 'pointer-events-none opacity-75' : ''} ${_class} ${variant}`}
-	{..._goto
-		? {
-				href: _goto,
-				onclick: (event) => {
-					event.preventDefault();
-					goto(_goto);
-					return false;
-				}
-			}
-		: {}}
->
-	{#if loading}
-		Cargando...
-	{:else}
-		{@render children?.()}
-	{/if}
-</a>
+{#if href}
+	<a {href} class={buttonClass} on:click={handleClick} {...$$restProps}>
+		{#if startIcon}
+			<svelte:component this={startIcon} class="mr-2 h-4 w-4" />
+		{/if}
+		{#if loading}
+			Cargando...
+		{:else}
+			<slot />
+		{/if}
+	</a>
+{:else}
+	<button class={buttonClass} disabled={loading} on:click {...$$restProps}>
+		{#if startIcon}
+			<svelte:component this={startIcon} class="mr-2 h-4 w-4" />
+		{/if}
+		{#if loading}
+			Cargando...
+		{:else}
+			<slot />
+		{/if}
+	</button>
+{/if}

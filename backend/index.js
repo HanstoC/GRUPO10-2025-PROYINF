@@ -1,34 +1,67 @@
 const express = require('express');
 const cors = require('cors');
-const pool = require('./db'); // Importar la conexión
+const { Pool } = require('pg');
 const alumnos = require('./api_sim/alumnos.json');
-const docentes = require('./api_sim/docentes.json')
+const docentes = require('./api_sim/docentes.json');
+const { findAlumnoByRut, findDocenteByRut, findDirectivoByRut } = require('./services/alumnos');
 const app = express();
-const port = 8000;
-
+const port = process.env.PORT || 8000;
 
 app.use(cors());
-
 app.use(express.json());
 
-(async () => {
-  await pool.query('SET search_path TO "Public"');
-})();
+const pool = new Pool({
+  user: process.env.DB_USER || 'user',
+  host: process.env.DB_HOST || 'postgres_db',
+  database: process.env.DB_NAME || 'mydb',
+  password: process.env.DB_PASSWORD || 'password',
+  port: process.env.DB_PORT || 5432,
+});
 
+(async () => {
+  await pool.query('SET search_path TO "public"');
+})();
 
 app.get('/asignaturas', async (req, res) => {
   try {
-    const asignaturas = await pool.query('SELECT * FROM "ASIGNATURA"');
-    res.json(asignaturas.rows);
+    const result = await pool.query('SELECT * FROM "ASIGNATURA" ORDER BY nombre');
+    res.json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Error');
+    console.error('Error al obtener asignaturas:', err);
+    res.status(500).send('Error al obtener las asignaturas');
+  }
+});
+
+app.post('/asignaturas', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { nombre } = req.body;
+
+    const existingSubject = await client.query(
+      'SELECT * FROM "ASIGNATURA" WHERE LOWER(nombre) = LOWER($1)',
+      [nombre]
+    );
+
+    if (existingSubject.rows.length > 0) {
+      return res.json(existingSubject.rows[0]);
+    }
+
+    const result = await client.query(
+      'INSERT INTO "ASIGNATURA" (nombre) VALUES ($1) RETURNING *',
+      [nombre]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Error al crear asignatura:', err);
+    res.status(500).send('Error al crear la asignatura');
+  } finally {
+    client.release();
   }
 });
 
 app.get('/ensayos', async (req, res) => {
   try {
-    await pool.query('SET search_path TO "Public"');
     const asignaturas = await pool.query('SELECT * FROM "ENSAYO"');
     res.json(asignaturas.rows);
   } catch (err) {
@@ -59,7 +92,6 @@ app.get('/docentes', async (req, res) => {
 
 app.post('/preguntas', async (req, res) => {
   const client = await pool.connect();
-  await pool.query('SET search_path TO "Public"');
 
   try {
     const {
@@ -68,20 +100,30 @@ app.post('/preguntas', async (req, res) => {
       topico,
       pregunta,
       imagen,
-      respuestas
+      respuestas,
+      id_tematica
     } = req.body;
 
     await client.query('BEGIN');
 
+    let tematicaId = id_tematica;
+    if (!id_tematica && topico) {
+      const tematicaResult = await client.query(
+        'INSERT INTO "TEMATICA" (id_asignatura, nombre) VALUES ($1, $2) RETURNING id',
+        [id_asignatura, topico]
+      );
+      tematicaId = tematicaResult.rows[0].id;
+    }
+
     const insertPregunta = `
-      INSERT INTO pregunta (id_asignatura, id_profesor, tematica, enunciado, imagen_base64)
+      INSERT INTO "PREGUNTA" (id_asignatura, id_profesor, id_tematica, enunciado, imagen_base64)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING id
     `;
     const { rows } = await client.query(insertPregunta, [
       id_asignatura,
       id_profesor,
-      topico,
+      tematicaId,
       pregunta,
       imagen
     ]);
@@ -89,7 +131,7 @@ app.post('/preguntas', async (req, res) => {
 
     for (const r of respuestas) {
       await client.query(
-        'INSERT INTO alternativa (id_pregunta, texto, es_correcta) VALUES ($1, $2, $3)',
+        'INSERT INTO "ALTERNATIVA" (id_pregunta, texto, es_correcta) VALUES ($1, $2, $3)',
         [id_pregunta, r.texto, r.es_correcta]
       );
     }
@@ -108,7 +150,6 @@ app.post('/preguntas', async (req, res) => {
 app.get('/topicos/:idAsignatura', async (req, res) => {
   const idAsignatura = parseInt(req.params.idAsignatura, 10);
   console.log(idAsignatura)
-  await pool.query('SET search_path TO "Public"');
 
   if (isNaN(idAsignatura)) {
     return res.status(400).json({ error: 'ID de asignatura inválido' });
@@ -149,29 +190,216 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', async (req, res) => {
-  const { rut, contraseña } = req.body;
-
-  if (!rut || !contraseña)
-    return res.status(400).json({ error: 'Rut y contraseña son requeridos' });
-
   try {
+    const { rut, contraseña } = req.body;
     const result = await pool.query(
-      'SELECT * FROM USUARIO WHERE rut = $1 AND contraseña = $2',
+      'SELECT * FROM "usuario" WHERE rut = $1 AND contraseña = $2',
       [rut, contraseña]
     );
 
-    if (result.rows.length > 0) {
-      res.status(200).json({ message: 'Inicio de sesión exitoso', user: result.rows[0] });
-    } else {
-      res.status(401).json({ error: 'Credenciales inválidas' });
+    if (result.rows.length === 0) {
+      res.status(401).send('Credenciales inválidas');
+      return;
     }
+
+    const user = result.rows[0];
+    let additionalData = {};
+
+    switch (user.tipo) {
+      case 'alumno':
+        additionalData = findAlumnoByRut(rut) || {};
+        break;
+      case 'profesor':
+        additionalData = findDocenteByRut(rut) || {};
+        break;
+      case 'visualizador':
+        additionalData = findDirectivoByRut(rut) || {};
+        break;
+    }
+
+    res.json({
+      message: 'Login exitoso',
+      user: {
+        id: user.id,
+        rut: user.rut,
+        correo: user.correo,
+        tipo: user.tipo,
+        ...additionalData
+      }
+    });
   } catch (err) {
-    console.error('Error al iniciar sesión:', err);
-    res.status(500).send('Error al intentar iniciar sesión');
+    console.error('Error en login:', err);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
+app.get('/ensayos/profesor/:id', async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT 
+        e.id,
+        e.id_asignatura,
+        e.dificultad,
+        e.fecha_creacion,
+        a.nombre as asignatura_nombre,
+        (
+          SELECT COUNT(*)
+          FROM "ENSAYO_PREGUNTA" ep
+          WHERE ep.id_ensayo = e.id
+        ) as cantidad_preguntas
+      FROM "ENSAYO" e 
+      JOIN "ASIGNATURA" a ON e.id_asignatura = a.id 
+      WHERE e.id_profesor = $1 
+      ORDER BY e.fecha_creacion DESC`,
+      [req.params.id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error al obtener ensayos del profesor:', err);
+    res.status(500).send('Error al obtener los ensayos');
+  }
+});
+
+app.post('/ensayos', async (req, res) => {
+  const client = await pool.connect();
+  try {
+    const { id_asignatura, dificultad, id_profesor, cantidad_preguntas } = req.body;
+    
+    await client.query('BEGIN');
+    
+    const essayResult = await client.query(
+      'INSERT INTO "ENSAYO" (id_asignatura, dificultad, id_profesor, fecha_creacion) VALUES ($1, $2, $3, CURRENT_DATE) RETURNING id',
+      [id_asignatura, dificultad, id_profesor]
+    );
+    
+    const id_ensayo = essayResult.rows[0].id;
+
+    const questionsResult = await client.query(
+      'SELECT id FROM "PREGUNTA" WHERE id_asignatura = $1 ORDER BY RANDOM() LIMIT $2',
+      [id_asignatura, cantidad_preguntas]
+    );
+
+    for (const question of questionsResult.rows) {
+      await client.query(
+        'INSERT INTO "ENSAYO_PREGUNTA" (id_ensayo, id_pregunta) VALUES ($1, $2)',
+        [id_ensayo, question.id]
+      );
+    }
+    
+    await client.query('COMMIT');
+    res.status(201).json(essayResult.rows[0]);
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Error al crear ensayo:', err);
+    res.status(500).send('Error al crear el ensayo');
+  } finally {
+    client.release();
+  }
+});
+
+app.get('/tematicas/:id_asignatura', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM "TEMATICA" WHERE id_asignatura = $1 ORDER BY nombre',
+      [req.params.id_asignatura]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error al obtener tematicas:', err);
+    res.status(500).send('Error al obtener las tematicas');
+  }
+});
+
+app.get('/asignaturas/:id/preguntas/count', async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT COUNT(*) as total FROM "PREGUNTA" WHERE id_asignatura = $1',
+      [req.params.id]
+    );
+    res.json({ total: parseInt(result.rows[0].total) });
+  } catch (err) {
+    console.error('Error al obtener cantidad de preguntas:', err);
+    res.status(500).send('Error al obtener cantidad de preguntas');
+  }
+});
+
+app.delete('/ensayos/:id', async (req, res) => {
+  const cliente = await pool.connect();
+  try {
+    await cliente.query('BEGIN');
+    
+    await cliente.query(
+      'DELETE FROM "ENSAYO_PREGUNTA" WHERE id_ensayo = $1',
+      [req.params.id]
+    );
+
+    const resultado = await cliente.query(
+      'DELETE FROM "ENSAYO" WHERE id = $1 RETURNING *',
+      [req.params.id]
+    );
+
+    if (resultado.rowCount === 0) {
+      res.status(404).send('Ensayo no encontrado');
+      return;
+    }
+
+    await cliente.query('COMMIT');
+    res.json({ mensaje: 'Ensayo eliminado exitosamente' });
+  } catch (err) {
+    await cliente.query('ROLLBACK');
+    console.error('Error al eliminar ensayo:', err);
+    res.status(500).send('Error al eliminar el ensayo');
+  } finally {
+    cliente.release();
+  }
+});
+
+app.put('/ensayos/:id', async (req, res) => {
+  const cliente = await pool.connect();
+  try {
+    const { id_asignatura, dificultad, cantidad_preguntas } = req.body;
+    
+    await cliente.query('BEGIN');
+    
+    const resultadoEnsayo = await cliente.query(
+      'UPDATE "ENSAYO" SET id_asignatura = $1, dificultad = $2 WHERE id = $3 RETURNING *',
+      [id_asignatura, dificultad, req.params.id]
+    );
+
+    if (resultadoEnsayo.rowCount === 0) {
+      res.status(404).send('Ensayo no encontrado');
+      return;
+    }
+
+    await cliente.query(
+      'DELETE FROM "ENSAYO_PREGUNTA" WHERE id_ensayo = $1',
+      [req.params.id]
+    );
+
+    const resultadoPreguntas = await cliente.query(
+      'SELECT id FROM "PREGUNTA" WHERE id_asignatura = $1 ORDER BY RANDOM() LIMIT $2',
+      [id_asignatura, cantidad_preguntas]
+    );
+
+    for (const pregunta of resultadoPreguntas.rows) {
+      await cliente.query(
+        'INSERT INTO "ENSAYO_PREGUNTA" (id_ensayo, id_pregunta) VALUES ($1, $2)',
+        [req.params.id, pregunta.id]
+      );
+    }
+    
+    await cliente.query('COMMIT');
+    res.json(resultadoEnsayo.rows[0]);
+  } catch (err) {
+    await cliente.query('ROLLBACK');
+    console.error('Error al actualizar ensayo:', err);
+    res.status(500).send('Error al actualizar el ensayo');
+  } finally {
+    cliente.release();
   }
 });
 
 app.listen(port, () => {
-  console.log(`App corriendo en http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
 
