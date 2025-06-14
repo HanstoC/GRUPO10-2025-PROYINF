@@ -5,4 +5,5 @@ export const API = {
     LOGIN: BACKEND + "login",
     CHECK_SESIÓN: BACKEND + 'check-session',
     LOGOUT: BACKEND + 'logout',
+    ALUMNOS: () => BACKEND + "AllAlumnos"
 } as const

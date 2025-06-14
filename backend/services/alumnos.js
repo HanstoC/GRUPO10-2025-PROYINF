@@ -41,8 +41,31 @@ const findDirectivoByRut = (rut) => {
     };
 }
 
+const getAllAlumnos = () => {
+    let allAlumnos = [];
+    cursos.forEach(curso => { 
+        curso.alumnos.forEach(alumno => { 
+            allAlumnos.push({
+                
+                id: alumno.rut,
+                rut: alumno.rut,
+                
+                nombre: `${alumno.nombre} ${alumno.paterno} ${alumno.materno}`.trim(),
+                email: alumno.email || 'No disponible',                
+                curso_codigo: curso.codigo_curso,
+                curso_nivel: curso.nivel,
+                curso_letra: curso.letra,
+                curso_tipo_ensenanza: curso.tipo_ensenanza,
+            });
+        });
+    });
+    return allAlumnos;
+};
+
+
 module.exports = {
     findAlumnoByRut,
     findDocenteByRut,
-    findDirectivoByRut
+    findDirectivoByRut,
+    getAllAlumnos
 }

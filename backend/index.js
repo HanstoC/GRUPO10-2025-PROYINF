@@ -6,6 +6,7 @@ const { Pool } = require('pg');
 
 const alumnos = require('./api_sim/alumnos.json');
 const docentes = require('./api_sim/docentes.json');
+const alumnosService = require('./services/alumnos');
 
 const app = express();
 const port = 8000;
@@ -18,7 +19,7 @@ function necesitaAuth(req, res, next) {
 }
 
 app.use(cors({
-  origin: true,
+  origin: 'http://localhost:3000',
   credentials: true
 }));
 app.use(cookieParser());
@@ -33,6 +34,17 @@ app.use(session({
   }
 }));
 app.use(express.json());
+
+app.get('/AllAlumnos',(req, res) => { 
+    try {
+        const allAlumnosFlattened = alumnosService.getAllAlumnos();
+        res.json(allAlumnosFlattened); 
+    } catch (err) {
+        console.error('Error al obtener todos los alumnos:', err);
+        res.status(500).send('Error al obtener la lista de alumnos.');
+    }
+});
+
 
 const pool = new Pool({
   user: process.env.DB_USER || 'user',
