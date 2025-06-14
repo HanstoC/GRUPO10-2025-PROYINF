@@ -1,59 +1,12 @@
 <script lang="ts">
-	import { API } from '$lib/global/api';
-	import { Usuario } from '$lib/auth.svelte';
 	import Card from '$lib/components/common/Card.svelte';
 	import PageMargin from '$lib/components/common/PageMargin.svelte';
 	import Form from '$lib/components/common/Form';
 	import Input from '$lib/components/common/Input.svelte';
+	import FileInput from '$lib/components/common/FileInput.svelte';
 
-	let ensayos = $state([]);
-	let cargando = $state(true);
-	let error = $state('');
-	let eliminando = $state(false);
-
-	$effect(() => {
-		cargarEnsayos();
-	});
-
-	async function cargarEnsayos() {
-		try {
-			const respuesta = await fetch(API.ENSAYOS_PROFESOR(Usuario.value?.id));
-			if (!respuesta.ok) throw new Error('Error al cargar ensayos');
-			ensayos = await respuesta.json();
-		} catch (e) {
-			error = e instanceof Error ? e.message : 'Error desconocido';
-		} finally {
-			cargando = false;
-		}
-	}
-
-	async function manejarEliminacion(id: number) {
-		if (!confirm('¿Está seguro que desea eliminar este ensayo?')) return;
-
-		eliminando = true;
-		try {
-			const respuesta = await fetch(API.ELIMINAR_ENSAYO(id.toString()), {
-				method: 'DELETE'
-			});
-
-			if (!respuesta.ok) throw new Error('Error al eliminar el ensayo');
-
-			// Recargar lista de ensayos
-			await cargarEnsayos();
-		} catch (e) {
-			error = e instanceof Error ? e.message : 'Error desconocido';
-		} finally {
-			eliminando = false;
-		}
-	}
-
-	function formatearFecha(fechaStr: string) {
-		return new Date(fechaStr).toLocaleDateString('es-CL', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric'
-		});
-	}
+	let pregunta: any = $state({});
+	let imagenes: FileList | undefined = $state();
 </script>
 
 <PageMargin backButton>

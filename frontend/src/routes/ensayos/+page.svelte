@@ -13,6 +13,9 @@
 	import { onMount } from 'svelte';
 	import { RolUsuario, Usuario } from '$lib/auth.svelte';
 	import Button from '$lib/components/common/Button.svelte';
+	import MaterialSymbolsSelectAll from '$lib/icons/MaterialSymbolsSelectAll.svelte';
+	import MaterialSymbolsDelete from '$lib/icons/MaterialSymbolsDelete.svelte';
+	import Vr from '$lib/components/common/Vr.svelte';
 
 	interface URLParams {
 		q: string;
@@ -57,8 +60,19 @@
 
 <PageMargin>
 	{#if Usuario.value?.rol === RolUsuario.Profesor}
-		<Card class="w-full">
-			<Button goto={LINKS.EDITOR_ENSAYOS}>Crear ensayo</Button>
+		<Card size="sm" class="flex w-full flex-row items-center justify-between gap-2">
+			<div class="flex h-full flex-row items-center justify-center gap-2">
+				<Button size="sm" goto={LINKS.EDITOR_ENSAYOS}>Crear ensayo</Button>
+			</div>
+			<div class="flex h-full flex-row items-center justify-center gap-2">
+				<p class="text-xs italic opacity-50">0 elementos seleccionados</p>
+				<Button size="icon" variant="secondary" class="h-full">
+					<MaterialSymbolsSelectAll />
+				</Button>
+				<Button disabled size="icon" variant="destructive" class="h-full">
+					<MaterialSymbolsDelete />
+				</Button>
+			</div>
 		</Card>
 	{/if}
 	<Card class="w-full">
