@@ -35,6 +35,14 @@ app.use(session({
 }));
 app.use(express.json());
 
+const db = new Pool({
+  user: 'user',
+  host: 'postgres_db',
+  database: 'mydb',
+  password: 'password',
+  port: 5432
+});
+
 app.get('/AllAlumnos',(req, res) => { 
     try {
         const allAlumnosFlattened = alumnosService.getAllAlumnos();
@@ -98,13 +106,102 @@ app.post('/asignaturas', necesitaAuth, async (req, res) => {
 
 app.get('/ensayos', necesitaAuth, async (req, res) => {
   try {
-    const asignaturas = await pool.query('SELECT * FROM "ENSAYO"');
-    res.json(asignaturas.rows);
+    let query = `
+      SELECT e.*, a.nombre AS asignatura
+      FROM "ENSAYO" e
+      JOIN "ASIGNATURA" a ON e.id_asignatura = a.id
+    `;
+    const values = [];
+    const where = [];
+
+    if (req.query.profesor) {
+      where.push(`e.id_profesor = $${values.length + 1}`);
+      values.push(Number(req.query.profesor));
+    }
+
+    if (req.query.asignatura) {
+      const asignaturas = Array.isArray(req.query.asignatura)
+        ? req.query.asignatura
+        : [req.query.asignatura];
+
+      const placeholders = asignaturas.map((_, i) => `$${values.length + i + 1}`).join(', ');
+      where.push(`e.id_asignatura IN (${placeholders})`);
+      values.push(...asignaturas.map(Number));
+    }
+
+    if (where.length > 0) {
+      query += ` WHERE ` + where.join(' AND ');
+    }
+
+    const result = await pool.query(query, values);
+    res.json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Error');
+    console.error('Error al obtener ensayos:', err);
+    res.status(500).send('Error al obtener ensayos');
   }
 });
+
+
+app.post('/ensayos', async (req, res) => {
+	const { id_asignatura, id_profesor, dificultad, preguntas } = req.body;
+
+	if (!id_asignatura || !id_profesor || !dificultad || !Array.isArray(preguntas)) {
+		return res.status(400).send('Faltan datos');
+	}
+
+	const client = await pool.connect(); //obtener client del pool
+
+	try {
+		await client.query('BEGIN');
+
+		const ensayoResult = await client.query(
+			`INSERT INTO "ENSAYO" (id_asignatura, id_profesor, dificultad)
+			 VALUES ($1, $2, $3) RETURNING id`,
+			[id_asignatura, id_profesor, dificultad]
+		);
+		const id_ensayo = ensayoResult.rows[0].id;
+
+		const inserts = preguntas.map((id_pregunta) =>
+			client.query(
+				`INSERT INTO "ENSAYO_PREGUNTA" (id_ensayo, id_pregunta) VALUES ($1, $2)`,
+				[id_ensayo, id_pregunta]
+			)
+		);
+		await Promise.all(inserts);
+
+		await client.query('COMMIT');
+
+		res.status(201).json({ message: 'Ensayo creado', id_ensayo });
+	} catch (err) {
+		await client.query('ROLLBACK');
+		console.error('Error al guardar ensayo:', err);
+		res.status(500).send('Error interno del servidor');
+	} finally {
+		client.release(); //liberar conexión
+	}
+});
+
+app.get('/ensayos/:id/preguntas', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await db.query(`
+      SELECT P.enunciado AS pregunta, A.texto AS respuesta, A.es_correcta AS correcta
+      FROM "ENSAYO_PREGUNTA" EP
+      JOIN "PREGUNTA" P ON EP.id_pregunta = P.id
+      JOIN "ALTERNATIVA" A ON A.id_pregunta = P.id AND A.es_correcta = true
+      WHERE EP.id_ensayo = $1
+    `, [id]);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error obteniendo preguntas:', err);
+    res.status(500).send('Error al obtener preguntas');
+  }
+});
+
+
+
+
 
 app.get('/alumnos', necesitaAuth, async (req, res) => {
   try {
@@ -116,6 +213,7 @@ app.get('/alumnos', necesitaAuth, async (req, res) => {
   }
 });
 
+
 app.get('/docentes', necesitaAuth, async (req, res) => {
   try {
     // console.log(data);
@@ -125,6 +223,81 @@ app.get('/docentes', necesitaAuth, async (req, res) => {
     res.status(500).send('Error');
   }
 });
+
+app.get('/resultados', async (req, res) => {
+  const idAlumno = req.query.alumno;
+
+  if (!idAlumno) {
+    return res.status(400).send('Falta el parámetro alumno');
+  }
+
+  try {
+    const result = await pool.query(`
+      SELECT 
+        e.id AS id_ensayo,
+        a.nombre AS asignatura,
+        e.dificultad,
+        r.puntaje
+      FROM "RESULTADO" r
+      JOIN "ENSAYO" e ON r.id_ensayo = e.id
+      JOIN "ASIGNATURA" a ON e.id_asignatura = a.id
+      WHERE r.id_alumno = $1
+    `, [idAlumno]);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error al obtener resultados del alumno:', err);
+    res.status(500).send('Error al obtener resultados del alumno');
+  }
+});
+
+
+app.get('/preguntas', necesitaAuth, async (req, res) => {
+  const idAsignatura = req.query.asignatura;
+
+  try {
+    let result;
+    if (idAsignatura) {
+      result = await pool.query(`
+        SELECT 
+          p.id,
+          p.enunciado,
+          p.imagen_base64,
+          t.nombre AS topico,
+          a.nombre AS asignatura,
+          u.rut AS autor
+        FROM "PREGUNTA" p
+        JOIN "TEMATICA" t ON p.id_tematica = t.id
+        JOIN "ASIGNATURA" a ON p.id_asignatura = a.id
+        JOIN "usuario" u ON p.id_profesor = u.id
+        WHERE p.id_asignatura = $1
+        ORDER BY p.id DESC
+      `, [idAsignatura]);
+    } else {
+      result = await pool.query(`
+        SELECT 
+          p.id,
+          p.enunciado,
+          p.imagen_base64,
+          t.nombre AS topico,
+          a.nombre AS asignatura,
+          u.rut AS autor
+        FROM "PREGUNTA" p
+        JOIN "TEMATICA" t ON p.id_tematica = t.id
+        JOIN "ASIGNATURA" a ON p.id_asignatura = a.id
+        JOIN "usuario" u ON p.id_profesor = u.id
+        ORDER BY p.id DESC
+      `);
+    }
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error al obtener preguntas:', err);
+    res.status(500).send('Error al obtener preguntas');
+  }
+});
+
+
 
 app.post('/preguntas', necesitaAuth, async (req, res) => {
   const client = await pool.connect();
@@ -143,45 +316,55 @@ app.post('/preguntas', necesitaAuth, async (req, res) => {
     await client.query('BEGIN');
 
     let tematicaId = id_tematica;
-    if (!id_tematica && topico) {
+    if (!id_tematica && topico?.trim()) {
       const tematicaResult = await client.query(
         'INSERT INTO "TEMATICA" (id_asignatura, nombre) VALUES ($1, $2) RETURNING id',
         [id_asignatura, topico]
       );
       tematicaId = tematicaResult.rows[0].id;
     }
+    const preguntaResult = await client.query(
+      `INSERT INTO "PREGUNTA" (id_asignatura, id_profesor, id_tematica, enunciado, imagen_base64)
+       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+      [id_asignatura, id_profesor, tematicaId, pregunta, imagen]
+    );
 
-    const insertPregunta = `
-      INSERT INTO "PREGUNTA" (id_asignatura, id_profesor, id_tematica, enunciado, imagen_base64)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING id
-    `;
-    const { rows } = await client.query(insertPregunta, [
-      id_asignatura,
-      id_profesor,
-      tematicaId,
-      pregunta,
-      imagen
-    ]);
-    const id_pregunta = rows[0].id;
+    const id_pregunta = preguntaResult.rows[0].id;
 
-    for (const r of respuestas) {
+    for (const alt of respuestas) {
       await client.query(
-        'INSERT INTO "ALTERNATIVA" (id_pregunta, texto, es_correcta) VALUES ($1, $2, $3)',
-        [id_pregunta, r.texto, r.es_correcta]
+        `INSERT INTO "ALTERNATIVA" (id_pregunta, texto, es_correcta)
+         VALUES ($1, $2, $3)`,
+        [id_pregunta, alt.texto, alt.es_correcta]
       );
     }
 
     await client.query('COMMIT');
-    res.sendStatus(201);
+    res.sendStatus(200);
   } catch (err) {
     await client.query('ROLLBACK');
-    console.error(err);
+    console.error('Error guardando pregunta:', err);
     res.status(500).send('Error al guardar la pregunta');
   } finally {
     client.release();
   }
 });
+
+app.post('/respuestas', necesitaAuth, async (req, res) => {
+  const { id_ensayo, id_pregunta, id_alternativa, id_alumno, estado } = req.body;
+  try {
+    await db.query(
+      `INSERT INTO "RESPUESTA" (id_ensayo, id_pregunta, id_alternativa, id_alumno, estado)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [id_ensayo, id_pregunta, id_alternativa, id_alumno, estado]
+    );
+    res.status(200).send('Respuesta registrada');
+  } catch (err) {
+    console.error('Error guardando respuesta:', err);
+    res.status(500).send('Error al guardar respuesta');
+  }
+});
+
 
 app.get('/topicos/:idAsignatura', necesitaAuth, async (req, res) => {
   const idAsignatura = parseInt(req.params.idAsignatura, 10);

@@ -1,33 +1,42 @@
 <script lang="ts">
-	import type { HTMLAttributes } from 'svelte/elements';
-	import Toggle from '../common/Toggle.svelte';
-	import { ASIGNATURAS } from '$lib/classes/Database';
-	import EnumHelper from '$lib/helpers/EnumHelper';
+	import { createEventDispatcher, onMount } from 'svelte';
 
-	let {
-		selected = $bindable([]),
-		class: _class,
-		...props
-	}: HTMLAttributes<HTMLDivElement> & {
-		selected?: string[];
-	} = $props();
+	export let selected: number[] = [];
+	let asignaturas: { id: number; nombre: string }[] = [];
+
+	onMount(async () => {
+		const res = await fetch('http://localhost:8000/asignaturas', {
+			credentials: 'include'
+		});
+		asignaturas = await res.json();
+	});
+
+	function toggleAsignatura(id: number) {
+		if (selected.includes(id)) {
+			selected = selected.filter(s => s !== id);
+		} else {
+			selected = [...selected, id];
+		}
+		selected = [...selected];
+	}
 </script>
 
-<div class={`flex flex-row flex-wrap gap-1 ${_class}`} {...props}>
-	{#each Object.entries(ASIGNATURAS) as [nombre, valor] (valor)}
-		{@const bg = EnumHelper.colorsAsignatura(nombre)}
-		{@const pressed = selected.includes(valor)}
-		<Toggle
-			size="sm"
-			bind:pressed={
-				() => pressed,
-				(value: boolean) =>
-					(selected = value
-						? [...selected, valor]
-						: (selected = selected.filter((s) => s !== valor)))
-			}
-			variant="outlined"
-			style={pressed ? `background: ${bg};` : ''}>{nombre}</Toggle
+<div class="flex flex-wrap gap-2">
+	{#each asignaturas as a}
+		<button
+			class="px-2 py-1 rounded border"
+			class:selected={selected.includes(a.id)}
+			on:click={() => toggleAsignatura(a.id)}
 		>
+			{a.nombre}
+		</button>
 	{/each}
 </div>
+
+<style>
+	button.selected {
+		background-color: #3b82f6;
+		color: white;
+		border-color: #3b82f6;
+	}
+</style>
