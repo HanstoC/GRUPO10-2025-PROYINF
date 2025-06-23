@@ -51,15 +51,34 @@ export default class Database {
         const { user } = await response.json();
         await delay;
 
-        localStorage.setItem(STORAGE.NOMBRE_USUARIO, {
-            [RolUsuario.Alumno]: "Juan Pérez González",
-            [RolUsuario.Profesor]: "Profesor Pepe",
-            [RolUsuario.Visualizador]: "Visualizador Pepe"
-        }[user.tipo as number] ?? "Desconocido Pepe")
-        Usuario.value = {
-            rut,
-            rol: user.tipo
-        };
+        if(user.tipo=='alumno'){
+            console.log("pepito paga doble");
+            console.log(user);
+            Usuario.value = {
+                rut,
+                nombre: user.nombre,
+                rol: user.tipo,
+                correo: user.correo,
+                curso: user.curso,
+                asistencia: user.asistencia,
+                apoderado: user.apoderado,
+                direccion: user.direccion,
+                fecha_nacimiento: user.fecha_nacimiento,
+                genero: user.genero,
+                situacion_alumno: user.situacion_alumno,
+                tipo_ensenanza: user.tipo_ensenanza
+    
+    
+            };
+        } else {
+            Usuario.value = {
+                rut,
+                nombre: user.nombre,
+                rol: user.tipo,
+                correo: user.correo
+            }
+            
+        }
     }
 
     public static async checkLogged() {

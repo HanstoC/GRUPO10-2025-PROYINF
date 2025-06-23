@@ -8,6 +8,8 @@
 		if (!Usuario.value) {
 			goto('/login');
 		}
+		console.log("pipin paga el triple");
+		console.log(Usuario);
 	});
 
 	// Format RUT with dots and dash
@@ -31,6 +33,7 @@
 		};
 		return roles[rol] || rol;
 	}
+
 </script>
 
 <div class="container mx-auto px-4">

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { NombreUsuario, RolUsuario, Usuario } from '$lib/auth.svelte';
+	import { RolUsuario, Usuario } from '$lib/auth.svelte';
 	import Database from '$lib/classes/Database';
 	import PageMargin from '$lib/components/common/PageMargin.svelte';
 	import StudentsResults from '$lib/components/profesor/StudentsResults.svelte';
@@ -30,7 +30,7 @@
 
 	<PageMargin>
 		<div>
-			<h2>Bienvenido, {NombreUsuario}!</h2>
+			<h2>Bienvenido, {Usuario.value?.nombre}!</h2>
 		</div>
 		{@render {
 			[RolUsuario.Alumno]: alumno,

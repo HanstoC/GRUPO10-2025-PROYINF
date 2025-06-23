@@ -12,7 +12,6 @@ export enum RolUsuario {
 	Visualizador = 'visualizador'
 }
 
-export const NombreUsuario = browser ? (localStorage?.getItem(STORAGE.NOMBRE_USUARIO) ?? 'Invitado') : ''
 export const Usuario: { value: Usuario | null } = $state({
 	value: null
 });

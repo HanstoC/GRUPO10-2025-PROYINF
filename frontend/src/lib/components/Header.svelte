@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { NombreUsuario, RolUsuario, Usuario } from '$lib/auth.svelte';
+	import { RolUsuario, Usuario } from '$lib/auth.svelte';
 	import { LINKS } from '$lib/global/links';
 	import EnumHelper from '$lib/helpers/EnumHelper';
 	import IconoirLogOut from '$lib/icons/IconoirLogOut.svelte';
@@ -57,7 +57,7 @@
 			<DropdownMenu.Trigger>
 				<Button variant="outlined">
 					<IconoirMenu class="svg-icon" />
-					{NombreUsuario}
+					{Usuario.value?.nombre}
 				</Button>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>

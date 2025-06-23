@@ -423,11 +423,22 @@ app.post('/login', async (req, res) => {
         rut,
         tipo
       };
+      let info
+      if(tipo == 'alumno'){
+        info = alumnosService.findAlumnoByRut(rut);
 
-      res.status(200).json({ message: 'Inicio de sesión exitoso', user: result.rows[0] });
+      } else if (tipo == 'profesor'){
+        info = alumnosService.findDocenteByRut(rut);
+
+      } else {
+        info = alumnosService.findDirectivoByRut(rut);
+      }
+
+      res.status(200).json({ message: 'Inicio de sesión exitoso', user:{...result.rows[0] , ...info} });
     } else {
       res.status(401).json({ error: 'Credenciales inválidas' });
     }
+
   } catch (err) {
     console.error('Error al actualizar ensayo:', err);
     res.status(500).send('Error al actualizar el ensayo');
