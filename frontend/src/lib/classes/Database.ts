@@ -52,7 +52,6 @@ export default class Database {
         await delay;
 
         if(user.tipo=='alumno'){
-            console.log("pepito paga doble");
             console.log(user);
             Usuario.value = {
                 rut,

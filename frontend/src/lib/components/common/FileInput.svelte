@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLInputAttributes } from 'svelte';
 	import Button from './Button.svelte';
 	import IconoirSubmitDocument from '$lib/icons/IconoirSubmitDocument.svelte';
 

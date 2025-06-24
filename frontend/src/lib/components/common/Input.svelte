@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Animations from '$lib/helpers/Animations';
 	import { getContext } from 'svelte';
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLInputAttributes } from 'svelte';
 
 	let {
 		value = $bindable(),

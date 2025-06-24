@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setContext, type Snippet } from 'svelte';
-	import type { HTMLAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte';
 	import Badge from '../Badge.svelte';
 
 	let {

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
   import Card from '$lib/components/common/Card.svelte';
   import PageMargin from '$lib/components/common/PageMargin.svelte';
   import FilterAsignatura from '$lib/components/ensayos/FilterAsignatura.svelte';
@@ -60,6 +61,7 @@
     }
   }
   	function rendirEnsayo(id: number) {
+      goto(`/ensayos/${id}`);
 	}
 </script>
 
@@ -108,12 +110,6 @@
                 </p>
               </div>
               {#if Usuario.value?.rol === RolUsuario.Profesor}
-				<button
-					on:click={() => verPreguntas(ensayo.id)}
-					class="text-blue-600 underline text-sm"
-				>
-					{ensayoExpandido === ensayo.id ? 'Ocultar' : 'Ver preguntas'}
-				</button>
 				{:else if Usuario.value?.rol === RolUsuario.Alumno}
 				<button
 					on:click={() => rendirEnsayo(ensayo.id)}
@@ -124,25 +120,6 @@
 				{/if}
 
             </div>
-
-            {#if ensayoExpandido === ensayo.id}
-              {#if cargandoPreguntas}
-                <p class="italic text-sm text-gray-500 mt-2">Cargando preguntas...</p>
-              {:else}
-                <ul class="mt-3 space-y-2">
-                  {#each preguntas as p, i (p.pregunta + i)}
-                    <li class="ml-2">
-                      <p class="font-medium">Pregunta: {p.pregunta}</p>
-                      <ul class="ml-4 list-disc">
-                        <li class={p.correcta ? 'text-green-600 font-bold' : ''}>
-                          {p.respuesta}
-                        </li>
-                      </ul>
-                    </li>
-                  {/each}
-                </ul>
-              {/if}
-            {/if}
           </Card>
         {/each}
       </div>

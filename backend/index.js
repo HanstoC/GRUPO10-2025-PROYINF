@@ -19,7 +19,7 @@ function necesitaAuth(req, res, next) {
 }
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: true,
   credentials: true
 }));
 app.use(cookieParser());
@@ -185,11 +185,18 @@ app.get('/ensayos/:id/preguntas', async (req, res) => {
   const { id } = req.params;
   try {
     const result = await db.query(`
-      SELECT P.enunciado AS pregunta, A.texto AS respuesta, A.es_correcta AS correcta
+      SELECT 
+        P.id AS pregunta_id,
+        P.enunciado AS pregunta,
+        JSON_AGG(JSON_BUILD_OBJECT(
+          'id', A.id,
+          'texto', A.texto
+        )) AS alternativas
       FROM "ENSAYO_PREGUNTA" EP
       JOIN "PREGUNTA" P ON EP.id_pregunta = P.id
-      JOIN "ALTERNATIVA" A ON A.id_pregunta = P.id AND A.es_correcta = true
+      JOIN "ALTERNATIVA" A ON A.id_pregunta = P.id
       WHERE EP.id_ensayo = $1
+      GROUP BY P.id, P.enunciado
     `, [id]);
 
     res.json(result.rows);

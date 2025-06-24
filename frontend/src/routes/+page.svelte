@@ -15,27 +15,37 @@
 </script>
 
 {#if Usuario.value}
-	{#snippet alumno()}{/snippet}
+    {#snippet alumno()}{/snippet}
 
-	{#snippet profesor()}
-		<div class="flex w-full flex-row gap-4">
-			<StudentsResults />
-			<TeacherSummary />
-		</div>
-	{/snippet}
+    {#snippet profesor()}
+        <div class="flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
+            <div class="w-full lg:w-1/2">
+                <StudentsResults />
+            </div>
+            <div class="w-full lg:w-1/2">
+                <TeacherSummary />
+            </div>
+        </div>
+    {/snippet}
 
-	{#snippet visualizador()}
-		<SearchAlumno />
-	{/snippet}
+    {#snippet visualizador()}
+        <div class="w-full">
+            <SearchAlumno />
+        </div>
+    {/snippet}
 
-	<PageMargin>
-		<div>
-			<h2>Bienvenido, {Usuario.value?.nombre}!</h2>
-		</div>
-		{@render {
-			[RolUsuario.Alumno]: alumno,
-			[RolUsuario.Profesor]: profesor,
-			[RolUsuario.Visualizador]: visualizador
-		}[Usuario.value!.rol]()}
-	</PageMargin>
+    <PageMargin>
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 sm:text-3xl">
+                Bienvenido, {Usuario.value?.nombre}!
+            </h2>
+        </div>
+        <div class="w-full">
+            {@render {
+                [RolUsuario.Alumno]: alumno,
+                [RolUsuario.Profesor]: profesor,
+                [RolUsuario.Visualizador]: visualizador
+            }[Usuario.value!.rol]()}
+        </div>
+    </PageMargin>
 {/if}

@@ -4,6 +4,16 @@
 	import SearchBar from '../common/SearchBar.svelte';
 	import LoadingIndicator from '../common/utils/LoadingIndicator.svelte';
 
+	let currentPage = 1;
+	const itemsPerPage = 5;
+
+	$: totalPages = Math.ceil(alumnosFiltrados.length / itemsPerPage);
+
+	$: alumnosPaginados = alumnosFiltrados.slice(
+  		(currentPage - 1) * itemsPerPage,
+  		currentPage * itemsPerPage
+	);
+
 	interface Alumno {
 		id: number;
 		nombre: string;
@@ -88,10 +98,10 @@
 		<p class="italic opacity-50">No se encontraron alumnos.</p>
 	{:else}
 		<ul class="flex flex-col gap-2">
-			{#each alumnosFiltrados as alumno}
+			{#each alumnosPaginados as alumno}
 				<li
 					on:click={() => cargarResultados(alumno.id)}
-					class="cursor-pointer border rounded p-3 shadow-sm bg-white hover:bg-gray-100"
+					class="cursor-pointer border rounded p-3 shadow-sm bg-card"
 				>
 					<p class="font-bold">{alumno.nombre}</p>
 					<p class="text-sm text-gray-600">RUT: {alumno.rut} · Curso: {alumno.curso}</p>
@@ -99,6 +109,32 @@
 			{/each}
 		</ul>
 	{/if}
+	{#if totalPages > 1}
+  <div class="flex justify-center gap-2 mt-4 w-full">
+    <button
+      on:click={() => currentPage = Math.max(1, currentPage - 1)}
+      disabled={currentPage === 1}
+      class="px-3 py-1 border rounded  hover:bg-gray-200 disabled:opacity-50 hover:text-black"
+    >
+      Anterior
+    </button>
+    {#each Array(totalPages) as _, i}
+      <button
+        on:click={() => currentPage = i + 1}
+        class="px-3 py-1 border rounded hover:bg-blue-100 hover:text-black {currentPage === i + 1 ? 'bg-blue-300 font-bold' : ''}"
+      >
+        {i + 1}
+      </button>
+    {/each}
+    <button
+      on:click={() => currentPage = Math.min(totalPages, currentPage + 1)}
+      disabled={currentPage === totalPages}
+      class="px-3 py-1 border rounded hover:bg-gray-200 disabled:opacity-50 hover:text-black"
+    >
+      Siguiente
+    </button>
+  </div>
+{/if}
 </Card>
 
 {#if selectedAlumno}

@@ -82,7 +82,7 @@
 			class="flex h-full w-full flex-col items-center justify-center gap-2"
 		>
 			<Form.Item required label="Asignatura">
-				<select bind:value={id_asignatura} class="w-full border rounded p-1">
+				<select bind:value={id_asignatura} class="w-full border rounded p-1 bg-card" >
 					{#each asignaturas as a}
 						<option value={a.id}>{a.nombre}</option>
 					{/each}

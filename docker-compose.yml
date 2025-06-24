@@ -1,16 +1,21 @@
 version: '3.8'
 services:
   frontend:
-    build: ./frontend
+    build:
+      context: frontend
+      dockerfile: Dockerfile
     ports:
+      - "5173:5173"
       - "3000:80"
     depends_on:
       - backend
     volumes:
-      - ./:/app
+      - ./frontend:/app
       - /app/node_modules
   backend:
-    build: ./backend
+    build:
+      context: backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -23,7 +28,7 @@ services:
       postgres_db:
         condition: service_healthy
     volumes:
-      - ./:/app
+      - ./backend:/app
       - /app/node_modules
   postgres_db:
     build: ./db

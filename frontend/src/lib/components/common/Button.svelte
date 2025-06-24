@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { tv } from 'tailwind-variants';
-	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte';
 	import LoadingIndicator from './utils/LoadingIndicator.svelte';
 
 	const BUTTONS_VARIANTS = {

@@ -4,7 +4,8 @@
     "main": "index.js",
     "scripts": {
         "start": "node index.js",
-        "cargar preguntas": "node loadQuestions.js"
+        "cargar preguntas": "node loadQuestions.js",
+        "dev": "nodemon index.js --legacy-watch --poll-interval 250"
     },
     "dependencies": {
         "cookie-parser": "^1.4.7",
@@ -14,5 +15,8 @@
         "pg": "^8.15.6",
         "wait-port": "^1.1.0",
         "dotenv": "^16.5.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.9"
     }
 }

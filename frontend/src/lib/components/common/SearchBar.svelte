@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HTMLAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte';
 	import Input from './Input.svelte';
 	import Button from './Button.svelte';
 	import IconoirSearch from '$lib/icons/IconoirSearch.svelte';
