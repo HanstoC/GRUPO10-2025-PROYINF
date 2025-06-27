@@ -5,6 +5,7 @@
     "scripts": {
         "start": "node index.js",
         "cargar preguntas": "node loadQuestions.js",
+        "cargar info": "node cargarInfo.js",
         "dev": "nodemon index.js --legacy-watch --poll-interval 250"
     },
     "dependencies": {

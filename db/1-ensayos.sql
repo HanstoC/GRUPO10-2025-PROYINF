@@ -8,7 +8,8 @@ CREATE TABLE
     "TEMATICA" (
         "id" serial PRIMARY KEY,
         "id_asignatura" INTEGER REFERENCES "ASIGNATURA" (id) NOT NULL,
-        "nombre" varchar(100)
+        "nombre" varchar(100),
+        CONSTRAINT unique_tematica_per_asignatura UNIQUE (id_asignatura, nombre)
     );
 
 CREATE TABLE
