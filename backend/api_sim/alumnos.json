@@ -1,4 +1,3 @@
-
 [
   {
     "agno": 2023,
@@ -11,7 +10,7 @@
     "colegio": "COLEGIO LOS ALAMOS",
     "profesor_jefe": [
       {
-        "rut": "12.345.678-9",
+        "rut": "12345678-9",
         "nombres": "Ana María",
         "paterno": "González",
         "materno": "López"
@@ -20,7 +19,7 @@
     "alumnos": [
       {
         "id": 1,
-        "rut": "19.876.543-2",
+        "rut": "19876543-2",
         "nombre": "Martina",
         "paterno": "Fernández",
         "materno": "Silva",
@@ -43,7 +42,7 @@
       },
       {
         "id": 2,
-        "rut": "20.111.222-3",
+        "rut": "20111222-3",
         "nombre": "Joaquín",
         "paterno": "Mendoza",
         "materno": "Ríos",
@@ -89,7 +88,7 @@
       },
       {
         "id": 4,
-        "rut": "20.555.666-7",
+        "rut": "20555666-7",
         "nombre": "Matías",
         "paterno": "Salinas",
         "materno": "Torres",
@@ -112,7 +111,7 @@
       },
       {
         "id": 5,
-        "rut": "20.777.888-9",
+        "rut": "20777888-9",
         "nombre": "Antonella",
         "paterno": "Muñoz",
         "materno": "Gómez",
@@ -146,7 +145,7 @@
     "colegio": "COLEGIO LOS ALAMOS",
     "profesor_jefe": [
       {
-        "rut": "13.579.246-8",
+        "rut": "13579246-8",
         "nombres": "Pedro Alejandro",
         "paterno": "Martínez",
         "materno": "Rojas"
@@ -155,7 +154,7 @@
     "alumnos": [
       {
         "id": 6,
-        "rut": "21.234.567-8",
+        "rut": "21234567-8",
         "nombre": "Benjamín",
         "paterno": "López",
         "materno": "Soto",
@@ -178,7 +177,7 @@
       },
       {
         "id": 7,
-        "rut": "21.345.678-9",
+        "rut": "21345678-9",
         "nombre": "Isidora",
         "paterno": "García",
         "materno": "Méndez",
@@ -201,7 +200,7 @@
       },
       {
         "id": 8,
-        "rut": "21.456.789-0",
+        "rut": "21456789-0",
         "nombre": "Tomás",
         "paterno": "Vera",
         "materno": "Pizarro",
@@ -224,7 +223,7 @@
       },
       {
         "id": 9,
-        "rut": "21.567.890-1",
+        "rut": "21567890-1",
         "nombre": "Emilia",
         "paterno": "Riquelme",
         "materno": "Navarro",
@@ -247,7 +246,7 @@
       },
       {
         "id": 10,
-        "rut": "21.678.901-2",
+        "rut": "21678901-2",
         "nombre": "Sebastián",
         "paterno": "Cortés",
         "materno": "Leiva",
@@ -281,7 +280,7 @@
     "colegio": "COLEGIO LOS ALAMOS",
     "profesor_jefe": [
       {
-        "rut": "14.680.357-9",
+        "rut": "14680357-9",
         "nombres": "Claudia Andrea",
         "paterno": "Herrera",
         "materno": "Vega"
@@ -290,7 +289,7 @@
     "alumnos": [
       {
         "id": 11,
-        "rut": "22.456.789-0",
+        "rut": "22456789-0",
         "nombre": "Maximiliano",
         "paterno": "Torres",
         "materno": "Fuentes",
@@ -313,7 +312,7 @@
       },
       {
         "id": 12,
-        "rut": "22.567.890-1",
+        "rut": "22567890-1",
         "nombre": "Valentina",
         "paterno": "Espinoza",
         "materno": "Morales",
@@ -336,7 +335,7 @@
       },
       {
         "id": 13,
-        "rut": "22.678.901-2",
+        "rut": "22678901-2",
         "nombre": "Ignacio",
         "paterno": "Miranda",
         "materno": "Sandoval",
@@ -359,7 +358,7 @@
       },
       {
         "id": 14,
-        "rut": "22.789.012-3",
+        "rut": "22789012-3",
         "nombre": "Catalina",
         "paterno": "Araya",
         "materno": "Peña",
@@ -382,7 +381,7 @@
       },
       {
         "id": 15,
-        "rut": "22.890.123-4",
+        "rut": "22890123-4",
         "nombre": "Diego",
         "paterno": "Carvajal",
         "materno": "Vergara",
@@ -416,7 +415,7 @@
     "colegio": "LICEO INDUSTRIAL SAN JOSÉ",
     "profesor_jefe": [
       {
-        "rut": "15.791.357-8",
+        "rut": "15791357-8",
         "nombres": "Roberto Carlos",
         "paterno": "Sánchez",
         "materno": "Díaz"
@@ -425,7 +424,7 @@
     "alumnos": [
       {
         "id": 16,
-        "rut": "23.456.789-0",
+        "rut": "23456789-0",
         "nombre": "Fernando",
         "paterno": "Maldonado",
         "materno": "Cáceres",
@@ -448,7 +447,7 @@
       },
       {
         "id": 17,
-        "rut": "23.567.890-1",
+        "rut": "23567890-1",
         "nombre": "Daniela",
         "paterno": "Contreras",
         "materno": "Lagos",
@@ -471,7 +470,7 @@
       },
       {
         "id": 18,
-        "rut": "23.678.901-2",
+        "rut": "23678901-2",
         "nombre": "Cristóbal",
         "paterno": "Farías",
         "materno": "Guajardo",
@@ -494,7 +493,7 @@
       },
       {
         "id": 19,
-        "rut": "23.789.012-3",
+        "rut": "23789012-3",
         "nombre": "Javiera",
         "paterno": "Tapia",
         "materno": "Salazar",
@@ -517,7 +516,7 @@
       },
       {
         "id": 20,
-        "rut": "23.890.123-4",
+        "rut": "23890123-4",
         "nombre": "Gustavo",
         "paterno": "Venegas",
         "materno": "Zúñiga",
@@ -551,7 +550,7 @@
     "colegio": "LICEO INDUSTRIAL SAN JOSÉ",
     "profesor_jefe": [
       {
-        "rut": "16.802.468-0",
+        "rut": "16802468-0",
         "nombres": "Marta Elena",
         "paterno": "Castro",
         "materno": "Ruiz"
@@ -560,7 +559,7 @@
     "alumnos": [
       {
         "id": 21,
-        "rut": "24.567.890-1",
+        "rut": "24567890-1",
         "nombre": "Rodrigo",
         "paterno": "Navarrete",
         "materno": "Bustos",
@@ -583,7 +582,7 @@
       },
       {
         "id": 22,
-        "rut": "24.678.901-2",
+        "rut": "24678901-2",
         "nombre": "Camila",
         "paterno": "Poblete",
         "materno": "Aguilera",
@@ -606,7 +605,7 @@
       },
       {
         "id": 23,
-        "rut": "24.789.012-3",
+        "rut": "24789012-3",
         "nombre": "Felipe",
         "paterno": "Sepúlveda",
         "materno": "Valdivia",
@@ -629,7 +628,7 @@
       },
       {
         "id": 24,
-        "rut": "24.890.123-4",
+        "rut": "24890123-4",
         "nombre": "Constanza",
         "paterno": "Reyes",
         "materno": "Figueroa",
@@ -652,7 +651,7 @@
       },
       {
         "id": 25,
-        "rut": "24.901.234-5",
+        "rut": "24901234-5",
         "nombre": "Nicolás",
         "paterno": "Godoy",
         "materno": "Carrasco",
@@ -686,7 +685,7 @@
     "colegio": "LICEO INDUSTRIAL SAN JOSÉ",
     "profesor_jefe": [
       {
-        "rut": "17.913.579-1",
+        "rut": "17913579-1",
         "nombres": "Juan Pablo",
         "paterno": "Morales",
         "materno": "Silva"
@@ -695,7 +694,7 @@
     "alumnos": [
       {
         "id": 26,
-        "rut": "25.678.901-2",
+        "rut": "25678901-2",
         "nombre": "Bastián",
         "paterno": "Fuenzalida",
         "materno": "Moya",
@@ -718,7 +717,7 @@
       },
       {
         "id": 27,
-        "rut": "25.789.012-3",
+        "rut": "25789012-3",
         "nombre": "Antonia",
         "paterno": "Acevedo",
         "materno": "Córdova",
@@ -741,7 +740,7 @@
       },
       {
         "id": 28,
-        "rut": "25.890.123-4",
+        "rut": "25890123-4",
         "nombre": "Matías",
         "paterno": "Bustamante",
         "materno": "Orellana",
@@ -764,7 +763,7 @@
       },
       {
         "id": 29,
-        "rut": "25.901.234-5",
+        "rut": "25901234-5",
         "nombre": "Josefa",
         "paterno": "Guzmán",
         "materno": "Parra",
@@ -787,7 +786,7 @@
       },
       {
         "id": 30,
-        "rut": "26.012.345-6",
+        "rut": "26012345-6",
         "nombre": "Vicente",
         "paterno": "Lagos",
         "materno": "Toro",
@@ -821,7 +820,7 @@
     "colegio": "COLEGIO SANTA CRUZ",
     "profesor_jefe": [
       {
-        "rut": "18.024.680-2",
+        "rut": "18024680-2",
         "nombres": "María Isabel",
         "paterno": "Vargas",
         "materno": "Pizarro"
@@ -830,7 +829,7 @@
     "alumnos": [
       {
         "id": 31,
-        "rut": "26.123.456-7",
+        "rut": "26123456-7",
         "nombre": "Sofía",
         "paterno": "Henríquez",
         "materno": "Donoso",
@@ -853,7 +852,7 @@
       },
       {
         "id": 32,
-        "rut": "26.234.567-8",
+        "rut": "26234567-8",
         "nombre": "Alonso",
         "paterno": "Silva",
         "materno": "Mardones",
@@ -876,7 +875,7 @@
       },
       {
         "id": 33,
-        "rut": "26.345.678-9",
+        "rut": "26345678-9",
         "nombre": "Isabella",
         "paterno": "Cáceres",
         "materno": "Olivares",
@@ -899,7 +898,7 @@
       },
       {
         "id": 34,
-        "rut": "26.456.789-0",
+        "rut": "26456789-0",
         "nombre": "Emilio",
         "paterno": "Riquelme",
         "materno": "Valdés",
@@ -922,7 +921,7 @@
       },
       {
         "id": 35,
-        "rut": "26.567.890-1",
+        "rut": "26567890-1",
         "nombre": "Renata",
         "paterno": "Vergara",
         "materno": "Sepúlveda",
@@ -956,7 +955,7 @@
     "colegio": "COLEGIO SANTA CRUZ",
     "profesor_jefe": [
       {
-        "rut": "19.135.791-3",
+        "rut": "19135791-3",
         "nombres": "Carlos Andrés",
         "paterno": "Muñoz",
         "materno": "Carvajal"
@@ -965,7 +964,7 @@
     "alumnos": [
       {
         "id": 36,
-        "rut": "27.234.567-8",
+        "rut": "27234567-8",
         "nombre": "Javier",
         "paterno": "Toro",
         "materno": "Salinas",
@@ -988,7 +987,7 @@
       },
       {
         "id": 37,
-        "rut": "27.345.678-9",
+        "rut": "27345678-9",
         "nombre": "Martina",
         "paterno": "Leiva",
         "materno": "Castro",
@@ -1011,7 +1010,7 @@
       },
       {
         "id": 38,
-        "rut": "27.456.789-0",
+        "rut": "27456789-0",
         "nombre": "Sebastián",
         "paterno": "Moya",
         "materno": "Pizarro",
@@ -1034,7 +1033,7 @@
       },
       {
         "id": 39,
-        "rut": "27.567.890-1",
+        "rut": "27567890-1",
         "nombre": "Florencia",
         "paterno": "Zúñiga",
         "materno": "Reyes",
@@ -1057,7 +1056,7 @@
       },
       {
         "id": 40,
-        "rut": "27.678.901-2",
+        "rut": "27678901-2",
         "nombre": "Diego",
         "paterno": "Garrido",
         "materno": "Lagos",
@@ -1091,7 +1090,7 @@
     "colegio": "COLEGIO SANTA CRUZ",
     "profesor_jefe": [
       {
-        "rut": "20.246.802-4",
+        "rut": "20246802-4",
         "nombres": "Patricia Alejandra",
         "paterno": "Soto",
         "materno": "Herrera"
@@ -1100,7 +1099,7 @@
     "alumnos": [
       {
         "id": 41,
-        "rut": "28.345.678-9",
+        "rut": "28345678-9",
         "nombre": "Maximiliano",
         "paterno": "Pérez",
         "materno": "Gómez",
@@ -1123,7 +1122,7 @@
       },
       {
         "id": 42,
-        "rut": "28.456.789-0",
+        "rut": "28456789-0",
         "nombre": "Antonella",
         "paterno": "Vera",
         "materno": "Mendoza",
@@ -1146,7 +1145,7 @@
       },
       {
         "id": 43,
-        "rut": "28.567.890-1",
+        "rut": "28567890-1",
         "nombre": "Benjamín",
         "paterno": "Rivas",
         "materno": "Araya",
@@ -1169,7 +1168,7 @@
       },
       {
         "id": 44,
-        "rut": "28.678.901-2",
+        "rut": "28678901-2",
         "nombre": "Isidora",
         "paterno": "López",
         "materno": "Fuentes",
@@ -1192,7 +1191,7 @@
       },
       {
         "id": 45,
-        "rut": "28.789.012-3",
+        "rut": "28789012-3",
         "nombre": "Tomás",
         "paterno": "Carrasco",
         "materno": "Vergara",
