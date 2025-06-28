@@ -4,10 +4,10 @@ const path = require('path');
 
 // --- Configuración de la Base de Datos ---
 const dbConfig = {
-    user: process.env.DB_USER || 'user',      //  <-- CAMBIA ESTO
+    user: process.env.DB_USER || 'user',
     host: process.env.DB_HOST || 'postgres_db',
-    database: process.env.DB_NAME || 'mydb',  //  <-- CAMBIA ESTO
-    password: process.env.DB_PASSWORD || 'password', //  <-- CAMBIA ESTO
+    database: process.env.DB_NAME || 'mydb',
+    password: process.env.DB_PASSWORD || 'password',
     port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
 };
 
@@ -28,9 +28,6 @@ const asignaturasParaEnsayos = [
     'Ciencias Física'
 ];
 
-// --- ID de profesor por defecto (asumimos que existe un profesor con ID 1) ---
-const ID_PROFESOR_DEFAULT = 1;
-
 async function runPopulationScript() {
     console.log('Iniciando script de población de base de datos...');
     const client = await pool.connect();
@@ -46,16 +43,99 @@ async function runPopulationScript() {
         const tematicaMap = new Map();   // asignatura_id-nombre_tematica -> id_tematica
         const preguntaMap = new Map();   // id_pregunta -> { original_correcta_char, alternativas: [{id, texto, es_correcta}] }
         const asignaturaPreguntasMap = new Map(); // id_asignatura -> [id_pregunta]
-        
-        const allAlumnosIds = [];
+
+        const dbUsersMap = new Map(); // rut -> db_id
+        let defaultProfesorDbId = null;
+
+        // --- 1. Insertar o verificar USUARIOS (Profesores y Alumnos) ---
+        console.log('Insertando o verificando usuarios (profesores y alumnos)...');
+        const uniqueUsersToInsert = new Map(); // rut -> { data, type }
+
+        // Recopilar profesores de profesor_jefe
+        alumnosData.forEach(curso => {
+            if (curso.profesor_jefe && curso.profesor_jefe.length > 0) {
+                const pj = curso.profesor_jefe[0]; // Asumiendo que siempre hay un profesor_jefe y es el primero
+                if (!uniqueUsersToInsert.has(pj.rut)) {
+                    uniqueUsersToInsert.set(pj.rut, {
+                        rut: pj.rut,
+                        nombre: pj.nombres,
+                        email: `${pj.nombres.toLowerCase().replace(/\s/g, '')}.${pj.paterno.toLowerCase()}@miinstituto.cl`, // Generar email
+                        tipo: 'profesor'
+                    });
+                }
+            }
+        });
+
+        // Recopilar alumnos
         alumnosData.forEach(curso => {
             curso.alumnos.forEach(alumno => {
-                allAlumnosIds.push(alumno.id);
+                if (!uniqueUsersToInsert.has(alumno.rut)) {
+                    uniqueUsersToInsert.set(alumno.rut, {
+                        rut: alumno.rut,
+                        nombre: alumno.nombre,
+                        email: alumno.email || `${alumno.nombre.toLowerCase().replace(/\s/g, '')}.${alumno.paterno.toLowerCase()}@miinstituto.cl`, // Usar email si existe, sino generar
+                        tipo: 'alumno'
+                    });
+                }
             });
         });
-        console.log(`Total de alumnos encontrados: ${allAlumnosIds.length}`);
 
-        // 1. Insertar ASIGNATURAS
+        // Primero, obtener los IDs de los usuarios ya existentes en la BD para evitar conflictos con el serial
+        const existingUsers = await client.query(`SELECT id, rut FROM "usuario";`);
+        existingUsers.rows.forEach(row => {
+            dbUsersMap.set(row.rut, row.id);
+        });
+
+        for (const [rut, userData] of uniqueUsersToInsert) {
+            if (!dbUsersMap.has(rut)) { // Solo intentar insertar si el RUT no existe en nuestra lista de usuarios ya cargados/existentes
+                const password = `${userData.nombre.toLowerCase()}123`; // Primer nombre + "123"
+                const res = await client.query(
+                    `INSERT INTO "usuario" (rut, contraseña, correo, tipo) VALUES ($1, $2, $3, $4)
+                     ON CONFLICT (rut) DO NOTHING RETURNING id;`, // DO NOTHING para no sobrescribir, solo insertar si es nuevo
+                    [userData.rut, password, userData.email, userData.tipo]
+                );
+                // Si la inserción ocurrió (es decir, no hubo conflicto y res.rows tiene algo)
+                if (res.rows.length > 0) {
+                    dbUsersMap.set(userData.rut, res.rows[0].id);
+                } else {
+                    // Si hubo conflicto y no se insertó, recupera el ID del usuario existente.
+                    // Esto es necesario porque DO NOTHING no retorna el ID si hubo conflicto.
+                    const existingUserRes = await client.query(`SELECT id FROM "usuario" WHERE rut = $1;`, [userData.rut]);
+                    if (existingUserRes.rows.length > 0) {
+                        dbUsersMap.set(userData.rut, existingUserRes.rows[0].id);
+                    }
+                }
+            }
+
+            // Establecer el primer profesor encontrado como default, usando su ID de la BD
+            if (userData.tipo === 'profesor' && defaultProfesorDbId === null) {
+                defaultProfesorDbId = dbUsersMap.get(userData.rut); 
+            }
+        }
+
+        console.log(`Usuarios (profesores y alumnos) procesados. Total: ${dbUsersMap.size}`);
+        if (defaultProfesorDbId === null) {
+            // Esto solo se activaría si no hay profesores en el JSON Y tampoco se detectó uno previamente en la BD.
+            throw new Error('No se pudo determinar un ID de profesor por defecto. Asegúrate de que hay al menos un profesor.');
+        }
+
+
+        // Obtener los IDs de alumnos de la BD para usar en resultados/respuestas
+        const allAlumnosDbIds = [];
+        alumnosData.forEach(curso => {
+            curso.alumnos.forEach(alumno => {
+                const dbId = dbUsersMap.get(alumno.rut);
+                if (dbId) {
+                    allAlumnosDbIds.push(dbId);
+                } else {
+                    console.warn(`Advertencia: Alumno con RUT ${alumno.rut} del JSON no tiene un ID mapeado en dbUsersMap. Esto puede indicar que no se insertó o recuperó correctamente.`);
+                }
+            });
+        });
+        console.log(`Total de IDs de alumnos de la BD para simulación: ${allAlumnosDbIds.length}`);
+
+
+        // --- 2. Insertar ASIGNATURAS ---
         console.log('Insertando o verificando asignaturas...');
         const uniqueAsignaturas = [...new Set(preguntasData.map(p => p.asignatura))];
         for (const nombre of uniqueAsignaturas) {
@@ -68,34 +148,47 @@ async function runPopulationScript() {
         }
         console.log(`Asignaturas procesadas: ${uniqueAsignaturas.length}`);
 
-        // 2. Insertar TEMATICAS
+        // --- 3. Insertar TEMATICAS ---
         console.log('Insertando o verificando temáticas...');
-        const uniqueTematicas = new Map(); // Para almacenar 'asignatura_id-tematica_nombre'
+        const uniqueTematicasSet = new Set(); // Para almacenar 'asignatura_id-tematica_nombre'
         for (const pregunta of preguntasData) {
             const id_asignatura = asignaturaMap.get(pregunta.asignatura);
+            if (!id_asignatura) {
+                console.warn(`Asignatura "${pregunta.asignatura}" no mapeada para temática "${pregunta.tematica}".`);
+                continue;
+            }
             const tematicaKey = `${id_asignatura}-${pregunta.tematica}`;
-            if (!uniqueTematicas.has(tematicaKey)) {
-                const res = await client.query(
-                    `INSERT INTO "TEMATICA" (id_asignatura, nombre) VALUES ($1, $2) ON CONFLICT (id_asignatura, nombre) DO UPDATE SET nombre = EXCLUDED.nombre RETURNING id;`,
-                    [id_asignatura, pregunta.tematica]
-                );
-                tematicaMap.set(tematicaKey, res.rows[0].id);
-                uniqueTematicas.set(tematicaKey, true); // Marcar como procesada
+            if (!uniqueTematicasSet.has(tematicaKey)) {
+                try {
+                    const res = await client.query(
+                        `INSERT INTO "TEMATICA" (id_asignatura, nombre) VALUES ($1, $2) ON CONFLICT (id_asignatura, nombre) DO UPDATE SET nombre = EXCLUDED.nombre RETURNING id;`,
+                        [id_asignatura, pregunta.tematica]
+                    );
+                    tematicaMap.set(tematicaKey, res.rows[0].id);
+                    uniqueTematicasSet.add(tematicaKey); // Marcar como procesada
+                } catch (error) {
+                    console.error(`Error al insertar temática "${pregunta.tematica}" para asignatura ${pregunta.asignatura}:`, error.message);
+                }
             }
         }
         console.log(`Temáticas procesadas.`);
 
 
-        // 3. Insertar PREGUNTAS y ALTERNATIVAS
+        // --- 4. Insertar PREGUNTAS y ALTERNATIVAS ---
         console.log('Insertando preguntas y alternativas...');
         for (const pregunta of preguntasData) {
             const id_asignatura = asignaturaMap.get(pregunta.asignatura);
             const tematicaKey = `${id_asignatura}-${pregunta.tematica}`;
             const id_tematica = tematicaMap.get(tematicaKey);
 
+            if (!id_tematica) {
+                console.warn(`Saltando pregunta ID ${pregunta.numero} ("${pregunta.enunciado.substring(0, 30)}...") debido a temática no mapeada.`);
+                continue; // Saltar si la temática no fue insertada
+            }
+
             const resPregunta = await client.query(
                 `INSERT INTO "PREGUNTA" (id_asignatura, id_profesor, id_tematica, enunciado, efectividad) VALUES ($1, $2, $3, $4, $5) RETURNING id;`,
-                [id_asignatura, ID_PROFESOR_DEFAULT, id_tematica, pregunta.enunciado, 0]
+                [id_asignatura, defaultProfesorDbId, id_tematica, pregunta.enunciado, 0]
             );
             const id_pregunta = resPregunta.rows[0].id;
             
@@ -106,9 +199,12 @@ async function runPopulationScript() {
             const alternativeChars = ['A', 'B', 'C', 'D'];
             for (const char of alternativeChars) {
                 const es_correcta = (pregunta.correcta === char);
+                // Asegura que el texto no sea null/undefined. Si es, usa una cadena vacía.
+                const alternativaTexto = pregunta[char] || ''; 
+                
                 const resAlternativa = await client.query(
                     `INSERT INTO "ALTERNATIVA" (id_pregunta, texto, es_correcta) VALUES ($1, $2, $3) RETURNING id;`,
-                    [id_pregunta, pregunta[char], es_correcta]
+                    [id_pregunta, alternativaTexto, es_correcta]
                 );
                 alternativas.push({ id: resAlternativa.rows[0].id, es_correcta: es_correcta });
             }
@@ -116,19 +212,19 @@ async function runPopulationScript() {
         }
         console.log(`Total de preguntas y alternativas insertadas: ${preguntasData.length}`);
 
-        // 4. Crear ENSAYOS por ASIGNATURA
+        // --- 5. Crear ENSAYOS por ASIGNATURA ---
         console.log('Creando ensayos para cada asignatura objetivo...');
         const ensayosCreados = []; // [{ id_ensayo, id_asignatura, preguntas_ids: [] }]
         for (const nombreAsignatura of asignaturasParaEnsayos) {
             const id_asignatura = asignaturaMap.get(nombreAsignatura);
             if (!id_asignatura) {
-                console.warn(`Advertencia: Asignatura "${nombreAsignatura}" no encontrada. Saltando creación de ensayo.`);
+                console.warn(`Advertencia: Asignatura "${nombreAsignatura}" no encontrada en el mapa de asignaturas. Saltando creación de ensayo.`);
                 continue;
             }
 
             const preguntasDeAsignatura = asignaturaPreguntasMap.get(id_asignatura);
-            if (preguntasDeAsignatura.length === 0) {
-                console.warn(`Advertencia: No hay preguntas para la asignatura "${nombreAsignatura}". Saltando creación de ensayo.`);
+            if (!preguntasDeAsignatura || preguntasDeAsignatura.length === 0) {
+                console.warn(`Advertencia: No hay preguntas cargadas para la asignatura "${nombreAsignatura}". Saltando creación de ensayo.`);
                 continue;
             }
             
@@ -138,7 +234,7 @@ async function runPopulationScript() {
 
             const resEnsayo = await client.query(
                 `INSERT INTO "ENSAYO" (id_asignatura, dificultad, id_profesor) VALUES ($1, $2, $3) RETURNING id;`,
-                [id_asignatura, 'Media', ID_PROFESOR_DEFAULT]
+                [id_asignatura, 'Media', defaultProfesorDbId]
             );
             const id_ensayo = resEnsayo.rows[0].id;
             ensayosCreados.push({ id_ensayo, id_asignatura, preguntas_ids: preguntasParaEnsayo });
@@ -153,9 +249,9 @@ async function runPopulationScript() {
         }
         console.log(`Total de ensayos creados: ${ensayosCreados.length}`);
 
-        // 5. Simular RESPUESTAS y RESULTADOS para cada alumno y ensayo
+        // --- 6. Simular RESPUESTAS y RESULTADOS para cada alumno y ensayo ---
         console.log('Simulando respuestas y resultados de alumnos...');
-        for (const alumnoId of allAlumnosIds) {
+        for (const alumnoDbId of allAlumnosDbIds) { // Usar los IDs de la DB de los alumnos
             for (const ensayo of ensayosCreados) {
                 let correctas = 0;
                 let erroneas = 0;
@@ -178,18 +274,19 @@ async function runPopulationScript() {
 
                     await client.query(
                         `INSERT INTO "RESPUESTA" (id_ensayo, id_pregunta, id_alternativa, id_alumno, estado) VALUES ($1, $2, $3, $4, $5);`,
-                        [ensayo.id_ensayo, id_pregunta, selectedAlternativa.id, alumnoId, estado]
+                        [ensayo.id_ensayo, id_pregunta, selectedAlternativa.id, alumnoDbId, estado]
                     );
                 }
 
-                // Calcular puntaje (ejemplo simple: 100 puntos por correcta, 0 por errónea/omitida)
-                let puntaje_obtenido = (correctas / 65)*100;
+                // Calcular puntaje: (correctas / 65) con dos decimales, sobre 100
+                let puntaje_obtenido = (correctas / 65) * 100; // Ahora sobre 100
                 puntaje_obtenido = parseFloat(puntaje_obtenido.toFixed(2));
+                
                 const tiempo_empleado = Math.floor(Math.random() * (120 - 30 + 1) + 30) * 60; // entre 30 y 120 minutos en segundos
 
                 await client.query(
-                    `INSERT INTO "RESULTADO" (id, id_alumno, id_ensayo, puntaje_obtenido, cantidad_correctas, cantidad_omitidas, cantidad_erroneas, tiempo_empleado) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7);`,
-                    [alumnoId, ensayo.id_ensayo, puntaje_obtenido, correctas, omitidas, erroneas, tiempo_empleado]
+                    `INSERT INTO "RESULTADO" (id_alumno, id_ensayo, puntaje_obtenido, cantidad_correctas, cantidad_omitidas, cantidad_erroneas, tiempo_empleado) VALUES ($1, $2, $3, $4, $5, $6, $7);`,
+                    [alumnoDbId, ensayo.id_ensayo, puntaje_obtenido, correctas, omitidas, erroneas, tiempo_empleado]
                 );
             }
         }
