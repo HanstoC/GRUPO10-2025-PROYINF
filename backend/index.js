@@ -3,6 +3,7 @@ const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const { Pool } = require('pg');
+const fs = require('fs');
 
 const alumnos = require('./api_sim/alumnos.json');
 const docentes = require('./api_sim/docentes.json');
@@ -470,5 +471,35 @@ app.get('/logout', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+});
+
+app.get('/api/alumnos/data-and-facets', (req, res) => { // Puedes elegir una URL más descriptiva
+    try {
+        const data = alumnosService.getAlumnosAndFacets();
+        res.json(data); // Envía el objeto completo con alumnos y facetas
+    } catch (error) {
+        console.error('Error en la ruta /api/alumnos/data-and-facets:', error.message);
+        res.status(500).json({ message: 'Error al obtener datos de alumnos y facetas.' });
+    }
+});
+
+app.get('/api/ensayos/data-and-facets', async (req, res) => { // ¡Importante: esta ruta debe ser async!
+    try {
+        const data = await alumnosService.getEnsayoResultsAndFacetsFromDB(); // ¡Await aquí!
+        res.json(data);
+    } catch (error) {
+        console.error('Error en la ruta /api/ensayos/data-and-facets:', error.message);
+        res.status(500).json({ message: 'Error al obtener datos de ensayos y facetas.' });
+    }
+});
+
+app.get('/api/data/combined', async (req, res) => { // Una URL descriptiva para los datos combinados
+    try {
+        const data = await alumnosService.getCombinedDataAndFacets();
+        res.json(data);
+    } catch (error) {
+        console.error('Error en la ruta /api/data/combined:', error.message);
+        res.status(500).json({ message: 'Error al obtener datos combinados.' });
+    }
 });
 
