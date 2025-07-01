@@ -208,6 +208,77 @@ app.get('/ensayos/:id/preguntas', async (req, res) => {
 });
 
 
+app.post('/ensayos/:id/responder', necesitaAuth, async (req, res) => {
+  const ensayoId = req.params.id;
+  const alumnoId = req.session.user?.id;
+  const { respuestas, tiempo } = req.body;
+
+  if (!alumnoId) return res.status(401).send('No autorizado');
+  if (!respuestas || typeof respuestas !== 'object') {
+    return res.status(400).send('Respuestas inválidas');
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Obtener todas las respuestas correctas del ensayo
+    const { rows: preguntas } = await client.query(`
+      SELECT P.id AS pregunta_id, A.id AS alternativa_correcta
+      FROM "ENSAYO_PREGUNTA" EP
+      JOIN "PREGUNTA" P ON EP.id_pregunta = P.id
+      JOIN "ALTERNATIVA" A ON A.id_pregunta = P.id AND A.es_correcta = true
+      WHERE EP.id_ensayo = $1
+    `, [ensayoId]);
+
+    let correctas = 0;
+    let erróneas = 0;
+    let omitidas = 0;
+
+    for (const row of preguntas) {
+      const respuesta = respuestas[row.pregunta_id];
+      if (respuesta === undefined) {
+        omitidas++;
+      } else if (Number(respuesta) === row.alternativa_correcta) {
+        correctas++;
+      } else {
+        erróneas++;
+      }
+    }
+
+    const puntaje = correctas; // Puedes personalizar este cálculo si es necesario
+
+    // Guardar resultado
+    await client.query(`
+      INSERT INTO "RESULTADO" (
+        id_alumno,
+        id_ensayo,
+        puntaje_obtenido,
+        cantidad_correctas,
+        cantidad_erroneas,
+        cantidad_omitidas,
+        tiempo_empleado
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `, [alumnoId, ensayoId, puntaje, correctas, erróneas, omitidas, tiempo]);
+
+    await client.query('COMMIT');
+    res.status(201).json({
+      mensaje: 'Respuestas guardadas',
+      puntaje,
+      correctas,
+      erróneas,
+      omitidas,
+      tiempo
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Error al guardar respuestas:', err);
+    res.status(500).send('Error al guardar respuestas');
+  } finally {
+    client.release();
+  }
+});
+
 
 
 
@@ -232,24 +303,40 @@ app.get('/docentes', necesitaAuth, async (req, res) => {
   }
 });
 
-app.get('/resultados', async (req, res) => {
-  const idAlumno = req.query.alumno;
+app.get('/resultados', necesitaAuth, async (req, res) => {
+  const tipo = req.session.user?.tipo;
+  const userId = req.session.user?.id;
 
-  if (!idAlumno) {
-    return res.status(400).send('Falta el parámetro alumno');
+  let idAlumno;
+
+  if (tipo === 'alumno') {
+    idAlumno = userId;
+  } else if (tipo === 'profesor') {
+    idAlumno = req.query.alumno;
+    if (!idAlumno) {
+      return res.status(400).send('Falta el parámetro alumno');
+    }
+  } else {
+    return res.status(403).send('Acceso denegado');
   }
 
   try {
     const result = await pool.query(`
       SELECT 
         e.id AS id_ensayo,
+        e.id_asignatura,
         a.nombre AS asignatura,
         e.dificultad,
-        r.puntaje
+        r.puntaje_obtenido,
+        r.cantidad_correctas,
+        r.cantidad_erroneas,
+        r.cantidad_omitidas,
+        r.tiempo_empleado
       FROM "RESULTADO" r
       JOIN "ENSAYO" e ON r.id_ensayo = e.id
       JOIN "ASIGNATURA" a ON e.id_asignatura = a.id
       WHERE r.id_alumno = $1
+      ORDER BY r.id DESC
     `, [idAlumno]);
 
     res.json(result.rows);
@@ -258,6 +345,7 @@ app.get('/resultados', async (req, res) => {
     res.status(500).send('Error al obtener resultados del alumno');
   }
 });
+
 
 
 app.get('/preguntas', necesitaAuth, async (req, res) => {

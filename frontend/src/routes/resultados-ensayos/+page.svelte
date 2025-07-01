@@ -1,40 +1,59 @@
 <script lang="ts">
-	import Card from '$lib/components/common/Card.svelte';
-	import FeatureList from '$lib/components/common/FeatureList';
-	import PageMargin from '$lib/components/common/PageMargin.svelte';
-	import LoadingIndicator from '$lib/components/common/utils/LoadingIndicator.svelte';
-	import LastEnsayos from '$lib/components/ensayos/LastEnsayos.svelte';
-	import { Utils } from '../../utils/Utils.svelte';
+  import { onMount } from 'svelte';
+  import Card from '$lib/components/common/Card.svelte';
+  import PageMargin from '$lib/components/common/PageMargin.svelte';
+  import LoadingIndicator from '$lib/components/common/utils/LoadingIndicator.svelte';
+  import FiltroAsignaturas from '$lib/components/ensayos/FilterAsignatura.svelte';
 
-	let estadisticas: Promise<{
-		ensayos_realizados?: number;
-		ensayos_completados?: number;
-	}> = $state(
-		new Promise(async (r) => {
-			let out: any = {};
-			let timeout = Utils.timeout(500);
-			await timeout;
-			r(out);
-		})
-	);
+  let resultados = [];
+  let cargando = true;
+  let selectedAsignaturas: number[] = [];
+
+  $: resultadosFiltrados = selectedAsignaturas.length > 0
+	? resultados.filter(r => selectedAsignaturas.includes(r.id_asignatura))
+	: resultados;
+
+  onMount(async () => {
+    try {
+      const res = await fetch('http://localhost:8000/resultados', {
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error('Error al obtener resultados');
+      resultados = await res.json();
+    } catch (e) {
+      console.error('Error al cargar resultados:', e);
+    } finally {
+      cargando = false;
+    }
+  });
 </script>
 
 <PageMargin>
-	<Card size="lg" class="flex h-full w-full flex-col gap-4">
-		{#await Promise.all([estadisticas])}
-			<LoadingIndicator size="lg" />
-		{:then [estadisticas]}
-			<FeatureList.Root>
-				<FeatureList.Item label="Ensayos realizados"
-					>{estadisticas.ensayos_realizados ?? 0}</FeatureList.Item
-				>
-				<FeatureList.Item label="Ensayos completados"
-					>{estadisticas.ensayos_completados ?? 0}</FeatureList.Item
-				>
-			</FeatureList.Root>
-			<Card class="h-1/4 w-full">
-				<LastEnsayos />
+  <Card size="lg" class="w-full">
+	{#if cargando}
+		<LoadingIndicator />
+	{:else if resultados.length === 0}
+		<p class="text-center text-gray-500">No tienes resultados aún.</p>
+	{:else}
+		<h2 class="text-2xl font-semibold mb-4">Tus resultados</h2>
+
+		<!-- Filtro -->
+		<FiltroAsignaturas bind:selected={selectedAsignaturas} />
+
+		<div class="space-y-4 mt-4">
+		{#each resultadosFiltrados as r}
+			<Card class="p-4">
+			<p><strong>Ensayo:</strong> #{r.id_ensayo}</p>
+			<p><strong>Asignatura:</strong> {r.asignatura}</p>
+			<p><strong>Dificultad:</strong> {r.dificultad}</p>
+			<p><strong>Puntaje:</strong> {r.puntaje_obtenido}</p>
+			<p><strong>Correctas:</strong> {r.cantidad_correctas}</p>
+			<p><strong>Erróneas:</strong> {r.cantidad_erroneas}</p>
+			<p><strong>Omitidas:</strong> {r.cantidad_omitidas}</p>
+			<p><strong>Tiempo empleado:</strong> {r.tiempo_empleado} segundos</p>
 			</Card>
-		{/await}
+		{/each}
+		</div>
+	{/if}
 	</Card>
 </PageMargin>

@@ -10,21 +10,19 @@
   import LoadingIndicator from '$lib/components/common/utils/LoadingIndicator.svelte';
   import Form from '$lib/components/common/Form';
   import { RolUsuario, Usuario } from '$lib/auth.svelte';
-  import Button from '$lib/components/common/Button.svelte';
   import MaterialSymbolsSelectAll from '$lib/icons/MaterialSymbolsSelectAll.svelte';
   import MaterialSymbolsDelete from '$lib/icons/MaterialSymbolsDelete.svelte';
 
   let preguntas = [];
   let respuestas: Record<number, number> = {}; // pregunta_id -> alternativa_id
-  let tiempoRestante = 600; // 10 minutos (en segundos)
+  let tiempoTranscurrido = 0; // en segundos
+  let minutos = 0;
+  let segundos = 0;
   let intervalo;
   let ensayoId: string;
-
+  let puntajeFinal: number | null = null;
   let cargando = true;
   let finalizado = false;
-
-  $: minutos = Math.floor(tiempoRestante / 60);
-  $: segundos = tiempoRestante % 60;
 
   onMount(async () => {
     const params = get(page).params;
@@ -36,40 +34,40 @@
       });
       preguntas = await res.json();
       cargando = false;
-      iniciarTemporizador();
+      iniciarCronometro();
     } catch (e) {
       console.error('Error al cargar preguntas:', e);
     }
   });
 
+  function iniciarCronometro() {
+    intervalo = setInterval(() => {
+      tiempoTranscurrido++;
+      minutos = Math.floor(tiempoTranscurrido / 60);
+      segundos = tiempoTranscurrido % 60;
+    }, 1000);
+  }
+
   function seleccionar(pregunta_id: number, alternativa_id: number) {
     respuestas[pregunta_id] = alternativa_id;
   }
 
-  function iniciarTemporizador() {
-    intervalo = setInterval(() => {
-      tiempoRestante -= 1;
-      if (tiempoRestante <= 0) {
-        clearInterval(intervalo);
-        enviar();
-      }
-    }, 1000);
-  }
-
   async function enviar() {
-    clearInterval(intervalo);
+    clearInterval(intervalo); // detener cronómetro
     finalizado = true;
+
     try {
       const res = await fetch(`http://localhost:8000/ensayos/${ensayoId}/responder`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ respuestas })
+        body: JSON.stringify({ respuestas, tiempo: tiempoTranscurrido })
       });
 
       if (res.ok) {
+        const data = await res.json();
+        puntajeFinal = data.puntaje ?? null;
         alert('Ensayo enviado con éxito');
-        goto('/'); // o ir a resultados
       } else {
         console.error('Error al enviar respuestas');
         alert('Hubo un problema al enviar tus respuestas.');
@@ -83,13 +81,18 @@
 {#if cargando}
   <p class="text-center mt-10 text-gray-500">Cargando preguntas...</p>
 {:else if finalizado}
-  <p class="text-center text-green-600 font-semibold mt-10">Ensayo finalizado. Gracias por responder.</p>
+  <div class="text-center mt-10">
+    <p class="text-green-600 font-semibold mb-2">Ensayo finalizado. Gracias por responder.</p>
+    {#if puntajeFinal !== null}
+      <p class="text-xl font-bold text-blue-700">Tu puntaje: {puntajeFinal} / {preguntas.length}</p>
+    {/if}
+  </div>
 {:else}
   <Card class="w-full max-w-3xl mx-auto p-6">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">Ensayo #{ensayoId}</h2>
       <p class="text-sm text-red-500 font-mono">
-        Tiempo restante: {minutos}:{segundos < 10 ? `0${segundos}` : segundos}
+        Tiempo transcurrido: {minutos}:{segundos < 10 ? `0${segundos}` : segundos}
       </p>
     </div>
     <form on:submit|preventDefault={enviar} class="space-y-6">
@@ -102,9 +105,10 @@
           <label class="flex items-center gap-2">
             <input
               type="radio"
-              name={`pregunta-${i}`}
+              name={`pregunta-${p.pregunta_id}`}
               value={alt.id}
-              bind:group={respuestas[i]}
+              checked={respuestas[p.pregunta_id] === alt.id}
+              on:change={() => seleccionar(p.pregunta_id, alt.id)}
               class="accent-blue-500"
             />
             <span>{alt.texto}</span>
@@ -115,7 +119,12 @@
   {/each}
 
   <div class="flex justify-end pt-6">
-    <Button type="submit" class="btn btn-primary">Enviar ensayo</Button>
+    <button
+      type="submit"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded shadow transition duration-150"
+    >
+      Enviar ensayo
+    </button>
   </div>
 </form>
   </Card>
