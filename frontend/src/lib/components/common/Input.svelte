@@ -1,18 +1,20 @@
 <script lang="ts">
 	import Animations from '$lib/helpers/Animations';
 	import { getContext } from 'svelte';
-	import type { HTMLInputAttributes } from 'svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
+
+	type formats = 'none' | 'rut';
 
 	let {
 		value = $bindable(),
-		format = 'none',
+		format = 'none' as formats,
 		class: className,
 		...props
 	}: HTMLInputAttributes & {
-		format?: 'none' | 'rut';
+		format?: formats;
 	} = $props();
 
-	const processFunc: () => any = {
+	const processFuncs: Record<formats, () => void> = {
 		none: () => {
 			value = value;
 		},
@@ -27,7 +29,8 @@
 					value.match(/^\d{1,2}\.\d{3}\.\d{3}-[\dkK]$/) ? '' : 'El rut es inválido'
 				);
 		}
-	}[format];
+	};
+	const processFunc = processFuncs[format as formats];
 
 	let last = '';
 	const onUpdate = () => {

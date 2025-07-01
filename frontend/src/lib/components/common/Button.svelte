@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { tv } from 'tailwind-variants';
-	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte';
 	import LoadingIndicator from './utils/LoadingIndicator.svelte';
+	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
 	const BUTTONS_VARIANTS = {
 		base: 'cursor-pointer focus-visible:ring-ring inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 disabled:pointer-events-none disabled:opacity-50',

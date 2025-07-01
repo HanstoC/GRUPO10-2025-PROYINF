@@ -1,10 +1,7 @@
 import { browser } from "$app/environment";
 import { STORAGE } from "./global/storage";
 
-export interface Usuario {
-	rol: RolUsuario;
-	rut: string;
-}
+export type Usuario = { [key: string]: any };
 
 export enum RolUsuario {
 	Alumno = 'alumno',

@@ -1,7 +1,6 @@
 import { goto } from "$app/navigation";
 import { RolUsuario, Usuario } from "$lib/auth.svelte";
 import { API } from "$lib/global/api";
-import { STORAGE } from "$lib/global/storage";
 import { Utils } from "../../utils/Utils.svelte";
 
 export enum ASIGNATURAS {
@@ -51,7 +50,7 @@ export default class Database {
         const { user } = await response.json();
         await delay;
 
-        if(user.tipo=='alumno'){
+        if (user.tipo == 'alumno') {
             console.log(user);
             Usuario.value = {
                 rut,
@@ -66,8 +65,6 @@ export default class Database {
                 genero: user.genero,
                 situacion_alumno: user.situacion_alumno,
                 tipo_ensenanza: user.tipo_ensenanza
-    
-    
             };
         } else {
             Usuario.value = {
@@ -76,7 +73,7 @@ export default class Database {
                 rol: user.tipo,
                 correo: user.correo
             }
-            
+
         }
     }
 
