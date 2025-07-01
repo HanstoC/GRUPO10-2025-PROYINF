@@ -77,6 +77,14 @@ Dento del proyecto, en la carpeta db se encuentra la información de los usuario
 
   ```
 
+## Scripts
+
+para poder tener mayor cantidad de datos en la plataforma se implemento un script que carga datos en las bases de datos, para poder ejecutarlo en docker son necesarios los siguientes comandos ejecutandolos en otra terminal:
+  ```
+docker exec -it proyectoanalisis-backend-1 sh
+npm run "cargar info"
+  ```
+
 ## Comandos utiles:
 
 - docker compose up Si quieren levantar el proyecto en segundo plano pueden usar:
