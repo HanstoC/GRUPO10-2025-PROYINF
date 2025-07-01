@@ -1,249 +1,125 @@
 <script lang="ts">
-    import { API } from '$lib/global/api';
-    import { Usuario } from '$lib/auth.svelte';
-    import Button from '$lib/components/common/Button.svelte';
-    import Form from '$lib/components/common/Form';
-    import Card from '$lib/components/common/Card.svelte';
-    import { goto } from '$app/navigation';
-    import PageMargin from '$lib/components/common/PageMargin.svelte';
+	import Card from '$lib/components/common/Card.svelte';
+	import PageMargin from '$lib/components/common/PageMargin.svelte';
+	import Form from '$lib/components/common/Form';
+	import Input from '$lib/components/common/Input.svelte';
+	import FileInput from '$lib/components/common/FileInput.svelte';
+	import { onMount } from 'svelte';
 
-    interface Asignatura {
-        id: number;
-        nombre: string;
-    }
+	let pregunta = {
+		topico: '',
+		pregunta: '',
+		alternativas: ['', '', '', ''],
+		correcta: 0
+	};
 
-    interface Tematica {
-        id: number;
-        nombre: string;
-    }
+	let imagenes: FileList | undefined;
+	let asignaturas = [];
+	let id_asignatura = '';
+	let id_profesor = 1;
 
-    interface Alternativa {
-        texto: string;
-        es_correcta: boolean;
-    }
+	onMount(async () => {
+		const res = await fetch('http://localhost:8000/asignaturas', {
+			method: 'GET',
+			credentials: 'include'
+		});
+		asignaturas = await res.json();
+		if (asignaturas.length) {
+			id_asignatura = asignaturas[0].id;
+		}
+	});
 
-    let asignaturas: Asignatura[] = $state([]);
-    let tematicas: Tematica[] = $state([]);
-    let selectedAsignatura = $state('');
-    let selectedTematica = $state('');
-    let newTematica = $state('');
-    let pregunta = $state('');
-    let imagen = $state('');
-    let alternativas: Alternativa[] = $state([
-        { texto: '', es_correcta: false },
-        { texto: '', es_correcta: false },
-        { texto: '', es_correcta: false },
-        { texto: '', es_correcta: false }
-    ]);
-    let loading = $state(false);
-    let error = $state('');
+	async function toBase64(file: File): Promise<string> {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.readAsDataURL(file);
+			reader.onload = () => resolve(reader.result as string);
+			reader.onerror = reject;
+		});
+	}
 
-    $effect(() => {
-        loadAsignaturas();
-    });
+	async function guardarPregunta() {
 
-    $effect(() => {
-        if (selectedAsignatura) {
-            loadTematicas();
-        } else {
-            tematicas = [];
-            selectedTematica = '';
-        }
-    });
+		let imagenBase64 = null;
+		if (imagenes && imagenes.length > 0) {
+			imagenBase64 = await toBase64(imagenes[0]);
+		}
 
-    async function loadAsignaturas() {
-        try {
-            const response = await fetch(API.ASIGNATURAS);
-            if (!response.ok) throw new Error('Error al cargar asignaturas');
-            asignaturas = await response.json();
-        } catch (e) {
-            error = e instanceof Error ? e.message : 'Error desconocido';
-        }
-    }
+		const respuestas = pregunta.alternativas.map((texto, i) => ({
+			texto,
+			es_correcta: i === pregunta.correcta
+		}));
 
-    async function loadTematicas() {
-        try {
-            const response = await fetch(API.TEMATICAS(selectedAsignatura));
-            if (!response.ok) throw new Error('Error al cargar tematicas');
-            tematicas = await response.json();
-        } catch (e) {
-            error = e instanceof Error ? e.message : 'Error desconocido';
-        }
-    }
+		const payload = {
+			id_asignatura,
+			id_profesor,
+			topico: pregunta.topico,
+			pregunta: pregunta.pregunta,
+			imagen: imagenBase64,
+			respuestas
+		};
 
-    function handleImageUpload(event: Event) {
-        const input = event.target as HTMLInputElement;
-        const file = input.files?.[0];
-        
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imagen = e.target?.result as string;
-            };
-            reader.readAsDataURL(file);
-        }
-    }
+		const res = await fetch('http://localhost:8000/preguntas', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include',
+			body: JSON.stringify(payload)
+		});
 
-    function setCorrectAnswer(index: number) {
-        alternativas = alternativas.map((alt, i) => ({
-            ...alt,
-            es_correcta: i === index
-        }));
-    }
-
-    async function handleSubmit() {
-        if (!selectedAsignatura || !pregunta || (!selectedTematica && !newTematica) || alternativas.some(alt => !alt.texto)) {
-            error = 'Por favor complete todos los campos requeridos';
-            return;
-        }
-
-        if (!alternativas.some(alt => alt.es_correcta)) {
-            error = 'Por favor seleccione una respuesta correcta';
-            return;
-        }
-
-        loading = true;
-        error = '';
-
-        try {
-            const response = await fetch(API.GUARDAR_PREGUNTA, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id_asignatura: parseInt(selectedAsignatura),
-                    id_profesor: Usuario.value?.id,
-                    id_tematica: selectedTematica ? parseInt(selectedTematica) : undefined,
-                    topico: newTematica || undefined,
-                    pregunta,
-                    imagen,
-                    respuestas: alternativas
-                }),
-            });
-
-            if (!response.ok) throw new Error('Error al crear la pregunta');
-            
-            // Navigate back to the essays list
-            goto('/editor-ensayos');
-            
-        } catch (e) {
-            error = e instanceof Error ? e.message : 'Error desconocido';
-        } finally {
-            loading = false;
-        }
-    }
+		if (res.ok) {
+			alert('Pregunta guardada con éxito');
+		} else {
+			const err = await res.text();
+			alert('Error al guardar: ' + err);
+		}
+	}
 </script>
 
-<PageMargin>
-    <div class="flex flex-col gap-4 mb-4">
-        <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold">Crear Nueva Pregunta</h1>
-            <Button variant="outlined" href="/editor-ensayos">Volver</Button>
-        </div>
-    </div>
+<PageMargin backButton>
+	<Card class="w-full">
+		<Form.Root
+			onsubmit|preventDefault={guardarPregunta}
+			class="flex h-full w-full flex-col items-center justify-center gap-2"
+		>
+			<Form.Item required label="Asignatura">
+				<select bind:value={id_asignatura} class="w-full border rounded p-1 bg-card" >
+					{#each asignaturas as a}
+						<option value={a.id}>{a.nombre}</option>
+					{/each}
+				</select>
+			</Form.Item>
 
-    <Card class="w-full">
-        <Form.Root 
-            class="flex flex-col gap-4"
-            {error}
-            onsubmit={handleSubmit}
-        >
-            <Form.Item required>
-                <Form.Label>Asignatura</Form.Label>
-                <select
-                    bind:value={selectedAsignatura}
-                    class="border-input bg-background text-sm rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring w-full"
-                >
-                    <option value="">Seleccione una asignatura</option>
-                    {#each asignaturas as asignatura}
-                        <option value={asignatura.id}>{asignatura.nombre}</option>
-                    {/each}
-                </select>
-            </Form.Item>
+			<Form.Item required label="Tópico">
+				<Input bind:value={pregunta.topico} placeholder="Ej: Gramática" />
+			</Form.Item>
 
-            <Form.Item required>
-                <Form.Label>Temática</Form.Label>
-                <div class="flex flex-col gap-4">
-                    {#if selectedAsignatura}
-                        <select
-                            bind:value={selectedTematica}
-                            class="border-input bg-background text-sm rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring w-full"
-                            on:change={() => newTematica = ''}
-                        >
-                            <option value="">Seleccione una temática existente</option>
-                            {#each tematicas as tematica}
-                                <option value={tematica.id}>{tematica.nombre}</option>
-                            {/each}
-                        </select>
+			<Form.Item required label="Enunciado">
+				<Input bind:value={pregunta.pregunta} />
+			</Form.Item>
 
-                        {#if !selectedTematica}
-                            <div class="flex flex-col gap-2">
-                                <span class="text-sm text-muted-foreground">O cree una nueva temática:</span>
-                                <input
-                                    type="text"
-                                    bind:value={newTematica}
-                                    class="border-input bg-background text-sm rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring w-full"
-                                    placeholder="Ej: Números Reales, Literatura Contemporánea, etc."
-                                />
-                            </div>
-                        {/if}
-                    {:else}
-                        <p class="text-sm text-muted-foreground">Seleccione una asignatura primero</p>
-                    {/if}
-                </div>
-            </Form.Item>
+			<Form.Item label="Imagen">
+				<FileInput bind:value={imagenes} />
+			</Form.Item>
 
-            <Form.Item required>
-                <Form.Label>Pregunta</Form.Label>
-                <textarea
-                    bind:value={pregunta}
-                    class="border-input bg-background text-sm rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring w-full min-h-[100px]"
-                    placeholder="Escriba la pregunta aquí..."
-                />
-            </Form.Item>
+			{#each ['A', 'B', 'C', 'D'] as letra, i}
+				<Form.Item label={`Alternativa ${letra}`}>
+					<div class="flex items-center gap-2">
+						<input type="radio" name="correcta" bind:group={pregunta.correcta} value={i} />
+						<Input bind:value={pregunta.alternativas[i]} />
+					</div>
+				</Form.Item>
+			{/each}
 
-            <Form.Item>
-                <Form.Label>Imagen (opcional)</Form.Label>
-                <input
-                    type="file"
-                    accept="image/*"
-                    on:change={handleImageUpload}
-                    class="border-input bg-background text-sm rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring w-full"
-                />
-            </Form.Item>
+			<Form.Footer>
+				<button
+					type="button"
+					class="bg-blue-400 text-white px-4 py-2 rounded"
+					on:click={guardarPregunta}
+				>
+					Guardar Pregunta
+				</button>
+			</Form.Footer>
+		</Form.Root>
+	</Card>
 
-            <Form.Item required>
-                <Form.Label>Alternativas</Form.Label>
-                <div class="flex flex-col gap-3">
-                    {#each alternativas as alternativa, i}
-                        <div class="flex gap-2 items-center">
-                            <input
-                                type="text"
-                                bind:value={alternativa.texto}
-                                placeholder={`Alternativa ${i + 1}`}
-                                class="border-input bg-background text-sm rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring flex-1"
-                            />
-                            <Button
-                                type="button"
-                                variant={alternativa.es_correcta ? 'default' : 'outlined'}
-                                size="sm"
-                                onclick={() => setCorrectAnswer(i)}
-                            >
-                                {alternativa.es_correcta ? 'Correcta' : 'Marcar correcta'}
-                            </Button>
-                        </div>
-                    {/each}
-                </div>
-            </Form.Item>
-
-            <Form.Error {error} />
-
-            <Form.Footer>
-                <Form.Submit {loading}>
-                    Crear Pregunta
-                </Form.Submit>
-            </Form.Footer>
-        </Form.Root>
-    </Card>
-</PageMargin> 
+</PageMargin>

@@ -2,7 +2,7 @@ export const LINKS = {
 	ENSAYOS: '/ensayos',
 	RESULTADOS_ENSAYOS: '/resultados-ensayos',
 	EDITOR_ENSAYOS: '/editor-ensayos',
-	EDITOR_PREGUNTAS: '/editor-preguntas',
+	EDITOR_PREGUNTAS: '/preguntas/crear',
 	PERFIL: '/perfil',
 	HOME: '/',
 	LOGIN: '/login',

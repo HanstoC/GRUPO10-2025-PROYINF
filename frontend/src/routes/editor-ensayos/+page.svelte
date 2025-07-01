@@ -4,6 +4,7 @@
 	import Form from '$lib/components/common/Form';
 	import Button from '$lib/components/common/Button.svelte';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation'
 
 	let asignaturas = [];
 	let id_asignatura = '';
@@ -70,6 +71,7 @@
 
 		if (res.ok) {
 			alert('Ensayo creado con éxito');
+			goto('/ensayos')
 		} else {
 			alert('Error al crear ensayo');
 		}
@@ -80,7 +82,7 @@
 	<Card class="w-full">
 		<Form.Root onsubmit|preventDefault={guardarEnsayo} class="flex flex-col gap-4">
 			<Form.Item label="Asignatura">
-				<select bind:value={id_asignatura} class="w-full border p-2 rounded">
+				<select bind:value={id_asignatura} class="w-full border p-2 rounded bg-card">
 					{#each asignaturas as a}
 						<option value={a.id}>{a.nombre}</option>
 					{/each}
@@ -88,7 +90,7 @@
 			</Form.Item>
 
 			<Form.Item label="Dificultad">
-				<select bind:value={dificultad} class="w-full border p-2 rounded">
+				<select bind:value={dificultad} class="w-full border p-2 rounded bg-card">
 					<option value="Fácil">Fácil</option>
 					<option value="Media">Media</option>
 					<option value="Difícil">Difícil</option>

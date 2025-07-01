@@ -347,54 +347,6 @@ app.get('/resultados', necesitaAuth, async (req, res) => {
 });
 
 
-
-app.get('/preguntas', necesitaAuth, async (req, res) => {
-  const idAsignatura = req.query.asignatura;
-
-  try {
-    let result;
-    if (idAsignatura) {
-      result = await pool.query(`
-        SELECT 
-          p.id,
-          p.enunciado,
-          p.imagen_base64,
-          t.nombre AS topico,
-          a.nombre AS asignatura,
-          u.rut AS autor
-        FROM "PREGUNTA" p
-        JOIN "TEMATICA" t ON p.id_tematica = t.id
-        JOIN "ASIGNATURA" a ON p.id_asignatura = a.id
-        JOIN "usuario" u ON p.id_profesor = u.id
-        WHERE p.id_asignatura = $1
-        ORDER BY p.id DESC
-      `, [idAsignatura]);
-    } else {
-      result = await pool.query(`
-        SELECT 
-          p.id,
-          p.enunciado,
-          p.imagen_base64,
-          t.nombre AS topico,
-          a.nombre AS asignatura,
-          u.rut AS autor
-        FROM "PREGUNTA" p
-        JOIN "TEMATICA" t ON p.id_tematica = t.id
-        JOIN "ASIGNATURA" a ON p.id_asignatura = a.id
-        JOIN "usuario" u ON p.id_profesor = u.id
-        ORDER BY p.id DESC
-      `);
-    }
-
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error al obtener preguntas:', err);
-    res.status(500).send('Error al obtener preguntas');
-  }
-});
-
-
-
 app.post('/preguntas', necesitaAuth, async (req, res) => {
   const client = await pool.connect();
 
@@ -591,3 +543,179 @@ app.get('/api/data/combined', async (req, res) => { // Una URL descriptiva para 
     }
 });
 
+app.get('/preguntas', necesitaAuth, async (req, res) => {
+  let asignaturaWhere = "";
+  if (req.query.asignatura) {
+    asignaturaWhere = ` WHERE p.id_asignatura IN (${req.query.asignatura})`;
+  }
+
+  try {
+    let result;
+
+    result = await pool.query(`
+      SELECT 
+        p.id,
+        p.enunciado,
+        p.imagen_base64,
+        t.nombre AS topico,
+        a.nombre AS asignatura,
+        u.rut AS autor
+      FROM "PREGUNTA" p
+      JOIN "TEMATICA" t ON p.id_tematica = t.id
+      JOIN "ASIGNATURA" a ON p.id_asignatura = a.id
+      JOIN "usuario" u ON p.id_profesor = u.id
+      ${asignaturaWhere}
+      ORDER BY p.id DESC
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error al obtener preguntas:', err);
+    res.status(500).send('Error al obtener preguntas');
+  }
+});
+
+app.get('/preguntas/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(`SELECT p.*, t.id as id_tematica, t.nombre AS topico FROM "PREGUNTA" p INNER JOIN "TEMATICA" t ON t.id = p.id_tematica WHERE p.id = $1`, [id]);
+    const pregunta = result.rows[0];
+
+    const resultAlternativas = await pool.query(`SELECT a.* FROM "ALTERNATIVA" a WHERE a.id_pregunta = $1 ORDER BY a.id ASC`, [id]);
+    pregunta.correcta = resultAlternativas.rows.find(alternativa => alternativa.es_correcta).id;
+    pregunta.alternativas = resultAlternativas.rows.map(alternativa => ({id: alternativa.id, texto: alternativa.texto}));
+
+    res.json(pregunta);
+  } catch (err) {
+    console.error('Error al obtener pregunta:', err);
+    res.status(500).send('Error al obtener pregunta');
+  }
+});
+
+app.put('/preguntas/:id', async (req, res) => {
+  const { id } = req.params;
+  const { enunciado, imagen_base64, id_tematica, topico, respuestas, id_asignatura } = req.body;
+
+  try {
+    await pool.query(`UPDATE "PREGUNTA" SET enunciado = $1, imagen_base64 = $2, id_asignatura = $3 WHERE id = $4`, [enunciado, imagen_base64, id_asignatura, id]);
+    await pool.query(`UPDATE "TEMATICA" SET nombre = $1 WHERE id = $2`, [topico, id_tematica]);
+
+    for (const alternativa of respuestas) {
+      await pool.query(`UPDATE "ALTERNATIVA" SET texto = $1, es_correcta = $2 WHERE id = $3`, [alternativa.texto, alternativa.es_correcta, alternativa.id]);
+    }
+
+    res.status(200).send('Pregunta actualizada');
+  } catch (err) {
+    console.error('Error al actualizar pregunta:', err);
+
+    res.status(500).send('Error al actualizar pregunta');
+  }
+});
+
+
+app.put('/ensayos/:id', necesitaAuth, async (req, res) => {
+  const ensayoId = parseInt(req.params.id, 10);
+  const { id_asignatura, dificultad, preguntas } = req.body;
+
+  if (!ensayoId || !Array.isArray(preguntas)) {
+    return res.status(400).send('Datos incompletos');
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    await client.query(
+      `UPDATE "ENSAYO"
+       SET id_asignatura = $1, dificultad = $2
+       WHERE id = $3`,
+      [id_asignatura, dificultad, ensayoId]
+    );
+
+    await client.query(
+      `DELETE FROM "ENSAYO_PREGUNTA" WHERE id_ensayo = $1`,
+      [ensayoId]
+    );
+
+    const inserts = preguntas.map(id_pregunta =>
+      client.query(
+        `INSERT INTO "ENSAYO_PREGUNTA" (id_ensayo, id_pregunta)
+         VALUES ($1, $2)`,
+        [ensayoId, id_pregunta]
+      )
+    );
+    await Promise.all(inserts);
+
+    await client.query('COMMIT');
+
+    res.status(200).json({ message: 'Ensayo actualizado' });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Error al actualizar ensayo:', err);
+    res.status(500).send('Error interno del servidor');
+  } finally {
+    client.release();
+  }
+});
+
+app.get('/ensayos/:id', necesitaAuth, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      'SELECT * FROM "ENSAYO" WHERE id = $1',
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).send('Ensayo no encontrado');
+    }
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error al obtener ensayo');
+  }
+});
+
+
+app.delete('/ensayos', async (req, res) => {
+  const { ids, id_profesor } = req.body;
+
+  if (!Array.isArray(ids) || ids.length === 0 || !id_profesor) {
+    return res.status(400).send('Faltan datos: ids o id_profesor');
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    await client.query(
+      `DELETE FROM "ENSAYO_PREGUNTA"
+       WHERE id_ensayo = ANY($1::int[])`,
+      [ids]
+    );
+
+    const result = await client.query(
+      `DELETE FROM "ENSAYO"
+       WHERE id = ANY($1::int[]) AND id_profesor = $2
+       RETURNING id`,
+      [ids, id_profesor]
+    );
+
+    await client.query('COMMIT');
+
+    if (result.rowCount === 0) {
+      return res.status(404).send('No se eliminaron ensayos. Verifica IDs y profesor.');
+    }
+
+    res.status(200).json({
+      message: 'Ensayos eliminados',
+      eliminados: result.rows.map(r => r.id)
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Error al eliminar ensayos:', err);
+    res.status(500).send('Error interno del servidor');
+  } finally {
+    client.release();
+  }
+});

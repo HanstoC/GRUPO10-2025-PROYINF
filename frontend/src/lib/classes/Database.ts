@@ -54,6 +54,7 @@ export default class Database {
             console.log(user);
             Usuario.value = {
                 rut,
+                id: user.id,
                 nombre: user.nombre,
                 rol: user.tipo,
                 correo: user.correo,
@@ -69,6 +70,7 @@ export default class Database {
         } else {
             Usuario.value = {
                 rut,
+                id: user.id,
                 nombre: user.nombre,
                 rol: user.tipo,
                 correo: user.correo
