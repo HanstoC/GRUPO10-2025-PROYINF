@@ -6,7 +6,7 @@ Este es el repositorio del grupo 1, cuyos integrantes son:
 * Cristobal Martinez Rol: 201941541-7
 * Hans Toledo Rol: 201704591-4
   
-* **tutor** : Matias Barrera
+* **tutor** : Sebastian Salgado
 
 ## WIKI
 Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/HanstoC/GRUPO01-2025-PROYINF/wiki)
