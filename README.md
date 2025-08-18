@@ -1,5 +1,5 @@
-# GRUPO 1
-Este es el repositorio del grupo 1, cuyos integrantes son:
+# GRUPO 10
+Este es el repositorio del grupo 10 (antiguamente grupo 01 en INF236), cuyos integrantes son:
 
 * Nicolás Muñoz Ramírez Rol: 202104641-0
 * Lucas Enríquez  Rol: 202373521-3
@@ -11,7 +11,7 @@ Este es el repositorio del grupo 1, cuyos integrantes son:
 ## WIKI
 Puede acceder a la Wiki mediante el siguiente [enlace](https://github.com/HanstoC/GRUPO01-2025-PROYINF/wiki)
 
-## Videos
+## Videos (INF-236)
 
 * [video resultados finales Hito 5](https://youtu.be/zY7TzRxbgvU)
 
