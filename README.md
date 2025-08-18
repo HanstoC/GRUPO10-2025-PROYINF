@@ -1,7 +1,7 @@
 # GRUPO 1
 Este es el repositorio del grupo 1, cuyos integrantes son:
 
-* Sebastian Castillo  Rol: 202273583-k
+* Nicolás Muñoz Ramírez Rol: 202104641-0
 * Lucas Enríquez  Rol: 202373521-3
 * Cristobal Martinez Rol: 201941541-7
 * Hans Toledo Rol: 201704591-4
