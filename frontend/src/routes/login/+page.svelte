@@ -80,10 +80,10 @@
 				<Form.Submit {loading}>Iniciar sesión</Form.Submit>
 				<div class="flex w-full flex-row items-center justify-center gap-4">
 					<div class="w-full text-center text-sm opacity-50">Y si aún no tienes cuenta</div>
-					<Button variant="outlined">Registrarse</Button>
+					<Button variant="secondary">Registrarse</Button>
 				</div>
 			</Form.Footer>
 		</Form.Root>
-		<p class="absolute bottom-2 opacity-50">Copyright A&DS-2025©</p>
+		<p class="absolute bottom-2 opacity-50">Copyright INGSOFT-2025©</p>
 	</div>
 </div>

@@ -1,24 +1,56 @@
-CREATE TABLE
-    "ASIGNATURA" (
-        "id" serial PRIMARY KEY,
-        "nombre" varchar(100) UNIQUE NOT NULL
-    );
+CREATE TYPE asignatura AS ENUM (
+    'Competencia Matematica 1 (M1)', -- 1
+    'Competencia Matematica 2 (M2)', -- 2
+    'Competencia Lectora', -- 3
+    'Historia y Ciencias Sociales', -- 4
+    'Ciencias - Fisica', -- 5
+    'Ciencias - Biologia', -- 6
+    'Ciencias - Quimica' -- 7
+);
 
 CREATE TABLE
-    "TEMATICA" (
+    "TIPO_CONTENIDO" (
         "id" serial PRIMARY KEY,
-        "id_asignatura" INTEGER REFERENCES "ASIGNATURA" (id) NOT NULL,
-        "nombre" varchar(100),
-        CONSTRAINT unique_tematica_per_asignatura UNIQUE (id_asignatura, nombre)
+        "nombre" TEXT UNIQUE NOT NULL
     );
+
+INSERT INTO
+    "TIPO_CONTENIDO" ("nombre")
+VALUES
+    ('Eje Temático'),
+    ('Unidad Temática'),
+    ('Habilidad'),
+    ('Conocimiento');
+
+CREATE TABLE
+    "CONTENIDO" (
+        "id" serial PRIMARY KEY,
+        "id_tipo_contenido" INTEGER REFERENCES "TIPO_CONTENIDO" (id) NOT NULL,
+        "asignatura" asignatura NOT NULL,
+        "nombre" TEXT NOT NULL,
+        "id_padre" INTEGER REFERENCES "CONTENIDO" (id),
+        CONSTRAINT unique_contenido_per_asignatura UNIQUE (asignatura, nombre, id_tipo_contenido)
+    );
+
+CREATE TYPE dificultad AS ENUM (
+    'Muy fácil',
+    'Fácil',
+    'Intermedia',
+    'Difícil',
+    'Muy difícil',
+    'Experto',
+    'Imposible',
+    'Divino'
+);
 
 CREATE TABLE
     "ENSAYO" (
         "id" serial PRIMARY KEY,
-        "id_asignatura" INTEGER REFERENCES "ASIGNATURA" (id) NOT NULL,
-        "dificultad" varchar(100) NOT NULL,
+        "asignatura" asignatura NOT NULL,
         "id_profesor" INTEGER NOT NULL,
-        "fecha_creacion" DATE DEFAULT CURRENT_DATE
+        "fecha_creacion" DATE DEFAULT CURRENT_DATE,
+        "nombre" varchar(100) NOT NULL,
+        "dificultad" dificultad NOT NULL
     );
 
 CREATE TABLE
@@ -43,12 +75,19 @@ CREATE TABLE
 CREATE TABLE
     "PREGUNTA" (
         "id" serial PRIMARY KEY,
-        "id_asignatura" INTEGER REFERENCES "ASIGNATURA" (id) NOT NULL,
         "id_profesor" INTEGER NOT NULL,
-        "id_tematica" INTEGER REFERENCES "TEMATICA" (id) NOT NULL,
+        "asignatura" asignatura NOT NULL,
         "enunciado" TEXT NOT NULL,
         "imagen_base64" TEXT,
-        "efectividad" float DEFAULT 0
+        "efectividad" float DEFAULT 0,
+        "dificultad" dificultad NOT NULL
+    );
+
+CREATE TABLE
+    "PREGUNTA_CONTENIDO" (
+        "id" serial PRIMARY KEY,
+        "id_pregunta" INTEGER REFERENCES "PREGUNTA" (id) NOT NULL,
+        "id_contenido" INTEGER REFERENCES "CONTENIDO" (id) NOT NULL
     );
 
 CREATE TABLE
@@ -67,4 +106,4 @@ CREATE TABLE
         "id_alternativa" INTEGER REFERENCES "ALTERNATIVA" (id) NOT NULL,
         "id_alumno" INTEGER NOT NULL,
         "estado" varchar(100)
-    )
+    );

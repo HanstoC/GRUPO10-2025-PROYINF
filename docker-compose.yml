@@ -4,7 +4,7 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile
-      #target: base # DEPURACIÓN
+      target: base # DEPURACIÓN
     ports:
       - "5173:5173"
       - "3000:80"
@@ -13,7 +13,7 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    #command: npm run dev # DEPURACIÓN
+    command: npm run dev # DEPURACIÓN
   backend:
     build:
       context: backend

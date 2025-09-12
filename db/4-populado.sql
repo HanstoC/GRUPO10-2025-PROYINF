@@ -1,10 +1,6 @@
-INSERT INTO "ASIGNATURA" (nombre) VALUES ('Matemáticas');
-INSERT INTO "ASIGNATURA" (nombre) VALUES ('Lenguaje');
-INSERT INTO "ASIGNATURA" (nombre) VALUES ('Historia');
-INSERT INTO "ASIGNATURA" (nombre) VALUES ('Ciencias');
-
+-- USUARIOS
 INSERT INTO
-    USUARIO (rut, contraseña, correo, tipo)
+    "USUARIO" (rut, contraseña, correo, tipo)
 VALUES
     (
         '11223344-5',
@@ -14,7 +10,7 @@ VALUES
     );
 
 INSERT INTO
-    USUARIO (rut, contraseña, correo, tipo)
+    "USUARIO" (rut, contraseña, correo, tipo)
 VALUES
     (
         '55667788-9',
@@ -24,7 +20,7 @@ VALUES
     );
 
 INSERT INTO
-    USUARIO (rut, contraseña, correo, tipo)
+    "USUARIO" (rut, contraseña, correo, tipo)
 VALUES
     (
         '22334455-6',
