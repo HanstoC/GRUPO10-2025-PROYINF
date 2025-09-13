@@ -109,6 +109,10 @@
     goto(`/editor-ensayos/${id}`);
   }
 
+  function verEnsayo(id: number) {
+    goto(`/ensayo-ver/${id}`);
+  }
+
   function editarPreguntas() {
     goto(`/mis-preguntas`);
   }
@@ -227,6 +231,9 @@
                   <button
                    size="sm" on:click={() => editarEnsayo(ensayo.id)}
                    >Editar</button>
+                  <button
+                   size="sm" on:click={() => verEnsayo(ensayo.id)}
+                   >Visualizar</button>
 
                 {:else if Usuario.value?.rol === RolUsuario.Alumno}
                   <button
