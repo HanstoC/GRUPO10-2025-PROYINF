@@ -4,7 +4,6 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const { Pool } = require('pg');
 const fs = require('fs');
-
 const alumnos = require('./api_sim/alumnos.json');
 const docentes = require('./api_sim/docentes.json');
 const alumnosService = require('./services/alumnos');
@@ -12,6 +11,7 @@ const alumnosService = require('./services/alumnos');
 const app = express();
 const port = 8000;
 
+//Verifica inicio de sesion. Si está iniciado retorna next lo que permite el acceso, sino, error. 
 function necesitaAuth(req, res, next) {
   if (req.session && req.session.user)
     return next();
@@ -19,10 +19,13 @@ function necesitaAuth(req, res, next) {
     return res.status(401).json({ error: 'No autorizado' });
 }
 
+//Configura middleware CORS para acceder 
 app.use(cors({
   origin: true,
   credentials: true
 }));
+
+
 app.use(cookieParser());
 app.use(session({
   secret: process.env.SESSION_SECRET || "secreto-sesión-no-tan-secreto",
