@@ -59,7 +59,6 @@ export default class Database {
         }
 
         const user = payload?.user ?? payload?.User ?? payload;
-        await delay;
 
         if (!user) {
             throw new Error('Respuesta inválida del servidor');
