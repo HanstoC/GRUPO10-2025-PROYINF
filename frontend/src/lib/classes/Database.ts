@@ -41,14 +41,30 @@ export default class Database {
             credentials: 'include'
         });
 
-        if (!response.ok) {
-            let { error } = await response.json().catch(() => ({ error: null }));
-            error ??= await response.clone().text();
-            throw error
+        const text = await response.text();
+        let payload: any = null;
+
+        try {
+            payload = text ? JSON.parse(text):null;
+        } catch {
+            payload = text;
         }
 
-        const { user } = await response.json();
+        if (!response.ok) {
+            const errMsg =
+                (payload && (payload.error || payload.message)) ||
+                (typeof payload === 'string' && payload) ||
+                `Login failed (${response.status})`;
+            throw new Error(errMsg);
+        }
+
+        const user = payload?.user ?? payload?.User ?? payload;
         await delay;
+
+        if (!user) {
+            throw new Error('Respuesta inválida del servidor');
+        }
+
 
         if (user.tipo == 'alumno') {
             console.log(user);
@@ -77,31 +93,30 @@ export default class Database {
             }
 
         }
+        await delay;
+        return Usuario.value;
     }
-
     public static async checkLogged() {
-        const response = await fetch(API.CHECK_SESIÓN, {
-            credentials: 'include'
-        })
+        const response = await fetch(API.CHECK_SESIÓN, { credentials: 'include' });
+        const text = await response.text();
+        let payload = null;
+        try { payload = text ? JSON.parse(text) : null; } catch { payload = text; }
 
-        if (!response.ok)
-            return void goto('login');
-        if (Usuario.value) return
-
-        const { user } = await response.json();
-        const value = {
-            rut: user.rut,
-            rol: user.tipo
-        }
-
-        Usuario.value = value;
-        return value
+        if (!response.ok) return null;
+        const user = payload?.user ?? payload;
+        if (!user) return null;
+        Usuario.value = { rut: user.rut, rol: user.tipo, id: user.id, nombre: user.nombre ?? user.nombres };
+        return Usuario.value;
     }
 
     public static async logout() {
-        fetch(API.LOGOUT, {
-            credentials: 'include'
-        });
-        Usuario.value = null;
+        try{
+            await fetch(API.LOGOUT, {
+                credentials: 'include'
+            });
+        } catch (err){
+            console.warn('logout error', err)
+        }
+        Usuario.value=null;
     }
 }

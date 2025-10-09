@@ -28,20 +28,12 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(sessionMiddleware);
-console.log('middle',sessionMiddleware)
 
 //routers
 app.use('/', mainRouter); 
-console.log('1->',mainRouter)
 app.use('/alumnos', alumnosRouter);
-console.log('2->',alumnosRouter)
-
 app.use('/asignaturas', asignaturasRouter);
-console.log('3->',asignaturasRouter)
-
 app.use('/ensayos', ensayosRouter); 
-console.log('4->',ensayosRouter)
-
 app.use('/docentes', docentesRouter); 
 app.use('/resultados', resultadosRouter);
 app.use('/preguntas', preguntasRouter);  

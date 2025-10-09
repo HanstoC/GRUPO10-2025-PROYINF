@@ -10,7 +10,8 @@ function getDocentesList() {
 }
 
 const findDocenteByRut = (rut) => {
-    const docente = docentes.find(docente => docente.rut === rut);
+    const docentes= getDocentesList();
+    const docente = docentes.find(d => d.rut === rut);
     if (!docente) return null;
     
     return {
