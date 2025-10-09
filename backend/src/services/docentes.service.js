@@ -9,6 +9,17 @@ function getDocentesList() {
     return docentesData; 
 }
 
+const findDocenteByRut = (rut) => {
+    const docente = docentes.find(docente => docente.rut === rut);
+    if (!docente) return null;
+    
+    return {
+        ...docente,
+        nombre: docente.nombres
+    };
+}
+
 module.exports = {
     getDocentesList,
+    findDocenteByRut,
 };

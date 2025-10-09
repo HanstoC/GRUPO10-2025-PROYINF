@@ -1,8 +1,7 @@
 
 const router = require('express').Router();
 const necesitaAuth = require('../middlewares/necesitaAuth'); 
-const ensayosController = require('../controllers/ensayos.controller');
-
+const ensayosController = require('../controllers/ensayos.controllers');
 // GET /ensayos (la nueva ruta)
 router.get('/', necesitaAuth, ensayosController.obtenerEnsayos); 
 router.post('/', necesitaAuth, ensayosController.crearEnsayo); 

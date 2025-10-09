@@ -169,6 +169,33 @@ async function obtenerEnsayoPorId(req, res) {
     }
 }
 
+async function eliminarEnsayos(req,res) {
+    const ensayoId = parseInt(req.params.id, 10);
+    const idProfesor = req.session.user?.id; // Usar el ID del usuario autenticado
+
+    const data = req.body;
+    
+    // Validación inicial
+    if (isNaN(ensayoId) || !Array.isArray(data.preguntas)) {
+        return res.status(400).send('Datos incompletos o ID inválido');
+    }
+
+    try {
+        // 1. Llamar al servicio, que maneja la transacción
+        await ensayosService.deleteEnsayos(ensayoId, idProfesor, client);
+        
+        // 2. Responder
+        res.status(200).json({ message: 'Ensayo actualizado' });
+        
+    } catch (err) {
+        // 3. Manejo de errores
+        console.error('Error al actualizar ensayo:', err);
+        res.status(500).send('Error interno del servidor');
+    }
+
+    
+}
+
 
 module.exports = {
     obtenerEnsayos,
@@ -178,5 +205,5 @@ module.exports = {
     obtenerResultadosYFacetas,
     actualizarEnsayo,
     obtenerEnsayoPorId,
-    obtenerEnsayoPorId,
+    eliminarEnsayos,
 };
