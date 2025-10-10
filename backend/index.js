@@ -20,8 +20,10 @@ const authRouter = require('./src/routes/auth.routes');
 
 app.use(cors({
   origin: true,
-  credentials: true
+  credentials: true,
+
 }));
+
 
 app.use(express.json()); 
 

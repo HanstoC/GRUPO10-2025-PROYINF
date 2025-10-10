@@ -1,3 +1,4 @@
+const db = require('../config/db'); // Necesario para obtener el cliente/conexión
 
 /**
  * Inserta una nueva temática si no existe su ID.
