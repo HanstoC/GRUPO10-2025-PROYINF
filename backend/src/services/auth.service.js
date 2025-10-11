@@ -3,6 +3,7 @@ const AuthRepository = require('../repositories/AuthRepository');
 // NOTA: Asumo que los servicios de alumnos, docentes, etc., ya están importables
 const alumnosService = require('./alumnos.service');
 const docentesService = require('./docentes.service'); // Asumo la existencia de este servicio
+const directivosService = require('./directivos.service');
 
 /**
  * Intenta iniciar sesión, obtiene los datos del perfil y compone el objeto de usuario.
@@ -28,7 +29,7 @@ async function login(rut, contraseña) {
         info = await docentesService.findDocenteByRut(user.rut); 
     } else {
         // Asumo que findDirectivoByRut está implementado
-        info = await docentesService.findDirectivoByRut(user.rut); 
+        info = await directivosService.findDirectivoByRut(user.rut); 
     }
 
     // 3. Componer el objeto de usuario final (spread operator para mezclar)

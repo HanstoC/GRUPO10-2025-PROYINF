@@ -17,6 +17,7 @@ const respuestasRouter = require('./src/routes/respuestas.routes');
 const topicosRouter = require('./src/routes/topicos.routes');
 const mainRouter = require('./src/routes/main.routes'); 
 const authRouter = require('./src/routes/auth.routes');
+const directivosRouter = require('./src/routes/directivos.routes');
 
 app.use(cors({
   origin: true,
