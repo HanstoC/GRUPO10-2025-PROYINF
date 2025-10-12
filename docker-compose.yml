@@ -5,7 +5,7 @@ services:
     build:
       context: frontend
       dockerfile: Dockerfile
-      #target: base # DEPURACIÓN
+      target: base # DEPURACIÓN
     ports:
       - "5173:5173"
       - "3000:80"

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HTMLAttributes } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 
 	let {
 		children,
@@ -13,7 +13,7 @@
 	<!-- TODO: -->
 {/if}
 <div
-	class={`my-4 flex h-full w-3/5 flex-col items-center justify-center gap-2 ${className}`}
+	class={`my-4 flex h-full w-3/5 flex-col items-center justify-center gap-2 overflow-hidden ${className}`}
 	{...props}
 >
 	{@render children?.()}

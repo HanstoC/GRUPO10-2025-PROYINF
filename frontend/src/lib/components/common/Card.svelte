@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HTMLAttributes } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { tv } from 'tailwind-variants';
 
 	const cardVariants = tv({

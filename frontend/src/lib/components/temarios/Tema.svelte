@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HTMLAttributes } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 
 	let { children, tema, ...props }: HTMLAttributes<HTMLDivElement> & { tema: string } = $props();
 </script>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 	import Button from './Button.svelte';
 	import IconoirSubmitDocument from '$lib/icons/IconoirSubmitDocument.svelte';
 
@@ -19,11 +19,11 @@
 
 <div class="flex w-full flex-row">
 	<input bind:this={input} hidden accept="image/png, image/jpeg" type="file" bind:files={value} />
-	<Button class="rounded-r-none! flex-1" onclick={() => input.click()}
+	<Button class="flex-1 rounded-r-none!" onclick={() => input.click()}
 		><IconoirSubmitDocument class="mr-2" /> Subir archivo</Button
 	>
 	<div
-		class="border-input flex-1/3 flex w-full items-center justify-center rounded-r-md border text-center text-sm italic"
+		class="border-input flex w-full flex-1/3 items-center justify-center rounded-r-md border text-center text-sm italic"
 	>
 		<p class="opacity-50">{text || 'Empieza por subir un archivo...'}</p>
 	</div>

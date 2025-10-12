@@ -1,59 +1,90 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import Card from '$lib/components/common/Card.svelte';
-  import PageMargin from '$lib/components/common/PageMargin.svelte';
-  import LoadingIndicator from '$lib/components/common/utils/LoadingIndicator.svelte';
-  import FiltroAsignaturas from '$lib/components/ensayos/FilterAsignatura.svelte';
+	import Badge from '$lib/components/common/Badge.svelte';
+	import Card from '$lib/components/common/Card.svelte';
+	import Form from '$lib/components/common/Form';
+	import PageMargin from '$lib/components/common/PageMargin.svelte';
+	import LoadingIndicator from '$lib/components/common/utils/LoadingIndicator.svelte';
+	import FiltroAsignaturas from '$lib/components/ensayos/FilterAsignatura.svelte';
+	import { API } from '$lib/global/api';
+	import MaterialSymbolsAlarmOutline from '$lib/icons/MaterialSymbolsAlarmOutline.svelte';
+	import MaterialSymbolsCancelOutline from '$lib/icons/MaterialSymbolsCancelOutline.svelte';
+	import MaterialSymbolsCheckCircleOutline from '$lib/icons/MaterialSymbolsCheckCircleOutline.svelte';
+	import MaterialSymbolsCircleOutline from '$lib/icons/MaterialSymbolsCircleOutline.svelte';
+	import MaterialSymbolsPauseCircleOutline from '$lib/icons/MaterialSymbolsPauseCircleOutline.svelte';
 
-  let resultados = [];
-  let cargando = true;
-  let selectedAsignaturas: number[] = [];
-
-  $: resultadosFiltrados = selectedAsignaturas.length > 0
-	? resultados.filter(r => selectedAsignaturas.includes(r.id_asignatura))
-	: resultados;
-
-  onMount(async () => {
-    try {
-      const res = await fetch('http://localhost:8000/resultados', {
-        credentials: 'include'
-      });
-      if (!res.ok) throw new Error('Error al obtener resultados');
-      resultados = await res.json();
-    } catch (e) {
-      console.error('Error al cargar resultados:', e);
-    } finally {
-      cargando = false;
-    }
-  });
+	let promiseRequest: Promise<any[]> = $state(
+		(async () => {
+			const res = await fetch(API.RESULTADOS, {
+				credentials: 'include'
+			});
+			if (!res.ok) {
+				console.error(res);
+				throw new Error('No se cargaron los resultados');
+			}
+			return await res.json();
+		})()
+	);
+	let selectedAsignaturas: number[] = $state([]);
 </script>
 
 <PageMargin>
-  <Card size="lg" class="w-full">
-	{#if cargando}
-		<LoadingIndicator />
-	{:else if resultados.length === 0}
-		<p class="text-center text-gray-500">No tienes resultados aún.</p>
-	{:else}
-		<h2 class="text-2xl font-semibold mb-4">Tus resultados</h2>
+	<Card class="w-full">
+		<h2 class="mb-4 text-2xl font-semibold">Tus Resultados</h2>
+		<Form.Root class="w-fit">
+			<Form.Item label="Filtrar por Asignaturas">
+				<FiltroAsignaturas bind:selected={selectedAsignaturas} />
+			</Form.Item>
+		</Form.Root>
+	</Card>
 
-		<!-- Filtro -->
-		<FiltroAsignaturas bind:selected={selectedAsignaturas} />
+	<Card size="lg" class="max-h-3/5 w-full">
+		{#await promiseRequest}
+			<LoadingIndicator />
+		{:then resultados}
+			{@const resultadosFiltrados =
+				selectedAsignaturas.length > 0
+					? resultados.filter((r) => selectedAsignaturas.includes(r.id_asignatura))
+					: resultados}
 
-		<div class="space-y-4 mt-4">
-		{#each resultadosFiltrados as r}
-			<Card class="p-4">
-			<p><strong>Ensayo:</strong> #{r.id_ensayo}</p>
-			<p><strong>Asignatura:</strong> {r.asignatura}</p>
-			<p><strong>Dificultad:</strong> {r.dificultad}</p>
-			<p><strong>Puntaje:</strong> {r.puntaje_obtenido}</p>
-			<p><strong>Correctas:</strong> {r.cantidad_correctas}</p>
-			<p><strong>Erróneas:</strong> {r.cantidad_erroneas}</p>
-			<p><strong>Omitidas:</strong> {r.cantidad_omitidas}</p>
-			<p><strong>Tiempo empleado:</strong> {r.tiempo_empleado} segundos</p>
-			</Card>
-		{/each}
-		</div>
-	{/if}
+			<div class="flex max-h-full flex-col gap-2 overflow-y-auto">
+				{#if resultados.length}
+					{#each resultadosFiltrados as r (r.id_ensayo)}
+						<Card size="sm" class="relative p-4">
+							<div class="flex w-full flex-row justify-between">
+								<p class="text-muted-foreground">#{r.id_ensayo}</p>
+								<div class="flex flex-row gap-2">
+									<Badge color="success" startDecorator={MaterialSymbolsCheckCircleOutline}>
+										{r.cantidad_correctas} correctas
+									</Badge>
+									<Badge color="error" startDecorator={MaterialSymbolsCancelOutline}>
+										{r.cantidad_erroneas} incorrectas
+									</Badge>
+									<Badge startDecorator={MaterialSymbolsPauseCircleOutline}>
+										{r.cantidad_omitidas} omitidas
+									</Badge>
+									<Badge color="primary" startDecorator={MaterialSymbolsCircleOutline}>
+										{r.cantidad_erroneas + r.cantidad_correctas + r.cantidad_omitidas} en total
+									</Badge>
+								</div>
+							</div>
+							<div class="w-full">
+								<p><strong>{r.asignatura}</strong></p>
+								<p>{r.dificultad}</p>
+								<div class="flex flex-row gap-2">
+									<MaterialSymbolsAlarmOutline />{r.tiempo_empleado} segundos
+								</div>
+							</div>
+							<div class="text-muted-foreground absolute right-0 bottom-0 m-2 font-bold uppercase">
+								<h2>Puntaje: {r.puntaje_obtenido}</h2>
+							</div>
+						</Card>
+					{/each}
+				{:else}
+					<p class="text-muted-foreground">Aún no has realizado ningún ensayo.</p>
+				{/if}
+			</div>
+		{:catch error}
+			<p class="text-destructive-foreground">Ocurrió un error {error}</p>
+		{/await}
 	</Card>
 </PageMargin>
