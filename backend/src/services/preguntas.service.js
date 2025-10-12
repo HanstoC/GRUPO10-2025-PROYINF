@@ -1,6 +1,5 @@
 const PreguntaRepository = require('../repositories/PreguntaRepository');
 const db = require('../config/db'); // Necesario para obtener el cliente/conexión
-console.log('db->',db)
 
 /**
  * Guarda una nueva pregunta con sus alternativas y maneja la creación de la temática.

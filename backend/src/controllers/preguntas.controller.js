@@ -17,15 +17,15 @@ async function crearPregunta(req, res) {
 
     try {
         // 2. Llamar al servicio que maneja la lógica y la transacción
-        await preguntasService.guardarPregunta(data);
+        const result = await preguntasService.guardarPregunta(data);
 
         // 3. Responder con éxito (200 OK o 201 Created si quieres ser más específico)
-        res.sendStatus(200); 
+        return res.status(201).json(result); 
 
     } catch (err) {
         // 4. Manejo de errores genéricos (500)
         console.error('Error guardando pregunta:', err);
-        res.status(500).send('Error al guardar la pregunta');
+        return res.status(500).send('Error al guardar la pregunta');
     }
 }
 

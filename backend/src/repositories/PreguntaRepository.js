@@ -7,6 +7,14 @@ const db = require('../config/db'); // Necesario para obtener el cliente/conexiÃ
  * @param {object} client - ConexiÃ³n individual de la DB
  */
 async function createTematica(id_asignatura, nombre, client) {
+    const nombreNorm = (nombre || "").trim();
+    const find = await client.query(
+        'SELECT id FROM "TEMATICA" WHERE id_asignatura = $1 AND nombre = $2',
+        [id_asignatura, nombreNorm]
+    );
+    if (find.rows.length > 0) {
+        return find.rows[0].id;
+    }
     const tematicaResult = await client.query(
         'INSERT INTO "TEMATICA" (id_asignatura, nombre) VALUES ($1, $2) RETURNING id',
         [id_asignatura, nombre]
