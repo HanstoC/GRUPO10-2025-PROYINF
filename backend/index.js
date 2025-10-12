@@ -18,6 +18,7 @@ const topicosRouter = require('./src/routes/topicos.routes');
 const mainRouter = require('./src/routes/main.routes'); 
 const authRouter = require('./src/routes/auth.routes');
 const directivosRouter = require('./src/routes/directivos.routes');
+const analisisRoutes = require('./src/routes/analisis.routes');
 
 app.use(cors({
   origin: true,
@@ -43,7 +44,7 @@ app.use('/preguntas', preguntasRouter);
 app.use('/respuestas', respuestasRouter);
 app.use('/topicos', topicosRouter); 
 app.use('/login', authRouter);
-
+app.use('/analisis', analisisRoutes); 
 
 app.listen(PORT, () => {
     console.log(`Servidor Express corriendo en el puerto ${PORT}`);
