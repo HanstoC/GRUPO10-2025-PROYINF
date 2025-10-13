@@ -1,29 +1,18 @@
 <script lang="ts">
+	import { ResultadosService } from '$lib/api/resultados';
 	import Badge from '$lib/components/common/Badge.svelte';
 	import Card from '$lib/components/common/Card.svelte';
 	import Form from '$lib/components/common/Form';
 	import PageMargin from '$lib/components/common/PageMargin.svelte';
 	import LoadingIndicator from '$lib/components/common/utils/LoadingIndicator.svelte';
 	import FiltroAsignaturas from '$lib/components/ensayos/FilterAsignatura.svelte';
-	import { API } from '$lib/global/api';
 	import MaterialSymbolsAlarmOutline from '$lib/icons/MaterialSymbolsAlarmOutline.svelte';
 	import MaterialSymbolsCancelOutline from '$lib/icons/MaterialSymbolsCancelOutline.svelte';
 	import MaterialSymbolsCheckCircleOutline from '$lib/icons/MaterialSymbolsCheckCircleOutline.svelte';
 	import MaterialSymbolsCircleOutline from '$lib/icons/MaterialSymbolsCircleOutline.svelte';
 	import MaterialSymbolsPauseCircleOutline from '$lib/icons/MaterialSymbolsPauseCircleOutline.svelte';
 
-	let promiseRequest: Promise<any[]> = $state(
-		(async () => {
-			const res = await fetch(API.RESULTADOS, {
-				credentials: 'include'
-			});
-			if (!res.ok) {
-				console.error(res);
-				throw new Error('No se cargaron los resultados');
-			}
-			return await res.json();
-		})()
-	);
+	let promiseRequest: Promise<any[]> = $state(ResultadosService.get());
 	let selectedAsignaturas: number[] = $state([]);
 </script>
 

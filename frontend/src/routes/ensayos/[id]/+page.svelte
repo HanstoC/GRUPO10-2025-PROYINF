@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import Card from '$lib/components/common/Card.svelte';
 	import { page } from '$app/state';
-	import { API } from '$lib/global/api';
+	import { EnsayosService } from '$lib/api/ensayos';
 
 	let preguntas: any[] = [];
 	let respuestas: Record<number, number> = {}; // pregunta_id -> alternativa_id
@@ -20,10 +20,7 @@
 		ensayoId = params.id;
 
 		try {
-			const res = await fetch(`${API.ENSAYOS}/${ensayoId}/preguntas`, {
-				credentials: 'include'
-			});
-			preguntas = await res.json();
+			preguntas = await EnsayosService.preguntas(ensayoId);
 			cargando = false;
 			iniciarCronometro();
 		} catch (e) {

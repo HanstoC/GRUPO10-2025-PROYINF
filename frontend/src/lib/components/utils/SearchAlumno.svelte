@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Card from '../common/Card.svelte';
 	import SearchBar from '../common/SearchBar.svelte';
-	import { API } from '$lib/global/api';
 	import CheckboxGroup from '../common/CheckboxGroup.svelte';
 	import Paginator from '../common/Paginator.svelte';
+	import { AlumnosService } from '$lib/api/alumnos';
 
 	interface Ensayo {
 		asignatura_ensayo: string;
@@ -54,7 +54,7 @@
 			error = '';
 			console.log('loadCombinedData: Iniciando carga desde API.COMBINED_DATA().');
 
-			const response = await fetch(API.COMBINED_DATA());
+			const response = await AlumnosService.getCombinada();
 
 			if (!response.ok) {
 				const errorData = await response

@@ -39,7 +39,6 @@
 	}
 
 	async function guardarPregunta() {
-
 		let imagenBase64 = null;
 		if (imagenes && imagenes.length > 0) {
 			imagenBase64 = await toBase64(imagenes[0]);
@@ -72,6 +71,8 @@
 			const err = await res.text();
 			alert('Error al guardar: ' + err);
 		}
+
+		history.back();
 	}
 </script>
 
@@ -82,7 +83,7 @@
 			class="flex h-full w-full flex-col items-center justify-center gap-2"
 		>
 			<Form.Item required label="Asignatura">
-				<select bind:value={id_asignatura} class="w-full border rounded p-1 bg-card" >
+				<select bind:value={id_asignatura} class="bg-card w-full rounded border p-1">
 					{#each asignaturas as a}
 						<option value={a.id}>{a.nombre}</option>
 					{/each}
@@ -113,7 +114,7 @@
 			<Form.Footer>
 				<button
 					type="button"
-					class="bg-blue-400 text-white px-4 py-2 rounded"
+					class="rounded bg-blue-400 px-4 py-2 text-white"
 					on:click={guardarPregunta}
 				>
 					Guardar Pregunta
@@ -121,5 +122,4 @@
 			</Form.Footer>
 		</Form.Root>
 	</Card>
-
 </PageMargin>
