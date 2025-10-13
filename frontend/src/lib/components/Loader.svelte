@@ -5,9 +5,11 @@
 	import LoadingIndicator from './common/utils/LoadingIndicator.svelte';
 
 	let visible = $state(false);
+	let lastId = '';
 
 	explicitEffect(
 		() => {
+			if (lastId === Usuario.value?.id) return;
 			visible = true;
 			(async () => {
 				await Promise.race([
@@ -25,6 +27,7 @@
 				]);
 				visible = false;
 			})();
+			lastId = Usuario.value?.id;
 		},
 		() => [Usuario.value],
 		true
@@ -34,7 +37,7 @@
 {#if visible}
 	<div
 		out:fade={{ duration: 200 }}
-		class="bg-background absolute left-0 top-0 z-[100] flex h-full w-full items-center justify-center"
+		class="bg-background absolute top-0 left-0 z-[100] flex h-full w-full items-center justify-center"
 	>
 		<LoadingIndicator size="lg" text="" />
 	</div>

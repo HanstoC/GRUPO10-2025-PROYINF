@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { AuthService } from '$lib/api/auth';
 	import { Usuario } from '$lib/auth.svelte';
-	import Database from '$lib/classes/Database';
 	import Button from '$lib/components/common/Button.svelte';
 	import Form from '$lib/components/common/Form';
 	import Input from '$lib/components/common/Input.svelte';
@@ -32,10 +32,10 @@
 <div class="flex h-full w-full flex-col md:flex-row">
 	<div
 		id="login-alt"
-		class="flex-1/3 pointer-events-none relative flex select-none flex-col items-center justify-center gap-2"
+		class="pointer-events-none relative flex flex-1/3 flex-col items-center justify-center gap-2 select-none"
 	>
 		<div class="absolute flex w-1/2 flex-col gap-6 text-center">
-			<h1 class="scale-150 font-extrabold uppercase text-white opacity-80 mix-blend-difference">
+			<h1 class="scale-150 font-extrabold text-white uppercase opacity-80 mix-blend-difference">
 				Siempre hay luz para tu futuro
 			</h1>
 			<RotatingDesc />
@@ -47,7 +47,7 @@
 			alt=""
 		/>
 	</div>
-	<div class="flex-3 lg:flex-2 flex flex-col items-center justify-center gap-2 xl:flex-1">
+	<div class="flex flex-3 flex-col items-center justify-center gap-2 lg:flex-2 xl:flex-1">
 		{#if loading}
 			<LoadingIndicator text="Espera un poco..." />
 		{/if}
@@ -57,7 +57,7 @@
 			onsubmit={async () => {
 				loading = true;
 				try {
-					await Database.login(rut, contraseña);
+					await AuthService.login(rut, contraseña);
 				} catch (err) {
 					error = `${err}`;
 					if (error.match(/failed to fetch/gi)) error = 'Problema al comunicar con el servidor';

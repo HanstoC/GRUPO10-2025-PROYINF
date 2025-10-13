@@ -10,7 +10,6 @@
 	import { RolUsuario, Usuario } from '$lib/auth.svelte';
 	import Button from '$lib/components/common/Button.svelte';
 	import MaterialSymbolsSelectAll from '$lib/icons/MaterialSymbolsSelectAll.svelte';
-	import { API } from '$lib/global/api';
 	import { page } from '$app/state';
 	import debounce from 'lodash/debounce';
 
@@ -18,9 +17,6 @@
 	let ensayos: any[] = $state([]);
 	let loading = $state(false);
 
-	let ensayoExpandido: number | null = null;
-	let preguntas: { pregunta: string; respuesta: string; correcta: boolean }[] = [];
-	let cargandoPreguntas = false;
 	let selectedEnsayos: number[] = $state([]);
 
 	const query = $derived.by(() => {
@@ -61,22 +57,6 @@
 		}
 	}
 
-	async function verPreguntas(id: number) {
-		ensayoExpandido = ensayoExpandido === id ? null : id;
-		if (ensayoExpandido !== null) {
-			cargandoPreguntas = true;
-			try {
-				const res = await fetch(`http://localhost:8000/ensayos/${id}/preguntas`, {
-					credentials: 'include'
-				});
-				preguntas = await res.json();
-			} catch (err) {
-				console.error('Error cargando preguntas:', err);
-			} finally {
-				cargandoPreguntas = false;
-			}
-		}
-	}
 	function rendirEnsayo(id: number) {
 		goto(`/ensayos/${id}`);
 	}
@@ -105,6 +85,10 @@
 
 	function verEnsayo(id: number) {
 		goto(`/ensayo-ver/${id}`);
+	}
+
+	function estadísticasEnsayo(id: number) {
+		goto(`/ensayo-estadistica/${id}`);
 	}
 
 	function editarPreguntas() {
@@ -185,7 +169,7 @@
 		</Form.Root>
 	</Card>
 
-	<Card variant="outlined" size="lg" class="flex h-full w-full items-center justify-center">
+	<Card variant="outlined" class="flex max-h-2/3 w-full items-center justify-center">
 		{#if loading}
 			<LoadingIndicator size="lg" />
 		{:else if ensayos.length === 0}
@@ -194,9 +178,9 @@
 				<p class="italic">No hay ensayos para esta asignatura.</p>
 			</div>
 		{:else}
-			<div class="h-full w-full">
-				{#each ensayos as ensayo}
-					<Card class="mb-2 p-4">
+			<div class="flex max-h-full w-full flex-col gap-2 overflow-y-auto">
+				{#each ensayos as ensayo (ensayo.id)}
+					<Card size="sm" class="px-4!">
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2">
 								{#if Usuario.value?.rol === RolUsuario.Profesor}
@@ -218,6 +202,9 @@
 							<div class="flex gap-2">
 								{#if Usuario.value?.rol === RolUsuario.Profesor}
 									<Button size="sm" onclick={() => editarEnsayo(ensayo.id)}>Editar</Button>
+									<Button size="sm" onclick={() => estadísticasEnsayo(ensayo.id)}
+										>Estadísticas</Button
+									>
 									<Button size="sm" onclick={() => verEnsayo(ensayo.id)}>Visualizar</Button>
 								{:else if Usuario.value?.rol === RolUsuario.Alumno}
 									<Button
