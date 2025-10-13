@@ -70,5 +70,44 @@ class TestEssaysEndpoint(unittest.TestCase):
         has_error = any(k in data for k in ("error", "message", "errors", "text"))
         self.assertTrue(has_error, f"Respuesta de validación inesperada: {data}")
 
+
+    def test_submit_essay_unauthenticated_valid(self):
+        """Caso C1: envío válido sin autenticación -> 401/403"""
+        anon = requests.Session()  # sesión sin login
+        try:
+            payload = {
+                "respuestas": [
+                    {"id_pregunta": 1, "respuesta": "B"},
+                    {"id_pregunta": 2, "respuesta": "A"},
+                ],
+                "tiempo": 30
+            }
+            r = anon.post(f"{BASE_URL}/ensayos/1/responder", json=payload)
+            # esperamos no autorizado (401 o 403). Algunas APIs devuelven 401, otras 403.
+            self.assertIn(r.status_code, (401, 403),
+                          f"Se esperaba 401/403 para request sin autenticar, obtuve {r.status_code} {r.text}")
+        finally:
+            anon.close()
+
+    def test_submit_essay_unauthenticated_invalid_format(self):
+        """Caso C2: envío inválido sin autenticación -> preferible 401/403, pero aceptar 400/422 si ocurre antes"""
+        anon = requests.Session()
+        try:
+            payload = {"respuestas": "esto_no_es_una_lista"}
+            r = anon.post(f"{BASE_URL}/ensayos/1/responder", json=payload)
+            # Si la API chequea sesión primero probablemente devuelva 401/403.
+            # Si valida payload primero puede devolver 400/422. Aceptamos ambos comportamientos.
+            self.assertIn(r.status_code, (401, 403, 400, 422),
+                          f"Se esperaba 401/403 o 400/422, obtuve {r.status_code} {r.text}")
+            # comprobar que existe algún mensaje/indicación de error (JSON o texto)
+            try:
+                data = r.json()
+            except Exception:
+                data = {"text": r.text}
+            has_error = any(k in data for k in ("error", "message", "errors", "text"))
+            self.assertTrue(has_error, f"Respuesta inesperada: {data}")
+        finally:
+            anon.close()
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

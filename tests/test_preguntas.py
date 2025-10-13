@@ -53,7 +53,7 @@ class TestPreguntasSessionAuth(unittest.TestCase):
             body = resp.text
         print(f"\n--- {label} ---\nstatus: {resp.status_code}\nbody: {body}\nheaders: {resp.headers}\n--- /{label} ---\n")
 
-    def test_create_question_authenticated_with_topico_text_creates_tematica(self):
+    def test_create_question_authenticated_ok(self):
         asignatura_id = ASIGNATURAS["Ciencias"]
         topico_text = "Geografía"
         enunciado = "¿Cuál es la capital de Francia?"
@@ -102,11 +102,20 @@ class TestPreguntasSessionAuth(unittest.TestCase):
         self.assertIn(r.status_code, (400, 422), f"Se esperaba 400/422, obtuve {r.status_code} - {r.text}")
 
     def test_create_question_unauthenticated(self):
-        payload = [{
-            "id_asignatura": ASIGNATURAS["Ciencias"],
-            "topico": "TestAnon",
-            "enunciado": "Intento sin login"
-        }]
+        payload = {
+            "id_asignatura": 4,
+            "id_profesor": 1,
+            "topico": "Geografía",
+            "pregunta": "¿Cuál es la capital de Francia?2",
+            "imagen": None,
+            "respuestas": [
+                {"texto": "París", "es_correcta": True},
+                {"texto": "Londres", "es_correcta": False},
+                {"texto": "Berlín", "es_correcta": False},
+                {"texto": "Berlín", "es_correcta": False}
+
+            ]
+        }
         anon = requests.Session()
         r = anon.post(f"{BASE_URL}{PREGUNTAS_PATH}", json=payload)
         self.assertIn(r.status_code, (401, 403), f"Se esperaba 401/403, obtuve {r.status_code} - {r.text}")
