@@ -1,7 +1,7 @@
 <script lang="ts">
 	import _ from 'lodash';
 	import { setContext } from 'svelte';
-	import { type HTMLAttributes } from 'svelte';
+	import { type HTMLAttributes } from 'svelte/elements';
 
 	let {
 		children,

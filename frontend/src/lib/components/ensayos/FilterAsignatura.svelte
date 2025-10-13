@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
+	import Toggle from '../common/Toggle.svelte';
 
-	export let selected: number[] = [];
-	let asignaturas: { id: number; nombre: string }[] = [];
+	let { selected = $bindable() }: { selected: number[] } = $props();
+	let asignaturas: { id: number; nombre: string }[] = $state([]);
 
 	onMount(async () => {
 		const res = await fetch('http://localhost:8000/asignaturas', {
@@ -12,31 +13,15 @@
 	});
 
 	function toggleAsignatura(id: number) {
-		if (selected.includes(id)) {
-			selected = selected.filter(s => s !== id);
-		} else {
-			selected = [...selected, id];
-		}
-		selected = [...selected];
+		if (selected.includes(id)) selected = [...selected.filter((s) => s !== id)];
+		else selected = [...selected, id];
 	}
 </script>
 
 <div class="flex flex-wrap gap-2">
 	{#each asignaturas as a}
-		<button
-			class="px-2 py-1 rounded border"
-			class:selected={selected.includes(a.id)}
-			on:click={() => toggleAsignatura(a.id)}
-		>
+		<Toggle pressed={selected.includes(a.id)} onclick={() => toggleAsignatura(a.id)}>
 			{a.nombre}
-		</button>
+		</Toggle>
 	{/each}
 </div>
-
-<style>
-	button.selected {
-		background-color: #3b82f6;
-		color: white;
-		border-color: #3b82f6;
-	}
-</style>

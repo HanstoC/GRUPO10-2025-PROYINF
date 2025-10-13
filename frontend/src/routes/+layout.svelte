@@ -1,21 +1,20 @@
 <script lang="ts">
 	import Header from '$lib/components/Header.svelte';
 	import Loader from '$lib/components/Loader.svelte';
-	import Database from '$lib/classes/Database';
-	import { onMount } from 'svelte';
 
 	import '../app.css';
 	import 'iconify-icon';
 
 	import { page } from '$app/state';
 	import { LINKS } from '$lib/global/links';
+	import { AuthService } from '$lib/api/auth';
 
 	let { children } = $props();
 	const hasHeader = $derived(page.url.pathname !== LINKS.LOGIN);
 
 	$effect.pre(() => {
 		if (page.url.pathname.match(/login|logout/g)) return;
-		let timeout = setTimeout(() => Database.checkLogged(), 200);
+		let timeout = setTimeout(() => AuthService.checkLogged(), 200);
 		return () => {
 			clearTimeout(timeout);
 		};

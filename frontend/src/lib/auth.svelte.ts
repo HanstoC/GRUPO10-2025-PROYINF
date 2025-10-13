@@ -1,6 +1,3 @@
-import { browser } from "$app/environment";
-import { STORAGE } from "./global/storage";
-
 export type Usuario = { [key: string]: any };
 
 export enum RolUsuario {
