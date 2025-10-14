@@ -1,30 +1,14 @@
 <script lang="ts">
 	import { Usuario } from '$lib/auth.svelte';
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 
-	onMount(() => {
-		// Redirect to login if no user data
-		if (!Usuario.value) {
-			goto('/login');
-		}
-		console.log("pipin paga el triple");
-		console.log(Usuario);
-	});
-
-	// Format RUT with dots and dash
 	function formatRut(rut: string) {
 		if (!rut) return '';
-		// Remove existing format
 		rut = rut.replace(/\./g, '').replace(/-/g, '');
-		// Add dash before last digit
 		rut = rut.slice(0, -1) + '-' + rut.slice(-1);
-		// Add dots for thousands
 		rut = rut.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 		return rut;
 	}
 
-	// Map role to display text
 	function getRolDisplay(rol: string) {
 		const roles = {
 			alumno: 'Estudiante',
@@ -33,7 +17,6 @@
 		};
 		return roles[rol] || rol;
 	}
-
 </script>
 
 <div class="container mx-auto px-4">
