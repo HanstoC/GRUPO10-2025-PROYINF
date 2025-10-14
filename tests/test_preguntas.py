@@ -97,7 +97,10 @@ class TestPreguntasSessionAuth(unittest.TestCase):
 
     def test_create_question_missing_fields(self):
         # Enviamos lista con objeto con enunciado vacío => esperamos validación 400/422
-        payload = [{"id_asignatura": ASIGNATURAS["Ciencias"], "topico": "X", "enunciado": ""}]
+        payload = {"id_asignatura": ASIGNATURAS["Ciencias"],
+                     "topico": "X",
+                       "enunciado": ""
+                    }
         r = self.session.post(f"{BASE_URL}{PREGUNTAS_PATH}", json=payload)
         self.assertIn(r.status_code, (400, 422), f"Se esperaba 400/422, obtuve {r.status_code} - {r.text}")
 
