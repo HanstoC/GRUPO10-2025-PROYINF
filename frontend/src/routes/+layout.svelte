@@ -8,16 +8,24 @@
 	import { page } from '$app/state';
 	import { LINKS } from '$lib/global/links';
 	import { AuthService } from '$lib/api/auth';
+	import { goto } from '$app/navigation';
+	import { Usuario } from '$lib/auth.svelte';
 
 	let { children } = $props();
-	const hasHeader = $derived(page.url.pathname !== LINKS.LOGIN);
+	const hasHeader = $derived(page.url.pathname !== LINKS.LOGIN && Usuario.value?.nombre);
+
+	const currentPath = $derived(page.url.pathname);
 
 	$effect.pre(() => {
-		if (page.url.pathname.match(/login|logout/g)) return;
-		let timeout = setTimeout(() => AuthService.checkLogged(), 200);
-		return () => {
-			clearTimeout(timeout);
-		};
+		if (currentPath.match(/login|logout/g)) return;
+		AuthService.checkLogged()
+			.then((status) => {
+				if (!status) goto(LINKS.LOGIN);
+			})
+			.catch((err) => {
+				console.error(err);
+				goto(LINKS.LOGIN);
+			});
 	});
 </script>
 

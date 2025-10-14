@@ -1,5 +1,4 @@
 import { Usuario } from "$lib/auth.svelte";
-import { Utils } from "../../utils/Utils.svelte";
 import { API_URL } from "./base";
 
 const API_BASE = API_URL + 'login/'
@@ -8,7 +7,6 @@ export const AuthService = {
     async login(rut: string, contraseña: string) {
         rut = rut.replace(/[^\d-]/g, '').trim()
 
-        const delay = Utils.timeout(2000);
         const response = await fetch(API_URL + 'login', {
             method: 'POST',
             headers: {
@@ -36,14 +34,10 @@ export const AuthService = {
         }
 
         const user = payload?.user ?? payload?.User ?? payload;
-
-        if (!user) {
+        if (!user)
             throw new Error('Respuesta inválida del servidor');
-        }
-
 
         if (user.tipo == 'alumno') {
-            console.log(user);
             Usuario.value = {
                 rut,
                 id: user.id,
@@ -59,7 +53,7 @@ export const AuthService = {
                 situacion_alumno: user.situacion_alumno,
                 tipo_ensenanza: user.tipo_ensenanza
             };
-        } else {
+        } else
             Usuario.value = {
                 rut,
                 id: user.id,
@@ -68,8 +62,6 @@ export const AuthService = {
                 correo: user.correo
             }
 
-        }
-        await delay;
         return Usuario.value;
     },
     async checkLogged() {
@@ -81,10 +73,8 @@ export const AuthService = {
         if (!response.ok) throw payload;
 
         const user = payload?.user ?? payload;
-        if (!user) return null;
-
-        Usuario.value = { rut: user.rut, rol: user.tipo, id: user.id, nombre: user.nombre ?? user.nombres };
-        return Usuario.value;
+        if (!user) return false;
+        return true;
     },
     async logout() {
         try {
