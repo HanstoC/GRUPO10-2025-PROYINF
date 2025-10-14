@@ -81,10 +81,21 @@ Dento del proyecto, en la carpeta db se encuentra la información de los usuario
 
 ## Scripts
 
-para poder tener mayor cantidad de datos en la plataforma se implemento un script que carga datos en las bases de datos, para poder ejecutarlo en docker son necesarios los siguientes comandos ejecutandolos en otra terminal:
+Para poder tener mayor cantidad de datos en la plataforma se implemento un script que carga datos en las bases de datos, para poder ejecutarlo en docker son necesarios los siguientes comandos ejecutandolos en otra terminal:
   ```
 docker exec -it proyectoanalisis-backend-1 sh
 npm run "cargar info"
+  ```
+## Testing
+
+Para ejecutar los scripts de testing, es necesario levantar el proyecto en modo detached con el siguiente comando: 
+  ```
+docker compose up --build -d
+  ```
+Seguido a esto, se procede a ejecutar los casos de prueba:
+  ```
+docker compose exec tester python -m unittest tests.tests_ensayos
+docker compose exec tester python -m unittest tests.tests_preguntas
   ```
 
 ## Comandos utiles:
