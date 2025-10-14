@@ -37,7 +37,7 @@ class TestEssaysEndpoint(unittest.TestCase):
             return {"text": resp.text}
 
     def test_submit_essay_valid(self):
-        """Caso B1: envío válido -> 200/201 y contiene puntaje y conteos"""
+        """Caso 1: envío válido -> 200/201 y contiene puntaje y conteos"""
         payload = {
             "respuestas": [
                 {"id_pregunta": 1, "respuesta": "B"},
@@ -60,7 +60,7 @@ class TestEssaysEndpoint(unittest.TestCase):
             self.assertIsInstance(data[k], int)
 
     def test_submit_essay_invalid_answers_format(self):
-        """Caso B2: answers no es una lista -> 400/422"""
+        """Caso 2: answers no es una lista -> 400/422"""
         payload = {
             "respuestas": "esto_no_es_una_lista"
         }
@@ -72,7 +72,7 @@ class TestEssaysEndpoint(unittest.TestCase):
 
 
     def test_submit_essay_unauthenticated_valid(self):
-        """Caso C1: envío válido sin autenticación -> 401/403"""
+        """Caso 3: envío válido sin autenticación -> 401/403"""
         anon = requests.Session()  # sesión sin login
         try:
             payload = {
@@ -90,7 +90,7 @@ class TestEssaysEndpoint(unittest.TestCase):
             anon.close()
 
     def test_submit_essay_unauthenticated_invalid_format(self):
-        """Caso C2: envío inválido sin autenticación -> preferible 401/403, pero aceptar 400/422 si ocurre antes"""
+        """Caso 4: envío inválido sin autenticación -> preferible 401/403, pero aceptar 400/422 si ocurre antes"""
         anon = requests.Session()
         try:
             payload = {"respuestas": "esto_no_es_una_lista"}
