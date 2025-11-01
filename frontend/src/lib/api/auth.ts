@@ -37,43 +37,33 @@ export const AuthService = {
         if (!user)
             throw new Error('Respuesta inválida del servidor');
 
-        if (user.tipo == 'alumno') {
-            Usuario.value = {
-                rut,
-                id: user.id,
-                nombre: user.nombre,
-                rol: user.tipo,
-                correo: user.correo,
-                curso: user.curso,
-                asistencia: user.asistencia,
-                apoderado: user.apoderado,
-                direccion: user.direccion,
-                fecha_nacimiento: user.fecha_nacimiento,
-                genero: user.genero,
-                situacion_alumno: user.situacion_alumno,
-                tipo_ensenanza: user.tipo_ensenanza
-            };
-        } else
-            Usuario.value = {
-                rut,
-                id: user.id,
-                nombre: user.nombre,
-                rol: user.tipo,
-                correo: user.correo
-            }
+        const { tipo, ...data } = user;
+
+        Usuario.value = {
+            rut,
+            rol: tipo,
+            ...data
+        }
 
         return Usuario.value;
     },
     async checkLogged() {
         const response = await fetch(API_BASE + 'check-session', { credentials: 'include' });
         const text = await response.text();
-        let payload = null;
+        let payload: any = null;
         try { payload = text ? JSON.parse(text) : null; } catch { payload = text; }
 
-        if (!response.ok) throw payload;
+        if (!response.ok) {
+            Usuario.value = null;
+            return false;
+        }
 
         const user = payload?.user ?? payload;
-        if (!user) return false;
+        if (!user) {
+            Usuario.value = null;
+            return false;
+        }
+
         return true;
     },
     async logout() {

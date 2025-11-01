@@ -2,7 +2,6 @@
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import Card from '$lib/components/common/Card.svelte';
-	import PageMargin from '$lib/components/common/PageMargin.svelte';
 	import FiltroAsignaturas from '$lib/components/ensayos/FilterAsignatura.svelte';
 	import IconoirEmojiSad from '$lib/icons/IconoirEmojiSad.svelte';
 	import LoadingIndicator from '$lib/components/common/utils/LoadingIndicator.svelte';
@@ -143,82 +142,75 @@
 	}
 </script>
 
-<PageMargin>
-	{#if Usuario.value?.rol === RolUsuario.Profesor}
-		<Card size="sm" class="flex w-full flex-row items-center justify-between gap-2">
-			<div class="flex flex-row items-center gap-2">
-				<Button size="sm" goto="/editor-ensayos">Crear ensayo</Button>
-				<Button size="sm" goto="/preguntas">Editar mis preguntas</Button>
-			</div>
-			<div class="flex flex-row items-center gap-2">
-				<p class="text-xs italic opacity-50">{selectedEnsayos.length} seleccionados</p>
-				<Button size="icon" variant="secondary" onclick={selectAllEnsayos}>
-					<MaterialSymbolsSelectAll />
-				</Button>
-				<Button onclick={() => eliminarEnsayos()}>Eliminar</Button>
-			</div>
-		</Card>
-	{/if}
-
-	<Card class="w-full">
-		<h2 class="mb-4 text-2xl font-semibold">Lista de Ensayos Disponibles</h2>
-		<Form.Root class="w-fit">
-			<Form.Item label="Filtrar por Asignaturas">
-				<FiltroAsignaturas bind:selected={selectedAsignaturas} />
-			</Form.Item>
-		</Form.Root>
+{#if Usuario.value?.rol === RolUsuario.Profesor}
+	<Card size="sm" class="flex w-full flex-row items-center justify-between gap-2">
+		<div class="flex flex-row items-center gap-2">
+			<Button size="sm" goto="/editor-ensayos">Crear ensayo</Button>
+			<Button size="sm" goto="/preguntas">Editar mis preguntas</Button>
+		</div>
+		<div class="flex flex-row items-center gap-2">
+			<p class="text-xs italic opacity-50">{selectedEnsayos.length} seleccionados</p>
+			<Button size="icon" variant="secondary" onclick={selectAllEnsayos}>
+				<MaterialSymbolsSelectAll />
+			</Button>
+			<Button onclick={() => eliminarEnsayos()}>Eliminar</Button>
+		</div>
 	</Card>
+{/if}
 
-	<Card variant="outlined" class="flex max-h-2/3 w-full items-center justify-center">
-		{#if loading}
-			<LoadingIndicator size="lg" />
-		{:else if ensayos.length === 0}
-			<div class="flex flex-col gap-1 opacity-50 select-none">
-				<IconoirEmojiSad class="aspect-square h-10! w-auto!" />
-				<p class="italic">No hay ensayos para esta asignatura.</p>
-			</div>
-		{:else}
-			<div class="flex max-h-full w-full flex-col gap-2 overflow-y-auto">
-				{#each ensayos as ensayo (ensayo.id)}
-					<Card size="sm" class="px-4!">
-						<div class="flex items-center justify-between">
-							<div class="flex items-center gap-2">
-								{#if Usuario.value?.rol === RolUsuario.Profesor}
-									<input
-										type="checkbox"
-										checked={selectedEnsayos.includes(ensayo.id)}
-										onchange={() => toggleSelectEnsayo(ensayo.id)}
-									/>
-								{/if}
-								<div>
-									<h2 class="text-lg font-bold">Ensayo #{ensayo.id}</h2>
-									<p class="text-sm text-gray-500">
-										Asignatura: {ensayo.asignatura ?? ensayo.id_asignatura} · Dificultad: {ensayo.dificultad}
-										· Fecha: {ensayo.fecha_creacion}
-									</p>
-								</div>
-							</div>
+<Card class="w-full">
+	<h2 class="mb-4 text-2xl font-semibold">Ensayos</h2>
+	<Form.Root class="w-fit">
+		<Form.Item label="Filtrar por Asignaturas">
+			<FiltroAsignaturas bind:selected={selectedAsignaturas} />
+		</Form.Item>
+	</Form.Root>
+</Card>
 
-							<div class="flex gap-2">
-								{#if Usuario.value?.rol === RolUsuario.Profesor}
-									<Button size="sm" onclick={() => editarEnsayo(ensayo.id)}>Editar</Button>
-									<Button size="sm" onclick={() => estadísticasEnsayo(ensayo.id)}
-										>Estadísticas</Button
-									>
-									<Button size="sm" onclick={() => verEnsayo(ensayo.id)}>Visualizar</Button>
-								{:else if Usuario.value?.rol === RolUsuario.Alumno}
-									<Button
-										onclick={() => rendirEnsayo(ensayo.id)}
-										class="text-sm text-green-600 underline"
-									>
-										Rendir ensayo
-									</Button>
-								{/if}
+<Card class="flex max-h-full w-1/2 flex-col">
+	{#if loading}
+		<LoadingIndicator size="lg" />
+	{:else if ensayos.length === 0}
+		<div class="flex select-none flex-col gap-1 opacity-50">
+			<IconoirEmojiSad class="h-10! w-auto! aspect-square" />
+			<p class="italic">No hay ensayos para esta asignatura.</p>
+		</div>
+	{:else}
+		<div class="flex h-full flex-col items-center gap-2 overflow-y-auto">
+			{#each ensayos as ensayo (ensayo.id)}
+				{@debug ensayo}
+				<Card class="w-full">
+					<div class="flex flex-col gap-4">
+						<div class="flex items-center gap-2">
+							{#if Usuario.value?.rol === RolUsuario.Profesor}
+								<input
+									type="checkbox"
+									checked={selectedEnsayos.includes(ensayo.id)}
+									onchange={() => toggleSelectEnsayo(ensayo.id)}
+								/>
+							{/if}
+							<div>
+								<h2 class="text-lg font-bold">Ensayo #{ensayo.id}</h2>
+								<p class="text-sm text-gray-500">
+									Asignatura: {ensayo.asignatura ?? ensayo.id_asignatura} · Dificultad: {ensayo.dificultad}
+									· Fecha: {ensayo.fecha_creacion}
+								</p>
 							</div>
 						</div>
-					</Card>
-				{/each}
-			</div>
-		{/if}
-	</Card>
-</PageMargin>
+
+						<div class="flex w-full flex-row gap-2">
+							{#if Usuario.value?.rol === RolUsuario.Profesor}
+								<Button size="sm" onclick={() => editarEnsayo(ensayo.id)}>Editar</Button>
+								<Button size="sm" onclick={() => estadísticasEnsayo(ensayo.id)}>Estadísticas</Button
+								>
+								<Button size="sm" onclick={() => verEnsayo(ensayo.id)}>Visualizar</Button>
+							{:else if Usuario.value?.rol === RolUsuario.Alumno}
+								<Button onclick={() => rendirEnsayo(ensayo.id)}>Rendir ensayo</Button>
+							{/if}
+						</div>
+					</div>
+				</Card>
+			{/each}
+		</div>
+	{/if}
+</Card>

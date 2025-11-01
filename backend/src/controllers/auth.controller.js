@@ -10,21 +10,17 @@ async function login(req, res) {
     }
 
     try {
-        // 1. Llamar al servicio para obtener el usuario completo
         const userWithInfo = await authService.login(rut, contraseña);
 
         if (userWithInfo) {
-            // 2. Éxito: Crear la sesión (SOLO la data mínima requerida para middleware)
             req.session.user = {
                 id: userWithInfo.id,
                 rut: userWithInfo.rut,
                 tipo: userWithInfo.tipo
             };
-            
-            // 3. Responder con el objeto de usuario completo
+
             res.status(200).json({ message: 'Inicio de sesión exitoso', user: userWithInfo });
         } else {
-            // 4. Fallo: Credenciales inválidas
             res.status(401).json({ error: 'Credenciales inválidas' });
         }
 
@@ -32,7 +28,7 @@ async function login(req, res) {
         // 5. Manejo de errores
         console.error('Error durante el inicio de sesión:', err);
         // El mensaje de error debe ser genérico por seguridad
-        res.status(500).send('Error interno del servidor'); 
+        res.status(500).send('Error interno del servidor');
     }
 }
 
@@ -53,10 +49,10 @@ function logout(req, res) {
             console.error('Error al destruir la sesión:', err);
             return res.status(500).json({ error: 'Error al cerrar sesión' });
         }
-        
+
         // 3. Limpiar la cookie (el nombre de la cookie por defecto es 'connect.sid')
         res.clearCookie('connect.sid');
-        
+
         // 4. Respuesta exitosa
         res.status(200).json({ message: 'Sesión cerrada correctamente' });
     });

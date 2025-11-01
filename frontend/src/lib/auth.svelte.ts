@@ -6,10 +6,8 @@ export enum RolUsuario {
 	Visualizador = 'visualizador'
 }
 
-// Clave para localStorage
 const LOCAL_STORAGE_KEY = 'app_local_user_data';
 
-// Función para obtener el valor inicial desde localStorage
 function getInitialUser(): Usuario | null {
 	if (typeof window === 'undefined') {
 		return null;
@@ -20,18 +18,18 @@ function getInitialUser(): Usuario | null {
 			return JSON.parse(storedValue);
 		} catch (e) {
 			console.error("Error al cargar usuario desde localStorage:", e);
-			localStorage.removeItem(LOCAL_STORAGE_KEY); // Limpiar datos corruptos
+			localStorage.removeItem(LOCAL_STORAGE_KEY);
 			return null;
 		}
 	}
 	return null;
 }
 
-// Función para guardar el valor en localStorage
 function saveUser(user: Usuario | null) {
 	if (typeof window === 'undefined') {
 		return;
 	}
+
 	if (user) {
 		localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(user));
 	} else {
@@ -48,7 +46,7 @@ export const Usuario = {
 		return userState.value;
 	},
 	set value(newUser: Usuario | null) {
-		userState.value = newUser; // Actualiza el estado reactivo interno
-		saveUser(newUser);        // Sincroniza con localStorage
+		userState.value = newUser;
+		saveUser(newUser);
 	}
 };

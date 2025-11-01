@@ -1,12 +1,12 @@
 
-const alumnosData = require('../../api_sim/alumnos.json'); 
-const EnsayoService = require('./ensayos.service'); 
+const cursosData = require('../../api_sim/alumnos.json');
+const EnsayoService = require('./ensayos.service');
 const DocenteService = require('./docentes.service');
 
 function getAllAlumnos() {
-    
+
     const allAlumnos = [];
-    alumnosData.forEach(curso => {
+    cursosData.forEach(curso => {
         curso.alumnos.forEach(alumno => {
             allAlumnos.push({
                 rut: alumno.rut,
@@ -18,16 +18,14 @@ function getAllAlumnos() {
 }
 
 function getAlumnosList() {
-    return alumnosData; 
+    return cursosData.flatMap(curso => curso.alumnos);
 }
 
 
 function getAlumnosAndFacets() {
     try {
-        // ¡Aquí el cambio! 'cursos' ya es el objeto JavaScript
-        const alumnosDataByCourse = cursos; 
-        
-        // Aplanar la estructura: de array de cursos a array plano de alumnos
+        const alumnosDataByCourse = cursos;
+
         let allAlumnos = [];
         alumnosDataByCourse.forEach(curso => {
             allAlumnos = allAlumnos.concat(curso.alumnos);
@@ -198,7 +196,7 @@ async function getEnsayoResultsAndFacetsFromDB() {
                 return String(a.value).localeCompare(String(b.value));
             });
         }
-        
+
         return {
             ensayoResults: allEnsayoResults,
             facets: formattedFacets
@@ -224,7 +222,7 @@ async function getCombinedDataAndFacets() {
 
     // 2. Lógica de Consolidación y Facetas Globales
     const totalEntidades = alumnosData.alumnos.length + ensayosData.resultados.length + docentesData.length;
-    
+
     // 3. Devolver la data organizada
     return {
         alumnos: alumnosData.alumnos,
@@ -244,10 +242,10 @@ const findAlumnoByRut = (rut) => {
     const alumnos = getAlumnosList();
     const alumno = alumnos.find(d => d.rut === rut);
     if (!alumno) return null;
-    
+
     return {
         ...alumno,
-        nombre: alumno.nombres
+        //nombre: alumno.nombres
     };
 }
 

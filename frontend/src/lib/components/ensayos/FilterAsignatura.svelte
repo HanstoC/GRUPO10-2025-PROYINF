@@ -18,7 +18,7 @@
 	}
 </script>
 
-<div class="flex flex-wrap gap-2">
+<div class="flex flex-wrap gap-1">
 	{#each asignaturas as a}
 		<Toggle pressed={selected.includes(a.id)} onclick={() => toggleAsignatura(a.id)}>
 			{a.nombre}

@@ -9,9 +9,9 @@
 	});
 </script>
 
-<div class="mt-2 sm:w-full md:w-2/3">
+<div class="mt-1 w-full">
 	{#key error}
-		<div transition:slide class="text-destructive-foreground w-full py-1 text-center text-sm">
+		<div transition:slide class="text-destructive-foreground mb-2 w-full text-center text-sm">
 			{error.replace(/\.$/g, '') + ((error?.length ?? 0) ? '.' : '')}
 		</div>
 	{/key}

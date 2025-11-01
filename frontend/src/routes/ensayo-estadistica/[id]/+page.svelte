@@ -3,7 +3,6 @@
 	import { AnalisisService } from '$lib/api/analisis';
 	import Card from '$lib/components/common/Card.svelte';
 	import InfoText from '$lib/components/common/InfoText.svelte';
-	import PageMargin from '$lib/components/common/PageMargin.svelte';
 	import LoadingIndicator from '$lib/components/common/utils/LoadingIndicator.svelte';
 	import { slide } from 'svelte/transition';
 
@@ -96,13 +95,12 @@
 	});
 </script>
 
-<PageMargin backButton text="Estadísticas">
-	<Card class="w-full">
-		{#await analisisPromise}
-			<LoadingIndicator />
-		{:then data}
-			{@const [resumen, detalles] = data}
-			{@const {
+<Card class="w-full">
+	{#await analisisPromise}
+		<LoadingIndicator />
+	{:then data}
+		{@const [resumen, detalles] = data}
+		{@const {
 							total_alumnos,
 							total_preguntas_ensayo,
 							promedios_por_alumno,
@@ -117,49 +115,36 @@
 								omisiones: number
 							}
 						} = resumen}
-			<div in:slide class="flex w-full flex-col items-center justify-between gap-2">
-				{#snippet promedio(value: number, text: string, _class: string = '')}
-					<div class="flex flex-col items-center justify-center {_class}">
-						<h2>
-							{value}%
-						</h2>
-						<p class="opacity-50">{text}</p>
-					</div>
-				{/snippet}
-
-				<div class="w-full p-8">
-					<div class="flex w-full flex-row items-center justify-around py-2">
-						{@render promedio(promedios_por_alumno.aciertos, 'Promedio Aciertos', 'text-green-400')}
-						{@render promedio(
-							promedios_por_alumno.errores,
-							'Promedio Errores',
-							'text-destructive-foreground'
-						)}
-						{@render promedio(
-							promedios_por_alumno.omisiones,
-							'Promedio Omisiones',
-							'text-warning-foreground'
-						)}
-						{@render promedio(
-							porcentaje_acierto_general,
-							'Acierto General',
-							'text-muted-foreground'
-						)}
-					</div>
-
-					<div class="w-full py-2 text-center">
-						<p>{total_alumnos} alumnos en total rindieron el ensayo.</p>
-						<p>{total_preguntas_ensayo} preguntas en total.</p>
-					</div>
+		<div in:slide class="flex w-full flex-col items-center justify-between gap-2">
+			{#snippet promedio(value: number, text: string, _class: string = '')}
+				<div class="text-shadow-sm flex flex-col items-center justify-center {_class}">
+					<h2 class="font-bold">
+						{value}%
+					</h2>
+					<p class="-mt-1 text-sm">{text}</p>
 				</div>
-				<div class="relative h-100 w-full">
-					<canvas bind:this={graficoCanvas}></canvas>
+			{/snippet}
+
+			<div class="w-full p-8">
+				<div class="flex w-full flex-row items-center justify-around py-2">
+					{@render promedio(promedios_por_alumno.aciertos, 'Promedio Aciertos', 'text-green-500')}
+					{@render promedio(promedios_por_alumno.errores, 'Promedio Errores', 'text-destructive')}
+					{@render promedio(promedios_por_alumno.omisiones, 'Promedio Omisiones', 'text-warning')}
+					{@render promedio(porcentaje_acierto_general, 'Acierto General', 'text-muted-foreground')}
+				</div>
+
+				<div class="w-full py-2 text-center">
+					<p>{total_alumnos} alumnos en total rindieron el ensayo.</p>
+					<p>{total_preguntas_ensayo} preguntas en total.</p>
 				</div>
 			</div>
-		{:catch error}
-			<InfoText variant="error">
-				Ocurrió un error al cargar las estadísticas: {error.message}
-			</InfoText>
-		{/await}
-	</Card>
-</PageMargin>
+			<div class="h-100 relative w-full">
+				<canvas bind:this={graficoCanvas}></canvas>
+			</div>
+		</div>
+	{:catch error}
+		<InfoText variant="error">
+			Ocurrió un error al cargar las estadísticas: {error.message}
+		</InfoText>
+	{/await}
+</Card>

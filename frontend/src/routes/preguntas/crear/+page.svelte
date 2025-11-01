@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Card from '$lib/components/common/Card.svelte';
-	import PageMargin from '$lib/components/common/PageMargin.svelte';
 	import Form from '$lib/components/common/Form';
 	import Input from '$lib/components/common/Input.svelte';
 	import FileInput from '$lib/components/common/FileInput.svelte';
@@ -76,50 +75,48 @@
 	}
 </script>
 
-<PageMargin backButton>
-	<Card class="w-full">
-		<Form.Root
-			onsubmit|preventDefault={guardarPregunta}
-			class="flex h-full w-full flex-col items-center justify-center gap-2"
-		>
-			<Form.Item required label="Asignatura">
-				<select bind:value={id_asignatura} class="bg-card w-full rounded border p-1">
-					{#each asignaturas as a}
-						<option value={a.id}>{a.nombre}</option>
-					{/each}
-				</select>
+<Card class="w-full">
+	<Form.Root
+		onsubmit|preventDefault={guardarPregunta}
+		class="flex h-full w-full flex-col items-center justify-center gap-2"
+	>
+		<Form.Item required label="Asignatura">
+			<select bind:value={id_asignatura} class="bg-card w-full rounded border p-1">
+				{#each asignaturas as a}
+					<option value={a.id}>{a.nombre}</option>
+				{/each}
+			</select>
+		</Form.Item>
+
+		<Form.Item required label="Tópico">
+			<Input bind:value={pregunta.topico} placeholder="Ej: Gramática" />
+		</Form.Item>
+
+		<Form.Item required label="Enunciado">
+			<Input bind:value={pregunta.pregunta} />
+		</Form.Item>
+
+		<Form.Item label="Imagen">
+			<FileInput bind:value={imagenes} />
+		</Form.Item>
+
+		{#each ['A', 'B', 'C', 'D'] as letra, i}
+			<Form.Item label={`Alternativa ${letra}`}>
+				<div class="flex items-center gap-2">
+					<input type="radio" name="correcta" bind:group={pregunta.correcta} value={i} />
+					<Input bind:value={pregunta.alternativas[i]} />
+				</div>
 			</Form.Item>
+		{/each}
 
-			<Form.Item required label="Tópico">
-				<Input bind:value={pregunta.topico} placeholder="Ej: Gramática" />
-			</Form.Item>
-
-			<Form.Item required label="Enunciado">
-				<Input bind:value={pregunta.pregunta} />
-			</Form.Item>
-
-			<Form.Item label="Imagen">
-				<FileInput bind:value={imagenes} />
-			</Form.Item>
-
-			{#each ['A', 'B', 'C', 'D'] as letra, i}
-				<Form.Item label={`Alternativa ${letra}`}>
-					<div class="flex items-center gap-2">
-						<input type="radio" name="correcta" bind:group={pregunta.correcta} value={i} />
-						<Input bind:value={pregunta.alternativas[i]} />
-					</div>
-				</Form.Item>
-			{/each}
-
-			<Form.Footer>
-				<button
-					type="button"
-					class="rounded bg-blue-400 px-4 py-2 text-white"
-					on:click={guardarPregunta}
-				>
-					Guardar Pregunta
-				</button>
-			</Form.Footer>
-		</Form.Root>
-	</Card>
-</PageMargin>
+		<Form.Footer>
+			<button
+				type="button"
+				class="rounded bg-blue-400 px-4 py-2 text-white"
+				on:click={guardarPregunta}
+			>
+				Guardar Pregunta
+			</button>
+		</Form.Footer>
+	</Form.Root>
+</Card>
