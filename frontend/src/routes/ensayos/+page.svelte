@@ -178,7 +178,6 @@
 	{:else}
 		<div class="flex h-full flex-col items-center gap-2 overflow-y-auto">
 			{#each ensayos as ensayo (ensayo.id)}
-				{@debug ensayo}
 				<Card class="w-full">
 					<div class="flex flex-col gap-4">
 						<div class="flex items-center gap-2">

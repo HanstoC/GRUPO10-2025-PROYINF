@@ -25,6 +25,10 @@
 			loading: {
 				false: '',
 				true: 'grayscale brightness-125 text-muted-foreground'
+			},
+			disabled: {
+				false: '',
+				true: 'grayscale cursor-not-allowed'
 			}
 		},
 		defaultVariants: {
@@ -43,6 +47,7 @@
 		loading = false,
 		class: _class,
 		disabled = false,
+		onclick: _onclick,
 		...props
 	}: HTMLAnchorAttributes & {
 		goto?: string;
@@ -56,7 +61,10 @@
 
 <a
 	{...props}
-	class={`${buttonVariants({ variant, size, loading, class: _class as string })}`}
+	class={`${buttonVariants({ variant, size, loading, disabled, class: _class as string })}`}
+	onclick={(event) => {
+		if (!disabled) _onclick?.(event);
+	}}
 	{..._goto
 		? {
 				href: _goto,
