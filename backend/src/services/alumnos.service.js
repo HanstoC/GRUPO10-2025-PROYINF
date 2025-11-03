@@ -21,13 +21,10 @@ function getAlumnosList() {
     return cursosData.flatMap(curso => curso.alumnos);
 }
 
-
 function getAlumnosAndFacets() {
     try {
-        const alumnosDataByCourse = cursos;
-
         let allAlumnos = [];
-        alumnosDataByCourse.forEach(curso => {
+        cursosData.forEach(curso => {
             allAlumnos = allAlumnos.concat(curso.alumnos);
         });
 
@@ -215,9 +212,9 @@ async function getEnsayoResultsAndFacetsFromDB() {
 async function getCombinedDataAndFacets() {
     // 1. Obtener datos de diferentes fuentes de forma concurrente (si es posible)
     const [alumnosData, ensayosData, docentesData] = await Promise.all([
-        this.getAlumnosAndFacets(), // Asumo que esta función ya está en este servicio
-        EnsayoService.getEnsayoResultsAndFacetsFromDB(), // Asumo que esta función existe
-        DocenteService.getDocentesList() // Asumo que esta función existe
+        this.getAlumnosAndFacets(),
+        getEnsayoResultsAndFacetsFromDB(),
+        DocenteService.getDocentesList()
     ]);
 
     // 2. Lógica de Consolidación y Facetas Globales

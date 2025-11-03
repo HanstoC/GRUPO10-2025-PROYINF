@@ -16,12 +16,8 @@
 		})()
 	);
 	let current: number = $state(0);
-	let respuestas: Record<number, number> = {}; // pregunta_id -> alternativa_id
+	let respuestas: Record<number, number> = $state({}); // pregunta_id -> alternativa_id
 	let puntajeFinal: number | null = $state(null);
-
-	function seleccionar(pregunta_id: number, alternativa_id: number) {
-		respuestas[pregunta_id] = alternativa_id;
-	}
 
 	async function enviar() {
 		try {
@@ -39,11 +35,8 @@
 	}
 
 	beforeNavigate(({ cancel }) => {
-		if (!puntajeFinal) {
-			if (!confirm('¿Estás seguro que quieres salir? Aún no terminas el ensayo.')) {
-				cancel();
-			}
-		}
+		if (!puntajeFinal)
+			if (!confirm('¿Estás seguro que quieres salir? Aún no terminas el ensayo.')) cancel();
 	});
 </script>
 
@@ -65,27 +58,27 @@
 			{:else}
 				<h2 class="absolute top-0 text-left">Pregunta {current + 1}</h2>
 
-				<Card class="mx-auto w-full max-w-3xl p-6">
-					<p class="mb-2 text-xl font-semibold">
-						{currentPregunta.pregunta}
-					</p>
+				<div class="max-w-3xl">
+					<Card size="lg">
+						<p class="mb-2 text-xl font-semibold">
+							{currentPregunta.pregunta}
+						</p>
 
-					<div class="space-y-2 text-lg">
-						{#each currentPregunta.alternativas as alt, i (alt)}
-							<label class="flex items-center gap-2">
-								<input
-									type="radio"
-									name={`pregunta-${currentPregunta.pregunta_id}`}
-									value={alt.id}
-									checked={respuestas[currentPregunta.pregunta_id] === alt.id}
-									onchange={() => seleccionar(currentPregunta.pregunta_id, alt.id)}
-									class="accent-blue-500"
-								/>
-								<span>{alt.texto}</span>
-							</label>
-						{/each}
-					</div>
-				</Card>
+						<div class="mt-4 space-y-2 text-lg">
+							{#each currentPregunta.alternativas as alt (alt.id)}
+								{@const checked = respuestas[currentPregunta.pregunta_id] === alt.id}
+								<button
+									class="w-full rounded-md border px-4 py-1 shadow-md {checked
+										? 'bg-primary text-primary-foreground font-medium'
+										: 'hover:bg-secondary hover:text-secondary-foreground hover:cursor-pointer'}"
+									onclick={() => (respuestas[currentPregunta.pregunta_id] = alt.id)}
+								>
+									{alt.texto}
+								</button>
+							{/each}
+						</div>
+					</Card>
+				</div>
 
 				<div class="absolute bottom-0 flex w-full flex-row justify-between pr-8">
 					<Button disabled={current <= 0} onclick={() => (current -= 1)}>Anterior</Button>

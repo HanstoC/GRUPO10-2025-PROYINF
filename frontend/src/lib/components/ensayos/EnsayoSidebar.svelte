@@ -36,20 +36,24 @@
 <div
 	class="from-background to-foreground/10 w-xs min-w-xs z-40 h-screen max-w-xs border-r bg-gradient-to-b from-25% shadow-lg"
 >
-	<div class="border-background flex h-full w-full flex-col border-l-2 border-r-2 p-4 px-6">
+	<div
+		class="border-background flex h-full w-full flex-col overflow-y-auto border-l-2 border-r-2 p-4 px-6"
+	>
 		<div class="flex w-full flex-col items-start gap-2 border-b py-5">
 			<h2>Ensayo #{ensayoId}</h2>
 			<div class="flex w-full flex-row">
 				<span>Tiempo transcurrido:</span>
-				<p class="right-0 ml-auto">{Utils.msToHHMMSS(tiempoTranscurrido)}</p>
+				<p class="right-0 ml-auto">
+					{!preguntas.length ? '--' : Utils.msToHHMMSS(tiempoTranscurrido)}
+				</p>
 			</div>
 		</div>
 
-		<div class="flex flex-row flex-wrap gap-1 overflow-y-auto pt-4">
+		<div class="flex flex-row flex-wrap gap-1 pt-4">
 			{#each preguntas as pregunta, i (pregunta.pregunta_id)}
 				{@const { pregunta_id } = pregunta}
 				<button
-					class="bg-background cursor-pointer! relative aspect-square h-10 w-10 rounded-sm border p-2 shadow-sm hover:brightness-125 {pregunta_id in
+					class="bg-background hover:cursor-pointer! relative aspect-square h-10 w-10 rounded-sm border p-2 shadow-sm hover:brightness-125 {pregunta_id in
 					respuestas
 						? 'bg-primary text-primary-foreground'
 						: ''} {current === i ? 'ring-accent shadow-md/40! ring-2' : ''}"

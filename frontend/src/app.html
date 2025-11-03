@@ -5,6 +5,17 @@
 	<meta charset="utf-8" />
 	<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+	<script type="module">
+		import { LaTeXJSComponent } from "https://cdn.jsdelivr.net/npm/latex.js/dist/latex.mjs"
+		customElements.define("latex-js", LaTeXJSComponent)
+	</script>
+
+	<style>
+		latex-js {
+			display: inline-block;
+		}
+	</style>
 	%sveltekit.head%
 </head>
 
