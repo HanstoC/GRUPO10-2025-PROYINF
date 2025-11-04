@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Card from '$lib/components/common/Card.svelte';
-	import PageMargin from '$lib/components/common/PageMargin.svelte';
 	import Form from '$lib/components/common/Form';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
@@ -77,58 +76,56 @@
 	}
 </script>
 
-<PageMargin backButton>
-	<Card class="w-full">
-		<Form.Root onsubmit|preventDefault={guardarEnsayo} class="flex flex-col gap-4">
-			<Form.Item label="Asignatura">
-				<select bind:value={id_asignatura} class="bg-card w-full rounded border p-2">
-					{#each asignaturas as a}
-						<option value={a.id}>{a.nombre}</option>
-					{/each}
-				</select>
-			</Form.Item>
+<Card class="w-full">
+	<Form.Root onsubmit|preventDefault={guardarEnsayo} class="flex flex-col gap-4">
+		<Form.Item label="Asignatura">
+			<select bind:value={id_asignatura} class="bg-card w-full rounded border p-2">
+				{#each asignaturas as a}
+					<option value={a.id}>{a.nombre}</option>
+				{/each}
+			</select>
+		</Form.Item>
 
-			<Form.Item label="Dificultad">
-				<select bind:value={dificultad} class="bg-card w-full rounded border p-2">
-					<option value="Fácil">Fácil</option>
-					<option value="Media">Media</option>
-					<option value="Difícil">Difícil</option>
-				</select>
-			</Form.Item>
+		<Form.Item label="Dificultad">
+			<select bind:value={dificultad} class="bg-card w-full rounded border p-2">
+				<option value="Fácil">Fácil</option>
+				<option value="Media">Media</option>
+				<option value="Difícil">Difícil</option>
+			</select>
+		</Form.Item>
 
-			<Form.Item label="Preguntas disponibles">
-				{#if preguntas.length}
-					{#each preguntas as p}
-						<label class="my-1 flex items-center gap-2">
-							<input
-								type="checkbox"
-								value={p.id}
-								on:change={(e) => {
-									const checked = e.currentTarget?.checked;
-									if (checked) {
-										preguntasSeleccionadas = [...preguntasSeleccionadas, p.id];
-									} else {
-										preguntasSeleccionadas = preguntasSeleccionadas.filter((id) => id !== p.id);
-									}
-								}}
-							/>
-							{p.enunciado}
-						</label>
-					{/each}
-				{:else}
-					<p class="text-sm text-gray-500 italic">No hay preguntas para esta asignatura.</p>
-				{/if}
-			</Form.Item>
+		<Form.Item label="Preguntas disponibles">
+			{#if preguntas.length}
+				{#each preguntas as p}
+					<label class="my-1 flex items-center gap-2">
+						<input
+							type="checkbox"
+							value={p.id}
+							on:change={(e) => {
+								const checked = e.currentTarget?.checked;
+								if (checked) {
+									preguntasSeleccionadas = [...preguntasSeleccionadas, p.id];
+								} else {
+									preguntasSeleccionadas = preguntasSeleccionadas.filter((id) => id !== p.id);
+								}
+							}}
+						/>
+						{p.enunciado}
+					</label>
+				{/each}
+			{:else}
+				<p class="text-sm italic text-gray-500">No hay preguntas para esta asignatura.</p>
+			{/if}
+		</Form.Item>
 
-			<Form.Footer>
-				<button
-					type="button"
-					class="rounded bg-blue-400 px-4 py-2 text-white"
-					on:click={guardarEnsayo}
-				>
-					Crear Ensayo
-				</button>
-			</Form.Footer>
-		</Form.Root>
-	</Card>
-</PageMargin>
+		<Form.Footer>
+			<button
+				type="button"
+				class="rounded bg-blue-400 px-4 py-2 text-white"
+				on:click={guardarEnsayo}
+			>
+				Crear Ensayo
+			</button>
+		</Form.Footer>
+	</Form.Root>
+</Card>

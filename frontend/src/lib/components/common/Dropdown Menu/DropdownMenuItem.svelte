@@ -8,7 +8,7 @@
 			variant: {
 				default: 'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
 				destructive:
-					'text-destructive-foreground data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground'
+					'text-destructive data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground'
 			}
 		}
 	} as const);

@@ -25,9 +25,9 @@
 					{@const isSelected = selectedTemario === i}
 					<button
 						onclick={(_) => (selectedTemario = i)}
-						class={`relative flex h-full flex-1 flex-col items-center justify-center text-center font-extralight ${isSelected ? 'font-extrabold! text-white' : 'group cursor-pointer text-white/70 hover:text-white'} duration-100!`}
+						class={`relative flex h-full flex-1 flex-col items-center justify-center text-center font-extralight ${isSelected ? 'font-extrabold! text-white' : 'group cursor-pointer text-white/70 hover:text-white'} duration-100! tracking-tighter`}
 					>
-						<p class="text-3xl uppercase">
+						<p class="px-2 text-3xl uppercase leading-7">
 							{what
 								.replace(/Temario de la PAES \w+(?: \w+)? de/gi, '')
 								.replace(/\.$/gi, '')

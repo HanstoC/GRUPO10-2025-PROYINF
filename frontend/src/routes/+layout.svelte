@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Header from '$lib/components/Header.svelte';
-	import Loader from '$lib/components/Loader.svelte';
+	import SideBar from '$lib/components/SideBar.svelte';
 
 	import '../app.css';
 	import 'iconify-icon';
@@ -12,7 +11,6 @@
 	import { Usuario } from '$lib/auth.svelte';
 
 	let { children } = $props();
-	const hasHeader = $derived(page.url.pathname !== LINKS.LOGIN && Usuario.value?.nombre);
 
 	const currentPath = $derived(page.url.pathname);
 
@@ -33,12 +31,14 @@
 <link rel="preload" href="/resultados-bg.jpg" as="image" />
 <link rel="preload" href="/ensayos-bg.jpg" as="image" />
 
-<Loader />
-{#if hasHeader}
-	<Header />
-{/if}
-<div
-	class={`flex ${hasHeader ? 'h-[calc(100%-3.5rem)]' : 'h-full'} flex-col items-center gap-2 overflow-auto`}
->
-	{@render children()}
+<div class="flex h-full max-h-screen w-full flex-row">
+	<SideBar />
+	<div
+		class="bg-foreground/10 flex max-h-screen w-full flex-col items-center gap-2 overflow-y-hidden {Usuario
+			.value?.rut && currentPath !== '/temarios'
+			? 'p-8'
+			: ''}"
+	>
+		{@render children()}
+	</div>
 </div>

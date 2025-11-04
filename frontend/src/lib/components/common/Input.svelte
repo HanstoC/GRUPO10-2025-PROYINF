@@ -2,13 +2,27 @@
 	import Animations from '$lib/helpers/Animations';
 	import { getContext } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
+	import { tv } from 'tailwind-variants';
+
+	const inputTv = tv({
+		base: 'border-input placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50',
+		variants: {
+			invalid: {
+				false: '',
+				true: 'border-destructive-foreground!'
+			}
+		},
+		defaultVariants: {
+			invalid: false
+		}
+	});
 
 	type formats = 'none' | 'rut';
 
 	let {
 		value = $bindable(),
 		format = 'none' as formats,
-		class: className,
+		class: _class,
 		...props
 	}: HTMLInputAttributes & {
 		format?: formats;
@@ -52,7 +66,7 @@
 	bind:this={input}
 	maxlength={(props.maxlength ?? props.type === 'password') ? 128 : undefined}
 	title=""
-	class={`border-input placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50 ${invalid ? 'border-destructive-foreground!' : ''} ${className}`}
+	class={inputTv({ class: _class as string, invalid })}
 	placeholder={(props.placeholder ?? props.type === 'password')
 		? '••••••••••••••••'
 		: format === 'rut'

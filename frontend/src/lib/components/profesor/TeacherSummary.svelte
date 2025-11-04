@@ -59,8 +59,8 @@
 	}
 </script>
 
-<Card class="flex w-full flex-col gap-4 p-4">
-	<h2 class="text-xl font-bold">Mis ensayos</h2>
+<Card class="flex w-full flex-col gap-2 p-4">
+	<h3 class="-mb-2 text-xl font-bold">Mis ensayos</h3>
 
 	{#if loading}
 		<div class="flex justify-center py-4">

@@ -97,8 +97,8 @@
 	);
 </script>
 
-<Card class="w-full! h-full! flex flex-col gap-4 p-4">
-	<h2 class="text-xl font-semibold">Resultados de alumnos</h2>
+<Card class="flex h-full! w-full! flex-col gap-4 p-4">
+	<h3 class="-mb-2 text-xl font-bold">Resultados de alumnos</h3>
 	<SearchBar bind:value={query} placeholder="Buscar alumnos por nombre o RUT" />
 
 	{#if loadingAlumnos}

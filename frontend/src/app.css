@@ -3,86 +3,47 @@
 
 @layer base {
     :root {
-        --background: 0 0% 98%;
-        --foreground: 0 0% 5%;
+        --background: 220 10% 98%;
+        --foreground: 220 15% 10%;
 
-        --muted: 0 0% 90%;
-        --muted-foreground: 0 0% 40%;
+        --muted: 220 10% 90%;
+        --muted-foreground: 220 10% 30%;
 
-        --popover: 0 0% 98%;
-        --popover-foreground: 0 0% 5%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 220 15% 10%;
 
-        --card: 0 0% 98%;
-        --card-foreground: 0 0% 5%;
+        --card: 0 0% 100%;
+        --card-foreground: 220 15% 10%;
 
-        --border: 0 0% 80%;
-        --input: 0 0% 80%;
+        --border: 220 10% 80%;
+        --input: 220 10% 80%;
 
-        --primary: 210 85% 60%;
+        --primary: 200 90% 35%;
         --primary-foreground: 0 0% 100%;
 
-        --secondary: 0 0% 90%;
-        --secondary-foreground: 0 0% 5%;
+        --secondary: 220 10% 80%;
+        --secondary-foreground: 220 15% 10%;
 
-        --accent: 0 0% 90%;
-        --accent-foreground: 0 0% 5%;
+        --accent: 200 80% 50%;
+        --accent-foreground: 220 15% 10%;
 
-        --destructive: 0 85% 65%;
-        --destructive-foreground: 0 0% 100%;
-
-        --ring: 0 0% 50%;
-
-        --radius: 0.5rem;
+        --destructive: 0 80% 50%;
+        --destructive-foreground: 5 60% 50%;
 
         --warning: 30 100% 50%;
         --warning-foreground: 0 0% 10%;
+
+        --ring: 200 80% 45%;
+        --radius: 0.5rem;
     }
-
-    .dark {
-        --background: 0 0% 3%;
-        --foreground: 0 0% 100%;
-
-        --muted: 0 0% 12%;
-        --muted-foreground: 0 0% 60%;
-
-        --popover: 0 0% 3%;
-        --popover-foreground: 0 0% 100%;
-
-        --card: 0 0% 3%;
-        --card-foreground: 0 0% 100%;
-
-        --border: 0 0% 25%;
-        --input: 0 0% 25%;
-
-        --primary: 210 85% 60%;
-        --primary-foreground: 0 0% 5%;
-
-        --secondary: 0 0% 12%;
-        --secondary-foreground: 0 0% 100%;
-
-        --accent: 0 0% 12%;
-        --accent-foreground: 0 0% 100%;
-
-        --destructive: 0 60% 40%;
-        --destructive-foreground: 0 85% 60%;
-
-        --ring: 0 0% 25%;
-
-        --warning: 30 100% 50%;
-        --warning-foreground: 0 0% 100%;
-    }
-}
-
-@utility scheme-light {
-    color-scheme: light;
-}
-
-@utility scheme-dark {
-    color-scheme: dark;
 }
 
 @utility svg-icon {
     @apply mr-2;
+}
+
+@utility acryllic {
+    @apply bg-foreground/25 border-none shadow-sm/40 backdrop-blur-sm;
 }
 
 @tailwind base;

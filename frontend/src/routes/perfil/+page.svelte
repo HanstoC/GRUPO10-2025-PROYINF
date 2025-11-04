@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { Usuario } from '$lib/auth.svelte';
+	import Avatar from '$lib/components/common/Avatar.svelte';
+	import Card from '$lib/components/common/Card.svelte';
 
 	function formatRut(rut: string) {
 		if (!rut) return '';
@@ -15,90 +17,57 @@
 			profesor: 'Profesor',
 			visualizador: 'Visualizador'
 		};
+
+		//@ts-ignore
 		return roles[rol] || rol;
 	}
 </script>
 
-<div class="container mx-auto px-4">
-	<div class="mx-auto max-w-2xl py-8">
-		<div class="overflow-hidden rounded-lg shadow">
-			<div class="px-6 py-8">
-				<!-- Header -->
-				<div class="mb-8 text-center">
-					<div class="bg-card mx-auto mb-4 flex h-32 w-32 items-center justify-center rounded-full">
-						{#if Usuario.value?.imagen}
-							<img
-								src={Usuario.value.imagen}
-								alt="Foto de perfil"
-								class="h-32 w-32 rounded-full object-cover"
-							/>
-						{:else}
-							<span class="text-5xl text-gray-400">
-								{Usuario.value?.nombre?.[0]?.toUpperCase() || '?'}
-							</span>
-						{/if}
-					</div>
-					<h1 class="text-xl font-bold text-gray-100">
-						{Usuario.value?.nombre || 'Usuario'}
-					</h1>
-					<p class="mt-1 text-sm text-gray-400">
-						{getRolDisplay(Usuario.value?.rol || '')}
-					</p>
+<div class="w-lg mx-auto max-w-2xl py-8">
+	<div class="overflow-hidden rounded-lg shadow">
+		<Card class="flex flex-col gap-4 px-6 py-8">
+			<div class="text-center">
+				<div class="mx-auto mb-4 flex h-32 w-32 items-center justify-center rounded-full">
+					<Avatar icon={Usuario.value?.imagen ?? Usuario.value?.nombre} />
 				</div>
-
-				<!-- Info Grid -->
-				<div class="mb-8 grid gap-6">
-					<div class="grid gap-4">
-						<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-							<span class="text-sm font-medium text-gray-400">RUT</span>
-							<span class="text-base text-gray-200">{formatRut(Usuario.value?.rut || '')}</span>
-						</div>
-						<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-							<span class="text-sm font-medium text-gray-400">Correo</span>
-							<span class="text-base text-gray-200">{Usuario.value?.correo || ''}</span>
-						</div>
-
-						{#if Usuario.value?.rol === 'alumno'}
-							<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-								<span class="text-sm font-medium text-gray-400">Curso</span>
-								<span class="text-base text-gray-200">{Usuario.value?.curso || ''}</span>
-							</div>
-							<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-								<span class="text-sm font-medium text-gray-400">Asistencia</span>
-								<span class="text-base text-gray-200"
-									>{Usuario.value?.asistencia ? `${Usuario.value.asistencia}%` : '-'}</span
-								>
-							</div>
-							<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-								<span class="text-sm font-medium text-gray-400">Apoderado</span>
-								<span class="text-base text-gray-200">{Usuario.value?.apoderado || '-'}</span>
-							</div>
-							<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-								<span class="text-sm font-medium text-gray-400">Dirección</span>
-								<span class="text-base text-gray-200">{Usuario.value?.direccion || '-'}</span>
-							</div>
-							<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-								<span class="text-sm font-medium text-gray-400">Fecha de Nacimiento</span>
-								<span class="text-base text-gray-200">{Usuario.value?.fecha_nacimiento || '-'}</span
-								>
-							</div>
-							<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-								<span class="text-sm font-medium text-gray-400">Género</span>
-								<span class="text-base text-gray-200">{Usuario.value?.genero || '-'}</span>
-							</div>
-							<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-								<span class="text-sm font-medium text-gray-400">Situación</span>
-								<span class="text-base text-gray-200">{Usuario.value?.situacion_alumno || '-'}</span
-								>
-							</div>
-							<div class="bg-card flex flex-col rounded-lg p-4 md:flex-row md:justify-between">
-								<span class="text-sm font-medium text-gray-400">Tipo de Enseñanza</span>
-								<span class="text-base text-gray-200">{Usuario.value?.tipo_ensenanza || '-'}</span>
-							</div>
-						{/if}
-					</div>
-				</div>
+				<h2 class="font-bold">
+					{#if Usuario.value?.nombre}
+						{Usuario.value.nombre}
+						{Usuario.value.paterno}
+						{Usuario.value.materno}
+					{:else}
+						Usuario
+					{/if}
+				</h2>
+				<p class="text-base">
+					{getRolDisplay(Usuario.value?.rol || '')}
+				</p>
 			</div>
-		</div>
+
+			<div class="grid gap-2">
+				{#snippet info(title: string, value: string)}
+					<div class="flex flex-col rounded-lg border px-4 py-2 md:flex-row md:justify-between">
+						<span class="text-sm font-bold">{title}</span>
+						<span class="text-muted-foreground text-base">{value}</span>
+					</div>
+				{/snippet}
+
+				{@render info('RUT', formatRut(Usuario.value?.rut || ''))}
+				{@render info('Correo', Usuario.value?.email || '')}
+
+				{#if Usuario.value?.rol === 'alumno'}
+					{@render info('Curso', Usuario.value?.curso || '')}
+					{@render info(
+						'Asistencia',
+						Usuario.value?.asistencia ? `${Usuario.value.asistencia}%` : '-'
+					)}
+					{@render info('Apoderado', Usuario.value?.apoderado || '-')}
+					{@render info('Dirección', Usuario.value?.direccion || '-')}
+					{@render info('Fecha de Nacimiento', Usuario.value?.fecha_nacimiento || '-')}
+					{@render info('Género', Usuario.value?.genero || '-')}
+					{@render info('Situación', Usuario.value?.situacion_alumno || '-')}
+				{/if}
+			</div>
+		</Card>
 	</div>
 </div>

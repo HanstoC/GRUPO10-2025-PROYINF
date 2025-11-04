@@ -3,11 +3,12 @@
 	import { page } from '$app/state';
 	import { AuthService } from '$lib/api/auth';
 	import { RolUsuario, Usuario } from '$lib/auth.svelte';
-	import PageMargin from '$lib/components/common/PageMargin.svelte';
 	import StudentsResults from '$lib/components/profesor/StudentsResults.svelte';
 	import TeacherSummary from '$lib/components/profesor/TeacherSummary.svelte';
+	import ProfileSnippet from '$lib/components/utils/ProfileSnippet.svelte';
 	import SearchAlumno from '$lib/components/utils/SearchAlumno.svelte';
 	import { LINKS } from '$lib/global/links';
+	import { fade } from 'svelte/transition';
 
 	$effect(() => {
 		if (page.url.hash.match(/logout/gi)) AuthService.logout().then(() => goto(LINKS.LOGIN));
@@ -18,14 +19,14 @@
 	{#snippet alumno()}{/snippet}
 
 	{#snippet profesor()}
-		<div class="flex w-full flex-col gap-4 lg:flex-row lg:gap-6">
-			<div class="w-full lg:w-1/2">
-				<StudentsResults />
+		<div class="flex w-full flex-row gap-4">
+			<div class="flex-1/8">
+				<ProfileSnippet />
 			</div>
-			<div class="w-full lg:w-1/2">
-				<TeacherSummary />
-			</div>
+			<div class="flex-3"></div>
 		</div>
+		<StudentsResults />
+		<TeacherSummary />
 	{/snippet}
 
 	{#snippet visualizador()}
@@ -38,16 +39,9 @@
 		[RolUsuario.Alumno]: alumno,
 		[RolUsuario.Profesor]: profesor,
 		[RolUsuario.Visualizador]: visualizador
-	}[Usuario.value!.rol as RolUsuario]}
+	}[Usuario.value?.rol as RolUsuario]}
 
-	<PageMargin>
-		<div class="mb-6">
-			<h2 class="text-2xl font-bold text-gray-800 sm:text-3xl">
-				Bienvenido, {Usuario.value?.nombre}!
-			</h2>
-		</div>
-		<div class="w-full">
-			{@render Snippet()}
-		</div>
-	</PageMargin>
+	<div class="flex w-full flex-col gap-2" in:fade>
+		{@render Snippet?.()}
+	</div>
 {/if}
