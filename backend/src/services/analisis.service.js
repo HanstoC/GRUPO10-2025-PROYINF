@@ -64,7 +64,7 @@ async function getEssaySummary(ensayoId) {
 
     // 3. Cálculo del % de acierto general
     const totalAlumnos = parseInt(data.total_alumnos_rindieron, 10);
-    const totalAciertosGlobal = parseFloat(data.total_aciertos_global);
+    const totalAciertosGlobal = Number.parseFloat(data.total_aciertos_global);
     const maxPossibleAnswers = totalQuestions * totalAlumnos;
 
     let overallAccuracyPercentage = 0;
@@ -77,9 +77,9 @@ async function getEssaySummary(ensayoId) {
         total_alumnos: totalAlumnos,
         total_preguntas_ensayo: totalQuestions,
         promedios_por_alumno: {
-            aciertos: parseFloat(data.avg_correctas).toFixed(2),
-            errores: parseFloat(data.avg_erroneas).toFixed(2),
-            omisiones: parseFloat(data.avg_omitidas).toFixed(2),
+            aciertos: Number.parseFloat(data.avg_correctas).toFixed(2),
+            errores: Number.parseFloat(data.avg_erroneas).toFixed(2),
+            omisiones: Number.parseFloat(data.avg_omitidas).toFixed(2),
         },
         porcentaje_acierto_general: overallAccuracyPercentage.toFixed(2),
     };
@@ -159,9 +159,9 @@ async function getEssayDetail(ensayoId) {
             omisiones_total: countOmision,
             
             // Requerimiento 5: Promedio por alumno para el gráfico (Eje Y)
-            acierto_promedio: parseFloat(avgAcierto.toFixed(4)), 
-            error_promedio: parseFloat(avgError.toFixed(4)),     
-            omision_promedio: parseFloat(avgOmision.toFixed(4)), 
+            acierto_promedio: Number.parseFloat(avgAcierto.toFixed(4)), 
+            error_promedio: Number.parseFloat(avgError.toFixed(4)),     
+            omision_promedio: Number.parseFloat(avgOmision.toFixed(4)), 
         };
     });
 

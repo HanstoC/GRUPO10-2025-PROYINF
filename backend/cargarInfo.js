@@ -280,7 +280,7 @@ async function runPopulationScript() {
 
                 // Calcular puntaje: (correctas / 65) con dos decimales, sobre 100
                 let puntaje_obtenido = (correctas / 65) * 100; // Ahora sobre 100
-                puntaje_obtenido = parseFloat(puntaje_obtenido.toFixed(2));
+                puntaje_obtenido = Number.parseFloat(puntaje_obtenido.toFixed(2));
                 
                 const tiempo_empleado = Math.floor(Math.random() * (120 - 30 + 1) + 30) * 60; // entre 30 y 120 minutos en segundos
 

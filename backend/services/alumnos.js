@@ -245,8 +245,8 @@ async function getEnsayoResultsAndFacetsFromDB() {
             // Para strings como asignatura/dificultad, ordenar alfabéticamente
             formattedFacets[key].sort((a, b) => {
                 // Intenta ordenar numéricamente si los valores parecen números
-                const numA = parseFloat(String(a.value).split('-')[0]); // Toma la primera parte del rango
-                const numB = parseFloat(String(b.value).split('-')[0]);
+                const numA = Number.parseFloat(String(a.value).split('-')[0]); // Toma la primera parte del rango
+                const numB = Number.parseFloat(String(b.value).split('-')[0]);
                 if (!isNaN(numA) && !isNaN(numB)) {
                     return numA - numB;
                 }
