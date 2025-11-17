@@ -12,4 +12,6 @@ Al Arreglar el problema descrito anteriormente se procede a realizar nuevamente 
 
 Otro problema a resolver del mismo indole que el primero es utilizar Number.parseInt sobre parseInt, Actualmente el proyecto obtiene 53 problemas de severidad media y realizando este arreglo se obtienen 34 problemas de esta misma severidad.
 
-Asi la mayoria de problemas detectados son de consistencia, se tratara de arreglar la mayoria de estos (reemplazar isNaN por Number.isNan y especificar los path y fs como node:path y node:fs) realizando estos arreglos se llega al numero de 
+Asi la mayoria de problemas detectados son de consistencia, se tratara de arreglar la mayoria de estos (reemplazar isNaN por Number.isNan y especificar los path y fs como node:path y node:fs) realizando estos arreglos se llega al numero de 12 problemas de severidad media.
+
+Además gracias a la aplicación detectamos un archivo duplicado lo que aumentaba considerablemente los errores detectados, luego de eliminar este archivo SonarQube aprobo sus puntos de control, lo que queda expuesto en las imagenes LastFix y LastFix2
