@@ -36,7 +36,7 @@ async function getEssaySummary(ensayoId) {
         WHERE id_ensayo = $1;
     `;
     const totalQuestionsResult = await db.query(totalQuestionsSql, [ensayoId]);
-    const totalQuestions = parseInt(totalQuestionsResult.rows[0]?.total_questions || 0, 10);
+    const totalQuestions = Number.parseInt(totalQuestionsResult.rows[0]?.total_questions || 0, 10);
     
     if (totalQuestions === 0) {
         throw new Error("Ensayo no encontrado o sin preguntas asignadas.");
@@ -63,7 +63,7 @@ async function getEssaySummary(ensayoId) {
     }
 
     // 3. Cálculo del % de acierto general
-    const totalAlumnos = parseInt(data.total_alumnos_rindieron, 10);
+    const totalAlumnos = Number.parseInt(data.total_alumnos_rindieron, 10);
     const totalAciertosGlobal = Number.parseFloat(data.total_aciertos_global);
     const maxPossibleAnswers = totalQuestions * totalAlumnos;
 
@@ -101,7 +101,7 @@ async function getEssayDetail(ensayoId) {
         WHERE id_ensayo = $1;
     `;
     const studentsResult = await db.query(studentsSql, [ensayoId]);
-    const totalAlumnos = parseInt(studentsResult.rows[0]?.total_alumnos || 0, 10);
+    const totalAlumnos = Number.parseInt(studentsResult.rows[0]?.total_alumnos || 0, 10);
 
     if (totalAlumnos === 0) {
         throw new Error("No hay alumnos que hayan rendido este ensayo para el detalle.");
@@ -140,9 +140,9 @@ async function getEssayDetail(ensayoId) {
     const graphData = detailRows.map((row, index) => {
         const questionNumber = index + 1; // Número secuencial de la pregunta en el ensayo
 
-        const countAcierto = parseInt(row.count_acierto, 10);
-        const countError = parseInt(row.count_error, 10);
-        const countOmision = parseInt(row.count_omision, 10);
+        const countAcierto = Number.parseInt(row.count_acierto, 10);
+        const countError = Number.parseInt(row.count_error, 10);
+        const countOmision = Number.parseInt(row.count_omision, 10);
         
         // Promedio por alumno (para el eje Y del gráfico de tendencia)
         const avgAcierto = (countAcierto / totalAlumnos);

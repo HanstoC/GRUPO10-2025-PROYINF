@@ -4,7 +4,7 @@ const TematicaRepository = require('../repositories/TematicaRepository');
 
 async function obtenerPorAsignatura(req, res) {
     // 1. Obtener y validar el ID del parámetro
-    const idAsignatura = parseInt(req.params.idAsignatura, 10);
+    const idAsignatura = Number.parseInt(req.params.idAsignatura, 10);
     // console.log(idAsignatura); // La línea de log original se queda aquí o se elimina
 
     if (isNaN(idAsignatura)) {

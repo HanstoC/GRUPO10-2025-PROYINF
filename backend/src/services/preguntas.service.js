@@ -54,7 +54,7 @@ async function obtenerPreguntasConDetalles(asignaturaQuery) {
         // Solo incluimos IDs que sean números válidos.
         asignaturaIds = asignaturaQuery
             .split(',')
-            .map(id => parseInt(id.trim(), 10))
+            .map(id => Number.parseInt(id.trim(), 10))
             .filter(id => !isNaN(id));
         
         // Si después de limpiar el filtro, no quedan IDs válidos, podríamos retornar un error o un array vacío.

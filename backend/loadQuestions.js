@@ -9,14 +9,14 @@ const dbConfig = {
     host: process.env.DB_HOST || 'postgres_db',         
     database: process.env.DB_NAME || 'mydb',   
     password: process.env.DB_PASSWORD || 'password', 
-    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
+    port: process.env.DB_PORT ? Number.parseInt(process.env.DB_PORT) : 5432,
 };
 
 
 const preguntasJsonFile = path.join(__dirname, 'preguntas.json'); 
 
 
-const defaultProfessorId = process.env.DEFAULT_PROFESSOR_ID ? parseInt(process.env.DEFAULT_PROFESSOR_ID) : 1;
+const defaultProfessorId = process.env.DEFAULT_PROFESSOR_ID ? Number.parseInt(process.env.DEFAULT_PROFESSOR_ID) : 1;
 
 async function insertQuestionsFromJson() {
     let client; 

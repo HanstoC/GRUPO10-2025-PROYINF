@@ -224,7 +224,7 @@ async function eliminarEnsayos(req, res) {
     }
 
     // Convertir IDs a números (aunque el servicio lo manejará, mejor validar aquí)
-    const ensayoIds = ids.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+    const ensayoIds = ids.map(id => Number.parseInt(id, 10)).filter(id => !isNaN(id));
 
     if (ensayoIds.length !== ids.length) {
         return res.status(400).send('IDs de ensayo deben ser números válidos.');

@@ -16,7 +16,7 @@
 	 * Se activa al enviar el formulario.
 	 */
 	function goToPage() {
-		const pageNum = parseInt(desiredPageInput, 10);
+		const pageNum = Number.parseInt(desiredPageInput, 10);
 
 		// Validar que sea un número y esté en el rango correcto
 		if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {

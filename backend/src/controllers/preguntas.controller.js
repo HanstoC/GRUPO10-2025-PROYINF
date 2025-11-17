@@ -48,7 +48,7 @@ async function obtenerPreguntas(req, res) {
 }
 
 async function obtenerPreguntaPorId(req, res) {
-    const id = parseInt(req.params.id, 10);
+    const id = Number.parseInt(req.params.id, 10);
     
     if (isNaN(id)) {
         return res.status(400).send('ID de pregunta inválido.');
@@ -74,7 +74,7 @@ async function obtenerPreguntaPorId(req, res) {
 }
 
 async function actualizarPregunta(req, res) {
-    const id = parseInt(req.params.id, 10);
+    const id = Number.parseInt(req.params.id, 10);
     const data = req.body;
     
     if (isNaN(id)) {

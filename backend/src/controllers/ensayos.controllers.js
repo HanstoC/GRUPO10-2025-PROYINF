@@ -123,7 +123,7 @@ async function obtenerResultadosYFacetas(req, res) {
 }
 
 async function actualizarEnsayo(req, res) {
-    const ensayoId = parseInt(req.params.id, 10);
+    const ensayoId = Number.parseInt(req.params.id, 10);
     const data = req.body;
     
     // Validación inicial
@@ -146,7 +146,7 @@ async function actualizarEnsayo(req, res) {
 }
 
 async function obtenerEnsayoPorId(req, res) {
-    const id = parseInt(req.params.id, 10);
+    const id = Number.parseInt(req.params.id, 10);
 
     if (isNaN(id)) {
         return res.status(400).send('ID de ensayo inválido');
@@ -170,7 +170,7 @@ async function obtenerEnsayoPorId(req, res) {
 }
 
 async function eliminarEnsayos(req,res) {
-    const ensayoId = parseInt(req.params.id, 10);
+    const ensayoId = Number.parseInt(req.params.id, 10);
     const idProfesor = req.session.user?.id; // Usar el ID del usuario autenticado
 
     const data = req.body;

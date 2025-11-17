@@ -40,7 +40,7 @@ analisisController.getEssays = async (req, res) => {
 analisisController.getEssaySummary = async (req, res) => {
     const { essayId } = req.params;
 
-    if (!essayId || isNaN(parseInt(essayId))) {
+    if (!essayId || isNaN(Number.parseInt(essayId))) {
         return res.status(400).json({ error: "ID de ensayo inválido." });
     }
 
@@ -79,7 +79,7 @@ analisisController.getEssaySummary = async (req, res) => {
 analisisController.getEssayDetail = async (req, res) => {
     const { essayId } = req.params;
     
-    if (!essayId || isNaN(parseInt(essayId))) {
+    if (!essayId || isNaN(Number.parseInt(essayId))) {
         return res.status(400).json({ error: "ID de ensayo inválido." });
     }
 

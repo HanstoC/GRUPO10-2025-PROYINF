@@ -50,7 +50,7 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    id_asignatura: parseInt(selectedAsignatura),
+                    id_asignatura: Number.parseInt(selectedAsignatura),
                     dificultad,
                     id_profesor: Usuario.value?.id
                 }),
