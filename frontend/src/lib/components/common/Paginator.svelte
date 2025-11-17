@@ -19,7 +19,7 @@
 		const pageNum = Number.parseInt(desiredPageInput, 10);
 
 		// Validar que sea un número y esté en el rango correcto
-		if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+		if (!Number.isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
 			currentPage = pageNum;
 		}
 

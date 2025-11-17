@@ -21,7 +21,7 @@ async function obtenerEnsayos(queryParams) {
             : [queryParams.asignatura];
         
         // Convierte todos los IDs de asignatura a números
-        filters.asignaturaIds = asignaturas.map(Number).filter(id => !isNaN(id));
+        filters.asignaturaIds = asignaturas.map(Number).filter(id => !Number.isNaN(id));
     }
 
     // Llama al repositorio con el objeto de filtros limpios
@@ -224,7 +224,7 @@ async function eliminarEnsayos(req, res) {
     }
 
     // Convertir IDs a números (aunque el servicio lo manejará, mejor validar aquí)
-    const ensayoIds = ids.map(id => Number.parseInt(id, 10)).filter(id => !isNaN(id));
+    const ensayoIds = ids.map(id => Number.parseInt(id, 10)).filter(id => !Number.isNaN(id));
 
     if (ensayoIds.length !== ids.length) {
         return res.status(400).send('IDs de ensayo deben ser números válidos.');

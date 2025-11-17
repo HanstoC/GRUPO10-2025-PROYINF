@@ -1,6 +1,6 @@
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 // --- Configuración de la Base de Datos ---
 const dbConfig = {

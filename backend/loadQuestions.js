@@ -1,8 +1,8 @@
 // loadQuestions.js
 
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const dbConfig = {
     user: process.env.DB_USER || 'user',       

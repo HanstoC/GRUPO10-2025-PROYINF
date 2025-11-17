@@ -1,7 +1,7 @@
 const cursos = require('../api_sim/alumnos.json');
 const docentes = require('../api_sim/docentes.json');
 const directivos = require('../api_sim/directivos.json');
-const fs = require('fs');
+const fs = require('node:fs');
 const { Pool } = require('pg');
 
 
@@ -247,7 +247,7 @@ async function getEnsayoResultsAndFacetsFromDB() {
                 // Intenta ordenar numéricamente si los valores parecen números
                 const numA = Number.parseFloat(String(a.value).split('-')[0]); // Toma la primera parte del rango
                 const numB = Number.parseFloat(String(b.value).split('-')[0]);
-                if (!isNaN(numA) && !isNaN(numB)) {
+                if (!Number.isNaN(numA) && !Number.isNaN(numB)) {
                     return numA - numB;
                 }
                 // Si no son números o rangos numéricos, ordena alfabéticamente

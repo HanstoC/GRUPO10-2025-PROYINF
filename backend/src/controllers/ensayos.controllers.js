@@ -46,7 +46,7 @@ async function obtenerPreguntas(req, res) {
     const ensayoId = Number(req.params.id);
 
     // 💡 Validación básica de entrada
-    if (isNaN(ensayoId)) {
+    if (Number.isNaN(ensayoId)) {
         return res.status(400).send('ID de ensayo inválido.');
     }
 
@@ -78,7 +78,7 @@ async function responderEnsayo(req, res) {
     if (!respuestas || typeof respuestas !== 'object') {
         return res.status(400).send('Respuestas inválidas');
     }
-    if (isNaN(ensayoId)) {
+    if (Number.isNaN(ensayoId)) {
          return res.status(400).send('ID de ensayo inválido');
     }
 
@@ -127,7 +127,7 @@ async function actualizarEnsayo(req, res) {
     const data = req.body;
     
     // Validación inicial
-    if (isNaN(ensayoId) || !Array.isArray(data.preguntas)) {
+    if (Number.isNaN(ensayoId) || !Array.isArray(data.preguntas)) {
         return res.status(400).send('Datos incompletos o ID inválido');
     }
 
@@ -148,7 +148,7 @@ async function actualizarEnsayo(req, res) {
 async function obtenerEnsayoPorId(req, res) {
     const id = Number.parseInt(req.params.id, 10);
 
-    if (isNaN(id)) {
+    if (Number.isNaN(id)) {
         return res.status(400).send('ID de ensayo inválido');
     }
 
@@ -176,7 +176,7 @@ async function eliminarEnsayos(req,res) {
     const data = req.body;
     
     // Validación inicial
-    if (isNaN(ensayoId) || !Array.isArray(data.preguntas)) {
+    if (Number.isNaN(ensayoId) || !Array.isArray(data.preguntas)) {
         return res.status(400).send('Datos incompletos o ID inválido');
     }
 

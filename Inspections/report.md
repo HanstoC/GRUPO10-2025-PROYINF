@@ -8,4 +8,8 @@ Respecto al problema de severidad alta, se puede apreciar en la imagen con este 
 
 Los recomendaciones que se considerarán son las que llevan a errores de fiabilidad, como primer arreglo se realizara el cambio respectivo de "parsefloat" a "Number.parseFloat" en distintos servicios del backend ya que esto puede llevar a comportamientos inedeseados en la aplicación (estos errores se muestran en la imagen "erroresParseFloat") sin el arreglo se obtienen 65 porblemas de severidad media.
 
-Al Arreglar el problema descrito anteriormente se procede a realizar nuevamente el analisis de sonarQube lo que entrega :
+Al Arreglar el problema descrito anteriormente se procede a realizar nuevamente el analisis de sonarQube lo que entrega un total de 53 problemas de severidad media
+
+Otro problema a resolver del mismo indole que el primero es utilizar Number.parseInt sobre parseInt, Actualmente el proyecto obtiene 53 problemas de severidad media y realizando este arreglo se obtienen 34 problemas de esta misma severidad.
+
+Asi la mayoria de problemas detectados son de consistencia, se tratara de arreglar la mayoria de estos (reemplazar isNaN por Number.isNan y especificar los path y fs como node:path y node:fs) realizando estos arreglos se llega al numero de 

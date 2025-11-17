@@ -7,7 +7,7 @@ async function obtenerPorAsignatura(req, res) {
     const idAsignatura = Number.parseInt(req.params.idAsignatura, 10);
     // console.log(idAsignatura); // La línea de log original se queda aquí o se elimina
 
-    if (isNaN(idAsignatura)) {
+    if (Number.isNaN(idAsignatura)) {
         return res.status(400).json({ error: 'ID de asignatura inválido' });
     }
 
