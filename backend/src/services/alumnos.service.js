@@ -14,14 +14,7 @@ function getAllAlumnos() {
             });
         }
     }
-    // cursosData.forEach(curso => {
-    //     curso.alumnos.forEach(alumno => {
-    //         allAlumnos.push({
-    //             rut: alumno.rut,
-    //             nombre: alumno.nombre,
-    //         });
-    //     });
-    // });
+
     return allAlumnos;
 }
 
@@ -36,9 +29,6 @@ function getAlumnosAndFacets() {
         for(const curso of cursosData){
             allAlumnos = allAlumnos.concat(curso.alumnos);
         }
-        // cursosData.forEach(curso => {
-        //     allAlumnos = allAlumnos.concat(curso.alumnos);
-        // });
 
         // --- Lógica para generar facetas ---
         const facets = {
@@ -84,36 +74,7 @@ function getAlumnosAndFacets() {
             }
 
         }
-        // allAlumnos.forEach(alumno => {
-        //     // Faceta 'agno'
-        //     if (alumno.agno) {
-        //         facets.agno[alumno.agno] = (facets.agno[alumno.agno] || 0) + 1;
-        //     }
-        //     // Faceta 'curso'
-        //     if (alumno.curso) {
-        //         facets.curso[alumno.curso] = (facets.curso[alumno.curso] || 0) + 1;
-        //     }
-        //     // Faceta 'genero'
-        //     if (alumno.genero) {
-        //         facets.genero[alumno.genero] = (facets.genero[alumno.genero] || 0) + 1;
-        //     }
-        //     // Faceta 'colegio'
-        //     if (alumno.colegio) {
-        //         facets.colegio[alumno.colegio] = (facets.colegio[alumno.colegio] || 0) + 1;
-        //     }
-        //     // Faceta 'nota_final' (rangos)
-        //     if (alumno.nota_final !== undefined && alumno.nota_final !== null) {
-        //         if (alumno.nota_final >= 1.0 && alumno.nota_final <= 3.9) {
-        //             facets.nota_final['1.0 - 3.9']++;
-        //         } else if (alumno.nota_final >= 4.0 && alumno.nota_final <= 4.9) {
-        //             facets.nota_final['4.0 - 4.9']++;
-        //         } else if (alumno.nota_final >= 5.0 && alumno.nota_final <= 5.9) {
-        //             facets.nota_final['5.0 - 5.9']++;
-        //         } else if (alumno.nota_final >= 6.0 && alumno.nota_final <= 7.0) {
-        //             facets.nota_final['6.0 - 7.0']++;
-        //         }
-        //     }
-        // });
+
 
         // Convertir los objetos de conteo a arrays de { value, count }
         const formattedFacets = {};
@@ -224,28 +185,6 @@ async function getEnsayoResultsAndFacetsFromDB() {
             }
         }
 
-        // allEnsayoResults.forEach(result => {
-        //     // Faceta 'asignatura_ensayo'
-        //     if (result.asignatura_ensayo) {
-        //         facets.asignatura_ensayo[result.asignatura_ensayo] = (facets.asignatura_ensayo[result.asignatura_ensayo] || 0) + 1;
-        //     }
-        //     // Faceta 'dificultad_ensayo'
-        //     if (result.dificultad_ensayo) {
-        //         facets.dificultad_ensayo[result.dificultad_ensayo] = (facets.dificultad_ensayo[result.dificultad_ensayo] || 0) + 1;
-        //     }
-        //     // Faceta 'puntaje_obtenido_rango'
-        //     if (result.puntaje_obtenido !== undefined && result.puntaje_obtenido !== null) {
-        //         if (result.puntaje_obtenido >= 0 && result.puntaje_obtenido <= 25) {
-        //             facets.puntaje_obtenido_rango['0-25']++;
-        //         } else if (result.puntaje_obtenido >= 26 && result.puntaje_obtenido <= 50) {
-        //             facets.puntaje_obtenido_rango['26-50']++;
-        //         } else if (result.puntaje_obtenido >= 51 && result.puntaje_obtenido <= 75) {
-        //             facets.puntaje_obtenido_rango['51-75']++;
-        //         } else if (result.puntaje_obtenido >= 76 && result.puntaje_obtenido <= 100) {
-        //             facets.puntaje_obtenido_rango['76-100']++;
-        //         }
-        //     }
-        // });
 
         // --- 3. Formatear las facetas a un array de objetos {value, count} y ordenar ---
         const formattedFacets = {};
