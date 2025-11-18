@@ -60,6 +60,11 @@
 		goto(`/ensayos/${id}`);
 	}
 
+	function preguntaRandom(){
+		goto('ensayos/random')
+
+	}
+
 	function toggleSelectEnsayo(id: number) {
 		console.log('toggle', id);
 		if (selectedEnsayos.includes(id)) {
@@ -157,6 +162,14 @@
 		</div>
 	</Card>
 {/if}
+
+<Card class="w-full">
+	<h2 class="mb-5 text-2xl font-semibold">Ponte a prueba</h2>
+	<div class = "flex justify-center">
+		<Button onclick={() => preguntaRandom() }>Pregunta aletoria</Button>
+	</div>
+
+</Card>
 
 <Card class="w-full">
 	<h2 class="mb-4 text-2xl font-semibold">Ensayos</h2>

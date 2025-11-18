@@ -16,5 +16,6 @@ export const EnsayosService = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ respuestas, tiempo })
         }).then(r => r.json());
-    }
+    },
+
 }

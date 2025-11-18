@@ -9,6 +9,8 @@
 	import SearchAlumno from '$lib/components/utils/SearchAlumno.svelte';
 	import { LINKS } from '$lib/global/links';
 	import { fade } from 'svelte/transition';
+	import Card from '$lib/components/common/Card.svelte';
+
 
 	$effect(() => {
 		if (page.url.hash.match(/logout/gi)) AuthService.logout().then(() => goto(LINKS.LOGIN));
@@ -16,7 +18,44 @@
 </script>
 
 {#if Usuario.value}
-	{#snippet alumno()}{/snippet}
+	{#snippet alumno()}
+	<div class="flex flex-col gap-6 w-full max-w-3xl mx-auto">
+
+		<Card class="w-full p-10 flex justify-center items-center">
+			<h2 class="text-3xl font-bold text-center">
+				Bienvenido alumno<br />
+				¿Qué te gustaría hacer hoy?
+			</h2>
+		</Card>
+
+		<Card
+			class="w-full max-w-5xl cursor-pointer rounded-xl overflow-hidden shadow-lg
+				bg-cover bg-center hover:scale-[1.02] transition-transform min-h-[320px]"
+			style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdobqqzq78l5kdc-eVWm4dsP05l23ojaqUHEZrmPrwpWpFmojUNK4gojg_-ZUt8hAvmZA&usqp=CAU');"
+			onclick={() => goto('/ensayos/random')}
+		>
+			<div class="bg-black/40 w-full h-full p-10 flex justify-center items-center">
+				<p class="text-2xl font-semibold text-white text-center">
+					¿Te interesa practicar con una pregunta aleatoria?
+				</p>
+			</div>
+		</Card>
+
+		<Card
+			class="w-full max-w-5xl cursor-pointer rounded-xl overflow-hidden shadow-lg
+				bg-cover bg-center hover:scale-[1.02] transition-transform min-h-[320px]"
+			style="background-image: url('https://i.pinimg.com/originals/1d/40/0e/1d400e79e924b844848049f3e52172b2.jpg');"
+			onclick={() => goto('/ensayos')}
+		>
+			<div class="bg-black/40 w-full h-full p-10 flex justify-center items-center">
+				<p class="text-2xl font-semibold text-white text-center">
+					¡Realicemos un ensayo!
+				</p>
+			</div>
+		</Card>
+
+	</div>
+	{/snippet}
 
 	{#snippet profesor()}
 		<div class="flex w-full flex-row gap-4">
