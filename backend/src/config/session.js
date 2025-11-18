@@ -7,7 +7,8 @@ const sessionOptions = {
     resave: false, // Evita guardar la sesión si no se modifica
     saveUninitialized: false, // Evita crear sesiones vacías
     cookie: {
-        secure: process.env.NODE_ENV === 'production', // true solo en HTTPS (producción)
+        //secure: process.env.NODE_ENV === 'production', // true solo en HTTPS (producción)
+        secure: false,
         httpOnly: true, // Protege contra XSS
         maxAge: 86400000, // 1 día
     }
